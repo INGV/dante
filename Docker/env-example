@@ -33,7 +33,7 @@ COMPOSE_FILE=docker-compose.yml
 COMPOSE_PATH_SEPARATOR=:
 
 # Define the prefix of container names. This is useful if you have multiple projects that use laradock to have seperate containers per project.
-COMPOSE_PROJECT_NAME=hyp2000-ws-master
+COMPOSE_PROJECT_NAME=dante-master
 
 ### PHP Version ###########################################
 
@@ -195,8 +195,8 @@ PHP_FPM_ADDITIONAL_LOCALES="es_ES.UTF-8 fr_FR.UTF-8"
 
 ### NGINX #################################################
 
-NGINX_HOST_HTTP_PORT=8086
-NGINX_HOST_HTTPS_PORT=8446
+NGINX_HOST_HTTP_PORT=8087
+NGINX_HOST_HTTPS_PORT=8447
 NGINX_HOST_LOG_PATH=./logs/nginx/
 NGINX_SITES_PATH=./nginx/sites/
 NGINX_PHP_UPSTREAM_CONTAINER=php-fpm
