@@ -1,0 +1,2 @@
+Example:
+./script.sh -d eventdb -h hgp4.int.ingv.it -u eventreader -t tdmt

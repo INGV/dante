@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Api\V1\Tests\--Dbname--;
+
+use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+
+use App\Api\V1\Tests\IngvControllerTest;
+
+class --TestNameClass-- extends IngvControllerTest
+{
+    protected $uri = '--uri--';
+    /* 
+     * Do not insert all fields that are auto generated; for example:
+     *  - 'id' (that is autoincremente) 
+     *  - 'inserted' (that is auto-generated)
+     *  - 'modified' (that is auto-generated) 
+     */
+    protected $inputParameters = [
+--db_inputParameters_fields--
+    ];   
+    protected $inputParametersForUpdate = [
+--db_inputParameters_update_fields--
+    ];
+    protected $data = [
+--db_data_fields--
+    ]; 
+}

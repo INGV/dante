@@ -1,0 +1,45 @@
+<?php
+
+namespace --BaseNamespace--\--Dbname--\Models;
+
+use App\IngvModel;
+
+class --ModelNameClass-- extends IngvModel
+{
+    /* protected $connection = 'mysql_hdbrm_--dbname--_ro'; */ /* set other DB connection */
+    protected $table = '--db_table_name--';
+    
+    /**
+     * This array is used, from "__construct" to:
+     * - build 'fillable' array (attributes that are mass assignable - 'id' and 'modified' are auto-generated)
+     * 
+     * And is also used from 'getValidatorRulesForStore' (that is in the 'IngvModel') and 'getValidatorRulesForUpdate', to:
+     * - centralize the Validator rules used in the Controller;
+     *
+     * @var array
+     */    
+    protected $baseArray = [
+--db_fillable_fields--
+    ];   
+    
+
+    public function __construct(array $attributes = []) {
+        parent::updateBaseArray();
+        parent::setFillableFromBaseArray();
+        parent::__construct($attributes);
+    } 
+    
+    /**
+     * This method is used to build the Validator roles (for UPDATE route) array from 'protected $baseArray' array
+     * 
+     * @var array
+     */
+    public function getValidatorRulesForUpdate() {
+        $arrayToReturn = $this->baseArray;
+        
+        /* Override here the roles for Update route */
+        //$arrayToReturn['type'] = 'string|unique:type_mag,type';
+        
+        return $arrayToReturn;
+    }
+}

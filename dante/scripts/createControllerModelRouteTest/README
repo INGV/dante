@@ -1,0 +1,4 @@
+./script.sh -d eventdb -h hgp6.int.ingv.it -u eventreader -t type_event
+
+Per stampare i 'field' di una tabella del DB, per inserirli successivamente nel Model, si puo' partire da questa:
+mysql -B -N -ueventreader -peventreader -Deventdb -hhgp4.int.ingv.it -e"desc amplitude" | awk -F" " '{print "\047"$1"\047,"}'

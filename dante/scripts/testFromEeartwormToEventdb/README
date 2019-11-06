@@ -1,0 +1,1 @@
+$ watch 'mysql -ueventreader -peventreader -hhgp5.int.ingv.it -Deventdb < query.sql '

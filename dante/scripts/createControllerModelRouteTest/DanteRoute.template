@@ -1,0 +1,8 @@
+        // --dbname--/--db_table_name--/
+        Route::get('--dbname--/_table/--db_table_name--/1',                      ['uses' => '--BaseNamespace--\--Dbname--\Controllers\--ControllerNameClass--@index']);
+        Route::get('--dbname--/_table/--db_table_name--/1/{id}',                 ['uses' => '--BaseNamespace--\--Dbname--\Controllers\--ControllerNameClass--@show',         'as' => '--db_table_name--.show'])->where('id', '[\d]+');
+        Route::post('--dbname--/_table/--db_table_name--/1',                     ['uses' => '--BaseNamespace--\--Dbname--\Controllers\--ControllerNameClass--@store',        'middleware' => 'IngvJsonApiMiddleware']);
+        Route::put('--dbname--/_table/--db_table_name--/1/{id}',                 ['uses' => '--BaseNamespace--\--Dbname--\Controllers\--ControllerNameClass--@update',       'middleware' => 'IngvJsonApiMiddleware'])->where('id', '[\d]+');
+        Route::delete('--dbname--/_table/--db_table_name--/1/{id}',              ['uses' => '--BaseNamespace--\--Dbname--\Controllers\--ControllerNameClass--@destroy',      'middleware' => 'IngvJsonApiMiddleware'])->where('id', '[\d]+');
+
+        // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
