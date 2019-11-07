@@ -40,12 +40,21 @@ build:
         
         # Build dockers
         - cp ./Docker/env-example ./Docker/.env
-        - cp ./.env.example ./.env
+        #- cp ./.env.example ./.env
+        #### START - Solve the publich DB info
+        - sed -e "s|DB_HOST_HOST1=.*|DB_HOST_HOST1=hgp6.int.ingv.it|" \
+              -e "s|DB_DATABASE_EVENTDB=.*|DB_DATABASE_EVENTDB=eventdb|" \
+              -e "s|DB_USERNAME_EVENTDB_RO=.*|DB_USERNAME_EVENTDB_RO=eventreader|" \
+              -e "s|DB_PASSWORD_EVENTDB_RO=.*|DB_PASSWORD_EVENTDB_RO=eventreader|" \
+              -e "s|DB_USERNAME_EVENTDB_RW=.*|DB_USERNAME_EVENTDB_RW=eventwriter|" \
+              -e "s|DB_PASSWORD_EVENTDB_RW=.*|DB_PASSWORD_EVENTDB_RW=eventwriter|" \
+              ./.env.example > ./.env
+        #### END - Solve the publich DB info
         - cd Docker
         - COMPOSE_HTTP_TIMEOUT=200 docker-compose up -d nginx redis workspace docker-in-docker
         - docker-compose exec -T workspace composer install
         - docker-compose exec -T workspace php artisan key:generate
-        - docker-compose exec -T --user=laradock workspace bash -c "vendor/bin/phpunit -v --filter=test_index_json"
+        - docker-compose exec -T workspace bash -c "vendor/bin/phpunit -v --filter=test_index_json"
 
     artifacts:
         when: always
