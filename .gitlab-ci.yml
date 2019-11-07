@@ -50,6 +50,7 @@ build:
               -e "s|DB_USERNAME_EVENTDB_RW=.*|DB_USERNAME_EVENTDB_RW=eventwriter|" 
               -e "s|DB_PASSWORD_EVENTDB_RW=.*|DB_PASSWORD_EVENTDB_RW=eventwriter|" 
               ./.env.example > ./.env
+        - cat ./.env
         #### END - REMEMBER to solve the publich DB info
         - cd Docker
         - COMPOSE_HTTP_TIMEOUT=200 docker-compose up -d nginx redis workspace docker-in-docker
