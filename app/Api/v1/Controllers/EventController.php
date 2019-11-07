@@ -5,7 +5,6 @@ namespace App\Api\v1\Controllers;
 use Illuminate\Http\Request;
 
 use App\Api\v1\Models\EventModel;
-use App\Api\v1\Resources\EventResource;
 use Illuminate\Support\Facades\Validator;
 use App\Api\v1\Controllers\DanteBaseController;
 
@@ -19,7 +18,7 @@ class EventController extends DanteBaseController
     public function index()
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        $data = EventResource::collection(EventModel::paginate(config('dante.default_params.limit')));
+        $data = EventModel::paginate(config('dante.default_params.limit'));
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $data;
     }
@@ -37,25 +36,21 @@ class EventController extends DanteBaseController
         /* Validator */
         $validator_default_check    = config('dante.validator_default_check');
         $validator_default_message  = config('dante.validator_default_messages');
-        $validator = Validator::make($request->all(), [
-            'id_locator'        => 'integer',
-            'fk_pref_hyp'       => 'nullable|integer',
-            'fk_pref_mag'       => 'nullable|integer',
-            'fk_events_group'   => 'integer',
-            'type_group'        => 'integer',
-            'fk_type_event'     => 'required|integer|exists:type_event,id',
-            'fk_provenance'     => 'required|integer|exists:provenance,id'
-        ], $validator_default_message)->validate();
-        /*
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
-        }
-        */
-   
-        /* Store record */
-        $event = EventModel::create($request->all());
+        $validator_store_rules      = (new EventModel)->getValidatorRulesForStore();
+        $validator = Validator::make($request->all(), $validator_store_rules, $validator_default_message)->validate();
         
-        return $event;
+        /* Create record */
+        $event = EventModel::create($request->all());
+        \Log::debug(' $event->id = '.$event->id);
+        
+        /* Get complete record just inserted */
+        $data = EventModel::findOrFail($event->id);
+        
+        /* Set '$data->wasRecentlyCreated' attribute equal to '$event->wasRecentlyCreated'; when it is 'true', the returned http_status_code will be '201' */
+        $data->wasRecentlyCreated = $event->wasRecentlyCreated;
+
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $data;
     }
 
     /**
@@ -64,9 +59,16 @@ class EventController extends DanteBaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(EventModel $id)
+    public function show($id)
     {
-        return new EventResource($id);
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
+        \Log::debug(" id=$id");
+        
+        /* Get record */
+        $data = EventModel::findOrFail($id);
+        
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $data;
     }
 
     /**
@@ -81,18 +83,21 @@ class EventController extends DanteBaseController
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
         \Log::debug(" id=$id");
         
+        /* Validator */
+        $validator_default_check    = config('dante.validator_default_check');
+        $validator_default_message  = config('dante.validator_default_messages');
+        $validator_update_rules     = (new EventModel)->getValidatorRulesForUpdate();
+        $validator = Validator::make($request->all(), $validator_update_rules, $validator_default_message)->validate();
+        
+        /* Get record to update */
         $event = EventModel::findOrFail($id);
         
-        // check if currently authenticated user is the owner of the book
-        /*
-        if ($request->user()->id !== $book->user_id) {
-            return response()->json(['error' => 'You can only edit your own books.'], 403);
-        }
-        */
-
-        $event->update($request->only(['title', 'description']));
-
-        return new BookResource($book);
+        /* Updated record and save it */
+        $event->fill($request->all());
+        $event->save();
+        
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $event;
     }
 
     /**
@@ -106,8 +111,10 @@ class EventController extends DanteBaseController
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
         \Log::debug(" id=$id");
         
+        /* Get record to destroy */
         $event = EventModel::findOrFail($id);
         
+        /* Destroy */
         $event->delete();
 
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
