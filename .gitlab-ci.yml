@@ -28,28 +28,29 @@ build:
         # Runners:
         # 1) 'laradock' runner is working on 'albus.int.ingv.it' valentino's MAC.
         # 2) 'test' runner is working on 'docker.int.ingv.it' server.
+        # 3) 'hgp5_runner' runner is working on 'hgp5.int.ingv.it' server.
         #- laradock
         - hgp5_runner
     script:
         # Install dependecies
         - apk update
         - apk upgrade
-        - apk add --no-cache git bash vim python py-pip python-dev libffi-dev openssl-dev gcc libc-dev make
+        - apk add --no-cache bash vim python py-pip python-dev libffi-dev openssl-dev gcc libc-dev make
         - pip install --upgrade pip
         - pip install --no-cache-dir docker-compose
         
         # Build dockers
         - cp ./Docker/env-example ./Docker/.env
         #- cp ./.env.example ./.env
-        #### START - Solve the publich DB info
+        #### START - REMEMBER to solve the publich DB info
         - sed -e "s|DB_HOST_HOST1=.*|DB_HOST_HOST1=hgp6.int.ingv.it|" \
               -e "s|DB_DATABASE_EVENTDB=.*|DB_DATABASE_EVENTDB=eventdb|" \
               -e "s|DB_USERNAME_EVENTDB_RO=.*|DB_USERNAME_EVENTDB_RO=eventreader|" \
               -e "s|DB_PASSWORD_EVENTDB_RO=.*|DB_PASSWORD_EVENTDB_RO=eventreader|" \
               -e "s|DB_USERNAME_EVENTDB_RW=.*|DB_USERNAME_EVENTDB_RW=eventwriter|" \
-              -e "s|DB_PASSWORD_EVENTDB_RW=.*|DB_PASSWORD_EVENTDB_RW=eventwriter|" \
+              -e "s|DB_PASSWORD_EVENTDB_RW=.*|DB_PASSWORD_EVENTDB_RW=eventwriter|" 
               ./.env.example > ./.env
-        #### END - Solve the publich DB info
+        #### END - REMEMBER to solve the publich DB info
         - cd Docker
         - COMPOSE_HTTP_TIMEOUT=200 docker-compose up -d nginx redis workspace docker-in-docker
         - docker-compose exec -T workspace composer install
