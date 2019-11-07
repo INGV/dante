@@ -22,6 +22,9 @@ Route::prefix('eventdb/_table/v1')->group(function(){
     Route::apiResources([
         'event'             => 'App\Api\v1\Controllers\EventController',
         'hypocenter'        => 'App\Api\v1\Controllers\HypocenterController',
+        'magnitude'         => 'App\Api\v1\Controllers\MagnitudeController',
+        'type_event'         => 'App\Api\v1\Controllers\TypeEventController',
+        // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
         ],[
             'parameters' => [
                 'event' => 'id',
