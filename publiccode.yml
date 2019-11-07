@@ -1,0 +1,56 @@
+# This repository adheres to the publiccode.yml standard by including this 
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+name: 'INGV - DANTE' 
+releaseDate: '2019-11-07'
+url: 'https://gitlab.rm.ingv.it/caravel/dante6beta'
+logo: public/images/ingv_logo_text_two_lines.png 
+landingURL: 'https://gitlab.rm.ingv.it/caravel/dante6beta'
+softwareVersion: 1.0.0-dev
+developmentStatus: stable
+softwareType: standalone/other
+platforms:
+  - windows
+  - mac
+  - linux
+usedBy:
+  - INGV
+categories:
+  - data-analytics
+  - data-collection
+maintenance:
+  type: internal
+  contacts:
+    - name: Valentino Lauciani
+      email: valentino.lauciani@ingv.it
+legal:
+  authorsFile: AUTHORS.md 
+  repoOwner: 'Istituto Nazionale di Geofisica e Vulcanologia - INGV'
+  license: 'AGPL-3.0-or-later'
+intendedAudience:
+  scope:
+    - research
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - en
+it:
+  countryExtensionVersion: '0.2'
+  riuso:
+    codiceIPA: ingv
+description:
+  en:
+    genericName: dante
+    shortDescription: >-
+      Web Service built to interact with 'eventdb' DataBase.
+    documentation: 'https://gitlab.rm.ingv.it/caravel/dante6beta/blob/master/README.md'
+    longDescription: >
+      Web Service built to interact with 'eventdb' DataBase.
+      
+      RESTfull
+    localisedName: 'DANTE'
+    features:
+      - Web Service built to interact with 'eventdb' DataBase.
+      - RESTfull
