@@ -52,11 +52,11 @@ build:
               ./.env.example > ./.env
         - cat ./.env
         #### END - REMEMBER to solve the publich DB info
-        - cd Docker
-        - COMPOSE_HTTP_TIMEOUT=200 docker-compose up -d nginx redis workspace docker-in-docker
-        - docker-compose exec -T workspace composer install
-        - docker-compose exec -T workspace php artisan key:generate
-        - docker-compose exec -T workspace bash -c "vendor/bin/phpunit -v --filter=test_index_json"
+        #- cd Docker
+        #- COMPOSE_HTTP_TIMEOUT=200 docker-compose up -d nginx redis workspace docker-in-docker
+        #- docker-compose exec -T workspace composer install
+        #- docker-compose exec -T workspace php artisan key:generate
+        #- docker-compose exec -T workspace bash -c "vendor/bin/phpunit -v --filter=test_index_json"
 
     artifacts:
         when: always
