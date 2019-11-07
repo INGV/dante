@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Api\V1\Tests\--Dbname--;
+namespace App\Api\v1\Tests\Feature;
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-use App\Api\V1\Tests\IngvControllerTest;
+use App\Api\v1\Tests\DanteBaseTest;
 
-class --TestNameClass-- extends IngvControllerTest
+class --TestNameClass-- extends DanteBaseTest
 {
     protected $uri = '--uri--';
     /* 

@@ -1,10 +1,10 @@
 <?php
 
-namespace --BaseNamespace--\--Dbname--\Models;
+namespace --BaseNamespace--\Models;
 
-use App\IngvModel;
+use App\Api\v1\Models\DanteBaseModel;
 
-class --ModelNameClass-- extends IngvModel
+class --ModelNameClass-- extends DanteBaseModel
 {
     /* protected $connection = 'mysql_hdbrm_--dbname--_ro'; */ /* set other DB connection */
     protected $table = '--db_table_name--';
@@ -22,24 +22,9 @@ class --ModelNameClass-- extends IngvModel
 --db_fillable_fields--
     ];   
     
-
     public function __construct(array $attributes = []) {
         parent::updateBaseArray();
         parent::setFillableFromBaseArray();
         parent::__construct($attributes);
-    } 
-    
-    /**
-     * This method is used to build the Validator roles (for UPDATE route) array from 'protected $baseArray' array
-     * 
-     * @var array
-     */
-    public function getValidatorRulesForUpdate() {
-        $arrayToReturn = $this->baseArray;
-        
-        /* Override here the roles for Update route */
-        //$arrayToReturn['type'] = 'string|unique:type_mag,type';
-        
-        return $arrayToReturn;
     }
 }

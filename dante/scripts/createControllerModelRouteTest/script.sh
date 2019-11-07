@@ -3,7 +3,7 @@
 DIR_WORK=$( cd $(dirname $0) ; pwd)
 DIR_TMP=${DIR_WORK}/tmp
 DIR_BASE_V1="../../../app/Api/v1"
-DIR_BASE_V1_TESTS=${DIR_BASE_V1}"/Tests"
+DIR_BASE_V1_TESTS=${DIR_BASE_V1}"/Tests/Feature"
 NAMESPACE_BASE_V1="App\\\Api\\\v1"
 FILE_ROUTE_API="../../../routes/api.php"
 CONTROLLER_TEMPLATE=DanteController.template
@@ -186,7 +186,7 @@ done
 DB_NAME_FIRST_LETTER_UPPER_CASE=$(tr '[:lower:]' '[:upper:]' <<< ${DB_NAME:0:1})${DB_NAME:1}
 
 # Set CONTROLLER variables
-DIR_CONTROLLERS=${DIR_BASE_V1}/${DB_NAME_FIRST_LETTER_UPPER_CASE}/Controllers
+DIR_CONTROLLERS=${DIR_BASE_V1}/Controllers
 if [ ! -d ${DIR_CONTROLLERS} ]; then
 	echo " The CONTROLLER directory \"${DIR_CONTROLLERS}\" doesn't exist; check it and try again"
 	echo ""
@@ -198,7 +198,7 @@ FILE_OUT_CONTROLLER=${DIR_CONTROLLERS}/${CONTROLLER_NAME_CLASS}.php
 FILE_OUT_CONTROLLER_TMP=${DIR_TMP}/${CONTROLLER_NAME_CLASS}.php.tmp
 
 # Set MODEL variables
-DIR_MODELS=${DIR_BASE_V1}/${DB_NAME_FIRST_LETTER_UPPER_CASE}/Models
+DIR_MODELS=${DIR_BASE_V1}/Models
 if [ ! -d ${DIR_MODELS} ]; then
         echo " The MODELS directory \"${DIR_MODELS}\" doesn't exist; check it and try again"
         echo ""
@@ -210,7 +210,7 @@ FILE_OUT_MODEL=${DIR_MODELS}/${MODEL_NAME_CLASS}.php
 FILE_OUT_MODEL_TMP=${DIR_TMP}/${MODEL_NAME_CLASS}.php.tmp
 
 # Set TEST variables
-DIR_TESTS=${DIR_BASE_V1_TESTS}/${DB_NAME_FIRST_LETTER_UPPER_CASE}
+DIR_TESTS=${DIR_BASE_V1_TESTS}
 if [ ! -d ${DIR_TESTS} ]; then
         echo " The TESTS directory \"${DIR_TESTS}\" doesn't exist; check it and try again"
         echo ""
@@ -239,7 +239,7 @@ else
 	CREATE_CONTROLLER=1
 fi
 if (( ${CREATE_CONTROLLER} == 1 )); then
-	cat ${CONTROLLER_TEMPLATE} | sed "s/--ControllerNameClass--/${CONTROLLER_NAME_CLASS}/g" | sed "s/--ModelNameClass--/${MODEL_NAME_CLASS}/g" | sed "s/--db_table_name--/${DB_TABLE_NAME}/g" | sed "s/--Dbname--/${DB_NAME_FIRST_LETTER_UPPER_CASE}/g" | sed "s/--BaseNamespace--/${NAMESPACE_BASE_V1}/g"> ${FILE_OUT_CONTROLLER_TMP}
+	cat ${CONTROLLER_TEMPLATE} | sed "s/--ControllerNameClass--/${CONTROLLER_NAME_CLASS}/g" | sed "s/--ModelNameClass--/${MODEL_NAME_CLASS}/g" | sed "s/--db_table_name--/${DB_TABLE_NAME}/g" | sed "s/--BaseNamespace--/${NAMESPACE_BASE_V1}/g"> ${FILE_OUT_CONTROLLER_TMP}
 	mv ${FILE_OUT_CONTROLLER_TMP} ${FILE_OUT_CONTROLLER}
 	echo " The new Controller was created:"
 	echo "  ${FILE_OUT_CONTROLLER}"
@@ -260,7 +260,7 @@ else
 	CREATE_MODEL=1
 fi
 if (( ${CREATE_MODEL} )); then
-	cat ${MODEL_TEMPLATE} | sed -e "s/--ModelNameClass--/${MODEL_NAME_CLASS}/g" -e "s/--db_table_name--/${DB_TABLE_NAME}/g" -e "s/--Dbname--/${DB_NAME_FIRST_LETTER_UPPER_CASE}/g" -e "s/--dbname--/${DB_NAME}/g" -e "s/--BaseNamespace--/${NAMESPACE_BASE_V1}/g" -e "s/--db_fillable_fields--/${MODEL__FILLABLE__STRING}/g" -e $'s/@@@/\\\n/g' > ${FILE_OUT_MODEL_TMP}
+	cat ${MODEL_TEMPLATE} | sed -e "s/--ModelNameClass--/${MODEL_NAME_CLASS}/g" -e "s/--db_table_name--/${DB_TABLE_NAME}/g" -e "s/--dbname--/${DB_NAME}/g" -e "s/--BaseNamespace--/${NAMESPACE_BASE_V1}/g" -e "s/--db_fillable_fields--/${MODEL__FILLABLE__STRING}/g" -e $'s/@@@/\\\n/g' > ${FILE_OUT_MODEL_TMP}
 	mv ${FILE_OUT_MODEL_TMP} ${FILE_OUT_MODEL}
 	echo " The new Model was created:"
 	echo "  ${FILE_OUT_MODEL}"
@@ -281,7 +281,7 @@ else
         CREATE_TEST=1
 fi
 if (( ${CREATE_TEST} == 1 )); then
-        cat ${TEST_TEMPLATE} | sed -e "s/--TestNameClass--/${TEST_NAME_CLASS}/g" -e "s/--uri--/\/ingvws\/${DB_NAME}\/_table\/${DB_TABLE_NAME}\/1/g" -e "s/--Dbname--/${DB_NAME_FIRST_LETTER_UPPER_CASE}/g" -e "s/--db_inputParameters_fields--/${TESTS__INPUTPARAMETERS__STRING}/g" -e "s/--db_inputParameters_update_fields--/${TESTS__INPUTPARAMETERS_UPDATE__STRING}/g" -e "s/--db_data_fields--/${TESTS__DATA__STRING}/g" -e $'s/@@@/\\\n/g' > ${FILE_OUT_TEST_TMP}
+        cat ${TEST_TEMPLATE} | sed -e "s/--TestNameClass--/${TEST_NAME_CLASS}/g" -e "s/--uri--/\/api\/${DB_NAME}\/_table\/v1\/${DB_TABLE_NAME}/g" -e "s/--db_inputParameters_fields--/${TESTS__INPUTPARAMETERS__STRING}/g" -e "s/--db_inputParameters_update_fields--/${TESTS__INPUTPARAMETERS_UPDATE__STRING}/g" -e "s/--db_data_fields--/${TESTS__DATA__STRING}/g" -e $'s/@@@/\\\n/g' > ${FILE_OUT_TEST_TMP}
         mv ${FILE_OUT_TEST_TMP} ${FILE_OUT_TEST}
         echo " The new Test was created:"
         echo "  ${FILE_OUT_TEST}"
@@ -292,7 +292,7 @@ echo ""
 
 # Build route file
 if grep -q '\-\-PLACEHOLDER\-\-' ${FILE_ROUTE_API} ; then
-	if grep -q "${DB_NAME}/${DB_TABLE_NAME}/" ${FILE_ROUTE_API} ; then
+	if grep -q "${DB_TABLE_NAME}" ${FILE_ROUTE_API} ; then
         	echo -n " The 'route' already exists into the file \"${FILE_ROUTE_API}\"; update it? (Y/N)? "
 		read ANSWER
 		ANSWER2=$( echo ${ANSWER} | tr '[a-z]' '[A-Z]' )
@@ -308,10 +308,10 @@ else
 	exit 1
 fi
 if (( ${CREATE_ROUTE} == 1 )); then
-	# remove the route if is presente
-	grep -v "${DB_NAME}/${DB_TABLE_NAME}/" ${FILE_ROUTE_API} > ${FILE_API_TMP}
+	# remove the route if it is presente
+	grep -v "'${DB_TABLE_NAME}'" ${FILE_ROUTE_API} > ${FILE_API_TMP}
 
-	# get the --PALCEHOLDER-- commenti, line number
+	# get the --PALCEHOLDER-- line number
 	LINE_NUMBER_PLACEHOLDER=$( grep -n '\-\-PLACEHOLDER\-\-' ${FILE_API_TMP} | awk -F":" '{print $1}' )
 
 	# get total line number
@@ -324,7 +324,8 @@ if (( ${CREATE_ROUTE} == 1 )); then
 	tail -$(( ${TOTAL_LINES} - ${LINE_NUMBER_PLACEHOLDER} )) ${FILE_API_TMP} > ${FILE_API_TMP}.tail 
 	
 	# build new pice of route
-	cat ${ROUTE_TEMPLATE} | sed "s/--ControllerNameClass--/${CONTROLLER_NAME_CLASS}/g" | sed "s/--db_table_name--/${DB_TABLE_NAME}/g" | sed "s/--BaseNamespace--/${NAMESPACE_BASE_V1}/g" | sed "s/--Dbname--/${DB_NAME_FIRST_LETTER_UPPER_CASE}/g" | sed "s/--dbname--/${DB_NAME}/g"> ${FILE_API_TMP}.newroute
+	cat ${ROUTE_TEMPLATE} | sed "s/--ControllerNameClass--/${CONTROLLER_NAME_CLASS}/g" | sed "s/--db_table_name--/${DB_TABLE_NAME}/g" | sed "s/--BaseNamespace--/${NAMESPACE_BASE_V1}/g" | sed "s/--dbname--/${DB_NAME}/g"> ${FILE_API_TMP}.newroute
+    #echo "        '"${DB_TABLE_NAME}"'         => '"App\Api\v1\Controllers\${CONTROLLER_NAME_CLASS}"'," > ${FILE_API_TMP}.newroute
 
 	# build final route file
 	cat ${FILE_API_TMP}.head ${FILE_API_TMP}.newroute ${FILE_API_TMP}.tail > ${FILE_API_TMP}
@@ -333,7 +334,7 @@ if (( ${CREATE_ROUTE} == 1 )); then
 	mv ${FILE_API_TMP} ${FILE_ROUTE_API}
 
 	#
-	echo " The routes file \"${FILE_ROUTE_API}\" was updated."
+	echo " The route file \"${FILE_ROUTE_API}\" was updated."
 	echo ""
 fi
 echo ""

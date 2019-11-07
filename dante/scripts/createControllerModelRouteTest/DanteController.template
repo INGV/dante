@@ -8,9 +8,8 @@ use --BaseNamespace--\Models\--ModelNameClass--;
 use Illuminate\Support\Facades\Validator;
 use App\Api\v1\Controllers\DanteBaseController;
 
-class --ControllerNameClass-- extends IngvController
+class --ControllerNameClass-- extends DanteBaseController
 {
-    
     /**
      * Display a listing of the resource.
      *
