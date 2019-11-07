@@ -34,7 +34,7 @@ build:
         # Install dependecies
         - apk update
         - apk upgrade
-        - apk add --no-cache py-pip
+        - apk add --no-cache git bash vim python py-pip python-dev libffi-dev openssl-dev gcc libc-dev make
         - pip install --upgrade pip
         - pip install --no-cache-dir docker-compose
         
