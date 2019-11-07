@@ -38,7 +38,7 @@ First, build docker images:
 
 ```
 $ cd Docker
-$ COMPOSE_HTTP_TIMEOUT=200 docker-compose up -d nginx redis workspace docker-in-docker
+$ COMPOSE_HTTP_TIMEOUT=200 docker-compose up -d nginx redis workspace
 $ cd ..
 ```
 
