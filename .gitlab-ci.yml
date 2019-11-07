@@ -43,13 +43,13 @@ build:
         - cp ./Docker/env-example ./Docker/.env
         #- cp ./.env.example ./.env
         #### START - REMEMBER to solve the publich DB info
-        - sed -e "s|DB_HOST_HOST1=.*|DB_HOST_HOST1=hgp6.int.ingv.it|" ./.env.example > ./.env
-              #-e "s|DB_DATABASE_EVENTDB=.*|DB_DATABASE_EVENTDB=eventdb|" 
-              #-e "s|DB_USERNAME_EVENTDB_RO=.*|DB_USERNAME_EVENTDB_RO=eventreader|" 
-              #-e "s|DB_PASSWORD_EVENTDB_RO=.*|DB_PASSWORD_EVENTDB_RO=eventreader|" 
-              #-e "s|DB_USERNAME_EVENTDB_RW=.*|DB_USERNAME_EVENTDB_RW=eventwriter|" 
-              #-e "s|DB_PASSWORD_EVENTDB_RW=.*|DB_PASSWORD_EVENTDB_RW=eventwriter|" 
-              #./.env.example > ./.env
+        - sed -e "s|DB_HOST=.*|DB_HOST=hgp6.int.ingv.it|" 
+              -e "s|DB_DATABASE=.*|DB_DATABASE=eventdb|" 
+              -e "s|DB_USERNAME_EVENTDB_RO=.*|DB_USERNAME_EVENTDB_RO=eventreader|" 
+              -e "s|DB_PASSWORD_EVENTDB_RO=.*|DB_PASSWORD_EVENTDB_RO=eventreader|" 
+              -e "s|DB_USERNAME_EVENTDB_RW=.*|DB_USERNAME_EVENTDB_RW=eventwriter|" 
+              -e "s|DB_PASSWORD_EVENTDB_RW=.*|DB_PASSWORD_EVENTDB_RW=eventwriter|" 
+              ./.env.example > ./.env
         - cat ./.env
         #### END - REMEMBER to solve the publich DB info
         #- cd Docker
