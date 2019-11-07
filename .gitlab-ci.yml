@@ -1,0 +1,46 @@
+#image: docker:stable
+image: docker:19.03.1
+
+# When using dind, it's wise to use the overlayfs driver for
+# improved performance.
+variables:
+    # This is used to connect the docker-client intalled into 'php:latest' image, to docker daemon
+    DOCKER_HOST: tcp://docker:2375/
+    # https://gitlab.rm.ingv.it/help/user/project/pipelines/settings#git-strategy
+    GIT_STRATEGY: clone
+    # BUG!!! - Remove this (DOCKER_TLS_CERTDIR: "") when solved!!! - https://gitlab.com/gitlab-org/gitlab-runner/issues/4501
+    DOCKER_TLS_CERTDIR: ""
+
+services:
+    # Remeber to set 'privileged = true' into the runner 'config.toml' file (es on hgp5: /srv/gitlab-runner/config/config.toml)
+    #- docker:dind
+    - docker:19.03.1-dind
+
+stages:
+  - build
+
+before_script:
+    - date
+        
+build:
+    stage: build
+    tags:
+        # Runners:
+        # 1) 'laradock' runner is working on 'albus.int.ingv.it' valentino's MAC.
+        # 2) 'test' runner is working on 'docker.int.ingv.it' server.
+        #- laradock
+        - hgp5_runner
+    script:
+        - cp ./Docker/env-example ./Docker/.env
+        - cp ./.env.example ./.env
+        - cd Docker
+        - COMPOSE_HTTP_TIMEOUT=200 docker-compose up -d nginx redis workspace docker-in-docker
+        - docker-compose exec -T workspace composer install
+        - docker-compose exec -T workspace php artisan key:generate
+        - docker-compose exec -T --user=laradock workspace bash -c "vendor/bin/phpunit -v --filter=test_index_json"
+
+    artifacts:
+        when: always
+        paths:
+            - storage/logs
+        expire_in: 1 day
