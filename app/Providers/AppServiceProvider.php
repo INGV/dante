@@ -23,6 +23,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        if(config('dante.logQuery')) {
+            \DB::listen(function ($query) {
+                $arrayQuery = [
+                    'sql' => $query->sql,
+                    'time' => $query->time,
+                    'bindings' => $query->bindings,
+                ];
+
+                \Log::debug(" query:", $arrayQuery);
+            });
+        }
     }
 }
