@@ -25,6 +25,7 @@ Route::prefix('eventdb/_table/v1')->group(function(){
         'type_event'            => 'App\Api\v1\Controllers\TypeEventController',
         'amplitude'             => 'App\Api\v1\Controllers\AmplitudeController',
         'event'                 => 'App\Api\v1\Controllers\EventController',
+        'focalmechanism'        => 'App\Api\v1\Controllers\FocalmechanismController',
         // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
         ],[
             'parameters' => [],
