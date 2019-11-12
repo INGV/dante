@@ -26,7 +26,7 @@ class StDurMagModel extends DanteBaseModel
         'azimut'            => 'nullable|numeric',
         'dur'               => 'nullable|numeric',
         'mag'               => 'required|---magnitude---',
-        'err_mag'           => '---err---',
+        'err_mag'           => '---error---',
         'fk_type_magnitude' => 'required|numeric',
         'is_used'           => 'nullable|numeric'
     ];   
