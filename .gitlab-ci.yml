@@ -56,7 +56,7 @@ build:
         - COMPOSE_HTTP_TIMEOUT=200 docker-compose up -d nginx redis workspace
         - docker-compose exec -T workspace composer install
         - docker-compose exec -T workspace php artisan key:generate
-        - docker-compose exec -T workspace bash -c "vendor/bin/phpunit -v --filter=test_index_json"
+        - docker-compose exec -T workspace bash -c "vendor/bin/phpunit -v --filter=test_index_json --debug"
 
     artifacts:
         when: always
