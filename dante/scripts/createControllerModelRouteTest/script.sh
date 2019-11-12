@@ -292,7 +292,7 @@ echo ""
 
 # Build route file
 if grep -q '\-\-PLACEHOLDER\-\-' ${FILE_ROUTE_API} ; then
-	if grep -q "${DB_TABLE_NAME}" ${FILE_ROUTE_API} ; then
+	if grep -q "\'${DB_TABLE_NAME}\'" ${FILE_ROUTE_API} ; then
         	echo -n " The 'route' already exists into the file \"${FILE_ROUTE_API}\"; update it? (Y/N)? "
 		read ANSWER
 		ANSWER2=$( echo ${ANSWER} | tr '[a-z]' '[A-Z]' )
