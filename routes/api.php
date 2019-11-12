@@ -40,6 +40,7 @@ Route::prefix('eventdb/_table/v1')->group(function(){
         'strongmotion'              => 'App\Api\v1\Controllers\StrongmotionController',
         'tdmt'                      => 'App\Api\v1\Controllers\TdmtController',
         'type_amplitude'            => 'App\Api\v1\Controllers\TypeAmplitudeController',
+        'type_hypocenter'           => 'App\Api\v1\Controllers\TypeHypocenterController',
         // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
         ],[
             'parameters' => [],
