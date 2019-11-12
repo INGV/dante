@@ -29,7 +29,7 @@ class HypocenterModel extends DanteBaseModel
 		'err_depth'             => 'nullable|---error---',
 		'err_h'                 => 'nullable|---error---',
 		'err_z'                 => 'nullable|---error---',
-		'confidence_lev'        => 'numeric',
+		'confidence_lev'        => 'nullable|numeric',
 		'e0_az'                 => 'nullable|numeric',
 		'e0_dip'                => 'nullable|numeric',
 		'e0'                    => 'nullable|numeric',
@@ -65,6 +65,13 @@ class HypocenterModel extends DanteBaseModel
         parent::__construct($attributes);
     }
     
+    public function setGeomAttribute($value)
+    {
+        \Log::debug("METHOD - ".__CLASS__.' -> '.__FUNCTION__);
+		\Log::debug(" value=".$value);
+		$this->attributes['geom'] = \DB::raw("ST_GeomFromWKB($value, 4326)");
+    }
+    
 	/**
 	 * @brief This method call 'DanteBaseModel.getGeomAttributeForPointFromNewQuery'. 
 	 * 
@@ -76,7 +83,6 @@ class HypocenterModel extends DanteBaseModel
 	 */
     public function getGeomAttribute($value)
     {
-		\Log::debug("METHOD - ".__CLASS__.' -> '.__FUNCTION__);
         return parent::getGeomAttributeForPointFromNewQuery($value);
     }
     
