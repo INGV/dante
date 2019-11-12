@@ -35,6 +35,7 @@ Route::prefix('eventdb/_table/v1')->group(function(){
         'provenance'                => 'App\Api\v1\Controllers\ProvenanceController',
         'scnl'                      => 'App\Api\v1\Controllers\ScnlController',
         'st_amp_mag'                => 'App\Api\v1\Controllers\StAmpMagController',
+        'st_dur_mag'         => 'App\Api\v1\Controllers\StDurMagController',
         // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
         ],[
             'parameters' => [],
