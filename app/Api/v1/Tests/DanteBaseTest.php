@@ -23,6 +23,7 @@ class DanteBaseTest extends TestCase
 	protected $uriStrongmotion		= '/api/eventdb/_table/v1/strongmotion';	
     protected $uriTypeMagnitude		= '/api/eventdb/_table/v1/type_magnitude';
 	protected $uriFocalmechanism	= '/api/eventdb/_table/v1/focalmechanism';
+    protected $uriTypeHypocenter	= '/api/eventdb/_table/v1/type_hypocenter';
 	    
     /* do not insert 'id' (that is autoincremte) or 'modified' (that is auto-generated */
     protected $inputParameters = [];
