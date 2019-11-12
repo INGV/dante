@@ -53,17 +53,17 @@ class StDurMagControllerTest extends DanteBaseTest
         parent::setUp();
         
         // Get a valid 'magnitude' for test
-        $responseMagnitude = $this->get($this->uriMagnitude.'?limit=1');
+        $responseMagnitude = $this->get($this->uriMagnitude);
         $dataMagnitude = json_decode($responseMagnitude->getContent());
         $magnitude_Id = $dataMagnitude->data[0]->id;
         
         // Get a valid 'scnl' for test
-        $responseScnl = $this->get($this->uriScnl.'?limit=1');
+        $responseScnl = $this->get($this->uriScnl);
         $dataScnl = json_decode($responseScnl->getContent());
         $scnl_Id = $dataScnl->data[0]->id;
         
         // Get a valid 'type_magnitude' for test
-        $responseTypeMagnitude	= $this->get($this->uriTypeMagnitude.'?limit=1');
+        $responseTypeMagnitude	= $this->get($this->uriTypeMagnitude);
         $dataTypeMagnitude		= json_decode($responseTypeMagnitude->getContent());
         $typeMagnitude_Id		= $dataTypeMagnitude->data[0]->id;        
         
