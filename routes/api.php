@@ -32,7 +32,9 @@ Route::prefix('eventdb/_table/v1')->group(function(){
         'phase'                     => 'App\Api\v1\Controllers\PhaseController',
         'pick'                      => 'App\Api\v1\Controllers\PickController',
         'pick_ew_coda'              => 'App\Api\v1\Controllers\PickEwCodaController',
-        'provenance'         => 'App\Api\v1\Controllers\ProvenanceController',
+        'provenance'                => 'App\Api\v1\Controllers\ProvenanceController',
+        'scnl'                      => 'App\Api\v1\Controllers\ScnlController',
+        'st_amp_mag'                => 'App\Api\v1\Controllers\StAmpMagController',
         // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
         ],[
             'parameters' => [],
