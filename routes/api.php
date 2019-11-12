@@ -31,6 +31,7 @@ Route::prefix('eventdb/_table/v1')->group(function(){
         'model'                     => 'App\Api\v1\Controllers\ModelController',
         'phase'                     => 'App\Api\v1\Controllers\PhaseController',
         'pick'                      => 'App\Api\v1\Controllers\PickController',
+        'pick_ew_coda'              => 'App\Api\v1\Controllers\PickEwCodaController',
         // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
         ],[
             'parameters' => [],
