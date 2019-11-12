@@ -37,6 +37,7 @@ Route::prefix('eventdb/_table/v1')->group(function(){
         'st_amp_mag'                => 'App\Api\v1\Controllers\StAmpMagController',
         'st_dur_mag'                => 'App\Api\v1\Controllers\StDurMagController',
         'strongmotion_alt'          => 'App\Api\v1\Controllers\StrongmotionAltController',
+        'strongmotion'              => 'App\Api\v1\Controllers\StrongmotionController',
         // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
         ],[
             'parameters' => [],
