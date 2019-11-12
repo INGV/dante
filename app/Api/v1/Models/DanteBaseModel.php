@@ -73,18 +73,18 @@ class DanteBaseModel extends Model
 	 */
     public function getGeomAttributeForPointFromNewQuery($value)
     {
-		\Log::debug("METHOD - ".__CLASS__.' -> '.__FUNCTION__);
-		\Log::debug(" value=".$value);
+		//\Log::debug("METHOD - ".__CLASS__.' -> '.__FUNCTION__);
+		//\Log::debug(" value=".$value);
 		if (empty($value)) {
 			$b = null;
 		} else {
 			$a = explode(')', explode('POINT(', $value)[1])[0];
-			\Log::debug(" a=".$a);
+			//\Log::debug(" a=".$a);
 			$b = str_replace(' ', ',', $a);
-			\Log::debug(" b=".$b);
+			//\Log::debug(" b=".$b);
 		}
 		$return = 'POINT('.$b.')';
-		\Log::debug(" return=".$return);
+		//\Log::debug(" return=".$return);
         return $return;
     }
     
@@ -157,5 +157,79 @@ class DanteBaseModel extends Model
 
             return $arrayToReturn;
         }
+    }
+    
+    public static function paginateWithQueryCache($itemPerPage, $cacheExpireInSeconds = 15) {
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
+        $query = self::query();
+
+		// Set cache key
+		$cacheKeyString = $query->getModel()->getConnection()->getDatabaseName().
+							' -->> '.
+							$query->toSql().
+                            ' -->> '.
+							request()->get('page', null);
+		\Log::debug(' cacheKeyString: '.$cacheKeyString);
+		$cacheKeyStringMD5 = md5($cacheKeyString);
+		\Log::debug(' cacheKeyStringMD5: '.$cacheKeyStringMD5);
+        
+        // Closure for executing a query
+        $func_execute_sql = function() use ($query, $itemPerPage) {
+            \Log::debug('  Sending query (DB_NAME="'.$query->getModel()->getConnection()->getDatabaseName().'"): '.$query->toSql());
+            return self::paginate($itemPerPage);
+        };
+        
+		//
+        if ( config('dante.enableQueryCache') ) {
+            \Log::debug(' Query cache enabled');
+            $ret = \Cache::remember($cacheKeyStringMD5, $cacheExpireInSeconds, $func_execute_sql);
+        } else {
+            \Log::debug(' Query cache NOT enabled');
+			if ( \Cache::has($cacheKeyStringMD5) ) {
+				\Log::debug('  forget: '.$cacheKeyStringMD5);
+				\Cache::forget($cacheKeyStringMD5);
+			}
+            $ret = $func_execute_sql();
+        }
+
+		\Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $ret;
+    }
+    
+    public static function queryCache($query, $cacheExpireInSeconds = 120) {
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
+        
+		// Set cache key
+		$cacheKeyString = $query->getModel()->getConnection()->getDatabaseName().
+							' -->> '.
+							$query->toSql().
+							' -->> '.
+							implode('|',$query->getBindings());
+		\Log::debug(' cacheKeyString: '.$cacheKeyString);
+		$cacheKeyStringMD5 = md5($cacheKeyString);
+		\Log::debug(' cacheKeyStringMD5: '.$cacheKeyStringMD5);
+        
+        // Closure for executing a query
+        $func_execute_sql = function() use ($query, $itemPerPage) {
+            \Log::debug('  Sending query (DB_NAME="'.$query->getModel()->getConnection()->getDatabaseName().'"): '.$query->toSql());
+			\Log::debug('   with bindings: ',$query->getBindings());
+            return $query->get();
+        };
+        
+		//
+        if ( config('dante.enableQueryCache') ) {
+            \Log::debug(' Query cache enabled');
+            $ret = \Cache::remember($cacheKeyStringMD5, $cacheExpireInSeconds, $func_execute_sql);
+        } else {
+            \Log::debug(' Query cache NOT enabled');
+			if ( \Cache::has($cacheKeyStringMD5) ) {
+				\Log::debug('  forget: '.$cacheKeyStringMD5);
+				\Cache::forget($cacheKeyStringMD5);
+			}
+            $ret = $func_execute_sql();
+        }
+
+		\Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $ret;
     }
 }
