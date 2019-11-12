@@ -134,4 +134,23 @@ class EventExtendedControllerTest extends DanteBaseTest
           'This test is skipped beacause this table is a materialized view.'
         );
     }
+    
+    public function test_show_json()
+    {
+        // get a valid id
+        $response       = $this->get($this->uri);
+        $data           = json_decode($response->getContent());
+        $data__id       = $data->data[0]->id;
+
+        // Get output request to get single record
+        $response = $this->get($this->uri.'/'.$data__id);
+
+        // Get status for previous request
+        $this->assertContains($response->status(), [200], $response->content());
+
+        // Check json structure
+        $response->assertJsonStructure(
+            $this->data
+        );
+    }
 }
