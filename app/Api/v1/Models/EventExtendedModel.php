@@ -13,11 +13,11 @@ class EventExtendedModel extends DanteBaseModel
      * This array is used, from "__construct" to:
      * - build 'fillable' array (attributes that are mass assignable - 'id' and 'modified' are auto-generated)
      * 
-     * And is also used from 'getValidatorRulesForStore' (that is in the 'IngvModel') and 'getValidatorRulesForUpdate', to:
-     * - centralize the Validator rules used in the Controller;
+     * And is also used from 'getValidatorRulesForStore' and 'getValidatorRulesForUpdate' (they are in the 'DanteBaseModel'), to
+     *  centralize the Validator rules used in the Controller;
      *
      * @var array
-     */    
+     */     
     protected $baseArray = [
 		'id_locator'                        => 'integer',
 		'fk_pref_hyp'                       => 'nullable|integer',
@@ -71,9 +71,9 @@ class EventExtendedModel extends DanteBaseModel
     }
     
 	/**
-	 * @brief This method call 'IngvModel.getGeomAttributeForPointFromNewQuery'. 
+	 * @brief This method call 'DanteBaseModel.getGeomAttributeForPointFromNewQuery'. 
 	 * 
-	 * More info about it can be found on the 'parent' method 'IngvModel.getGeomAttributeForPointFromNewQuery'
+	 * More info about it can be found on the 'parent' method 'DanteBaseModel.getGeomAttributeForPointFromNewQuery'
 	 *  
 	 * 
 	 * @param type $value Contiene il valore di 'hyp_geom' risultato della query presente nel metodo 'newQuery'
@@ -88,7 +88,7 @@ class EventExtendedModel extends DanteBaseModel
 	/**
 	 * @brief This method, override the default query.
 	 * 
-	 * More info about it can be found on the 'parent' method 'IngvModel.newQueryForHypocenter'
+	 * More info about it can be found on the 'parent' method 'DanteBaseModel.newQueryForHypocenter'
 	 * 
 	 * @param bool $excludeDeleted
 	 * @return Query output, adding new fields.

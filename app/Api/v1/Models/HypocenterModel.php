@@ -12,13 +12,11 @@ class HypocenterModel extends DanteBaseModel
      * This array is used, from "__construct" to:
      * - build 'fillable' array (attributes that are mass assignable - 'id' and 'modified' are auto-generated)
      * 
-     * And is also used from 'getValidatorRulesForStore' (that is in the 'IngvModel') and 'getValidatorRulesForUpdate', to:
-     * - centralize the Validator rules used in the Controller;
+     * And is also used from 'getValidatorRulesForStore' and 'getValidatorRulesForUpdate' (they are in the 'DanteBaseModel'), to
+     *  centralize the Validator rules used in the Controller;
      *
-	 * NOTA: This is used when the insert will be done via 'IngvHypocenterControl' and NOT from 'IngvNTInsertController' that has its own Validator
-	 * 
      * @var array
-     */    
+     */   
     protected $baseArray = [
 		'ot'                    => 'required|---data_time_with_msec---',
 		'lat'                   => '---lat---',

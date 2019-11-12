@@ -13,11 +13,11 @@ class EventModel extends DanteBaseModel
      * This array is used, from "__construct" to:
      * - build 'fillable' array (attributes that are mass assignable - 'id' and 'modified' are auto-generated)
      * 
-     * And is also used from 'getValidatorRulesForStore' (that is in the 'IngvModel') and 'getValidatorRulesForUpdate', to:
-     * - centralize the Validator rules used in the Controller;
+     * And is also used from 'getValidatorRulesForStore' and 'getValidatorRulesForUpdate' (they are in the 'DanteBaseModel'), to
+     *  centralize the Validator rules used in the Controller;
      *
      * @var array
-     */    
+     */   
     protected $baseArray = [
         'id_locator'            => 'integer',
         'fk_pref_hyp'           => 'nullable|integer',
@@ -39,7 +39,7 @@ class EventModel extends DanteBaseModel
      */
     public function provenance()
     {
-        return $this->hasOne('App\Api\V1\WSs\Eventdb\Models\IngvProvenanceModel', 'id', 'fk_provenance');
+        return $this->hasOne('App\Api\v1\Models\ProvenanceModel', 'id', 'fk_provenance');
     }
 	
     /**
@@ -47,7 +47,7 @@ class EventModel extends DanteBaseModel
      */
     public function type_event()
     {
-        return $this->hasOne('App\Api\V1\WSs\Eventdb\Models\IngvTypeEventModel', 'id', 'fk_type_event');
+        return $this->hasOne('App\Api\v1\Models\TypeEventModel', 'id', 'fk_type_event');
     }
     
     /**
@@ -55,6 +55,6 @@ class EventModel extends DanteBaseModel
      */
     public function hypocenters()
     {
-        return $this->hasMany('App\Api\V1\WSs\Eventdb\Models\IngvHypocenterModel', 'fk_event', 'id');
+        return $this->hasMany('App\Api\v1\Models\HypocenterModel', 'fk_event', 'id');
     }
 }
