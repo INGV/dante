@@ -43,6 +43,7 @@ Route::prefix('eventdb/_table/v1')->group(function(){
         'type_hypocenter'           => 'App\Api\v1\Controllers\TypeHypocenterController',
         'type_magnitude'            => 'App\Api\v1\Controllers\TypeMagnitudeController',
         'vw_event_extended'         => 'App\Api\v1\Controllers\VwEventExtendedController',
+        'vw_event_pref'             => 'App\Api\v1\Controllers\VwEventPrefController',
         // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
         ],[
             'parameters' => [],
