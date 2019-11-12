@@ -27,7 +27,7 @@ class ScnlControllerTest extends DanteBaseTest
         'elev'  => '52.000000'
     ];   
     protected $inputParametersForUpdate = [
-		'elev'  => 'ACER'
+		'elev'  => '48'
     ];
     protected $data = [
         'id',
