@@ -8,7 +8,6 @@ return [
     |--------------------------------------------------------------------------
     |
     */
-    //'version' => trim(file_get_contents(base_path().'/VERSION')),
     'version' => trim(yaml_parse_file(base_path().'/publiccode.yml')['softwareVersion']),
 
     /*
