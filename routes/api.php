@@ -39,6 +39,7 @@ Route::prefix('eventdb/_table/v1')->group(function(){
         'strongmotion_alt'          => 'App\Api\v1\Controllers\StrongmotionAltController',
         'strongmotion'              => 'App\Api\v1\Controllers\StrongmotionController',
         'tdmt'                      => 'App\Api\v1\Controllers\TdmtController',
+        'type_amplitude'            => 'App\Api\v1\Controllers\TypeAmplitudeController',
         // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
         ],[
             'parameters' => [],
