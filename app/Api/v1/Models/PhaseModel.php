@@ -29,7 +29,7 @@ class PhaseModel extends DanteBaseModel
 		'polarity_is_used'	=> 'nullable|integer',
 		'arr_time_is_used'	=> 'nullable|integer',
 		'residual'          => 'nullable|numeric',
-		'teo_travel_time'	=> 'date',
+		'teo_travel_time'	=> 'nullable|date',
 		'weight_in'         => 'nullable|integer',
 		'weight_out'		=> 'nullable|numeric',
 		'std_error'         => 'nullable|integer'
