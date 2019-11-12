@@ -93,7 +93,6 @@ class VwEventExtendedModel extends DanteBaseModel
 	 */
     public function getHypGeomAttribute($value)
     {
-		\Log::debug("METHOD - ".__CLASS__.' -> '.__FUNCTION__);
         return parent::getGeomAttributeForPointFromNewQuery($value);
     }
 	

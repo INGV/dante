@@ -64,7 +64,6 @@ class TdmtModel extends DanteBaseModel
 	 */
     public function newQuery($excludeDeleted = true)
     {
-		\Log::debug("METHOD - ".__CLASS__.' -> '.__FUNCTION__);
 		$table = $this->getTable();
 		
 		$raw  = " ";
