@@ -27,7 +27,8 @@ Route::prefix('eventdb/_table/v1')->group(function(){
         'event'                     => 'App\Api\v1\Controllers\EventController',
         'focalmechanism'            => 'App\Api\v1\Controllers\FocalmechanismController',
         'hypocenter_region_name'    => 'App\Api\v1\Controllers\HypocenterRegionNameController',
-        'loc_program'         => 'App\Api\v1\Controllers\LocProgramController',
+        'loc_program'               => 'App\Api\v1\Controllers\LocProgramController',
+        'model'                     => 'App\Api\v1\Controllers\ModelController',
         // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
         ],[
             'parameters' => [],
