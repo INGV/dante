@@ -52,7 +52,8 @@ class MagnitudeControllerTest extends DanteBaseTest
         'fk_provenance'
     ];
     
-    public function setUp(): void {
+    public function setUp(): void 
+    {
         parent::setUp();
         
 		// Get a valid 'hypocenter' and update it into '$inputParameters'

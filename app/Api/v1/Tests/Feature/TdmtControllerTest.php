@@ -80,7 +80,8 @@ class TdmtControllerTest extends DanteBaseTest
         'inserted'
     ];
     
-    public function setUp(): void {
+    public function setUp(): void 
+    {
         parent::setUp();
         
 		/* Get a valid hypocenter */

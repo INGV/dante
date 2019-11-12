@@ -54,7 +54,8 @@ class PickEwCodaControllerTest extends DanteBaseTest
         'inserted'
     ];
     
-    public function setUp(): void {
+    public function setUp(): void 
+    {
         //$this->markTestSkipped(
         //  ' waiting the table \'pick_ew_code\' will be changed with \'fk_pick\'.'
         //);

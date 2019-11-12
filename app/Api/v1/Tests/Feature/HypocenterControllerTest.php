@@ -105,7 +105,8 @@ class HypocenterControllerTest extends DanteBaseTest
         'fk_loc_program'
     ]; 
     
-    public function setUp(): void {
+    public function setUp(): void 
+    {
         parent::setUp();
         
 		// Get a valid 'eventid' and update it into '$inputParameters'

@@ -34,7 +34,8 @@ class StrongmotionAltControllerTest extends DanteBaseTest
         'inserted'
     ];
     
-    public function setUp(): void {
+    public function setUp(): void 
+    {
         parent::setUp();
 		
         // Get a valid 'strongmotion' for test

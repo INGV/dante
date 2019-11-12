@@ -46,7 +46,8 @@ class PickControllerTest extends DanteBaseTest
         'fk_scnl'
     ];
     
-    public function setUp(): void {
+    public function setUp(): void 
+    {
         parent::setUp();
         
         $this->inputParameters['arrival_time'] = date("Y-m-d H:i:s");

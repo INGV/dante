@@ -36,7 +36,8 @@ class TypeAmplitudeControllerTest extends DanteBaseTest
         'inserted'
     ];
     
-    public function setUp(): void {
+    public function setUp(): void 
+    {
         parent::setUp();
         
         $this->inputParameters['type'] = 'phpunit-'.$this->inputParameters['type'].'-'.date("Y-m-d\TH:i:s");

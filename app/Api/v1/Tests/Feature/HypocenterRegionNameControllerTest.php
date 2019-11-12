@@ -32,7 +32,8 @@ class HypocenterRegionNameControllerTest extends DanteBaseTest
         'inserted'
     ]; 
     
-    public function setUp(): void {
+    public function setUp(): void 
+    {
         parent::setUp();
 		
 		// Get a valid 'hypocenter'
@@ -50,7 +51,7 @@ class HypocenterRegionNameControllerTest extends DanteBaseTest
 		$this->inputParameters['fk_hypocenter']	= $dataNewHypocenter__id;
     }
 	
-	public function tearDown()
+	public function tearDown(): void
 	{
         // Remove hypocenter inserted for test
         $this->delete($this->uriHypocenter.'/'.$this->inputParameters['fk_hypocenter'])->assertStatus(204);

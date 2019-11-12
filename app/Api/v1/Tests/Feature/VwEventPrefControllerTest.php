@@ -116,7 +116,8 @@ class VwEventPrefControllerTest extends DanteBaseTest
         'region'
     ];
     
-    public function setUp(): void {
+    public function setUp(): void 
+    {
         parent::setUp();
 
         // get a valid event_id
