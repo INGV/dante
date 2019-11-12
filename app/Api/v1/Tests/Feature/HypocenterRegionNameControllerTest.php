@@ -37,7 +37,7 @@ class HypocenterRegionNameControllerTest extends DanteBaseTest
         parent::setUp();
 		
 		// Get a valid 'hypocenter'
-        $response__getHypocenter			= $this->get($this->uriHypocenter.'?limit=1');
+        $response__getHypocenter			= $this->get($this->uriHypocenter);
         $data__getHypocenter				= json_decode($response__getHypocenter->getContent());
 
 		// Insert a new hypocenter

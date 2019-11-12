@@ -110,13 +110,13 @@ class HypocenterControllerTest extends DanteBaseTest
         parent::setUp();
         
 		// Get a valid 'eventid' and update it into '$inputParameters'
-        $response__event                                = $this->get($this->uriEvent.'?limit=1');
+        $response__event                                = $this->get($this->uriEvent);
         $data__event                                    = json_decode($response__event->getContent());
         $event__id                                      = $data__event->data[0]->id;
 		$this->inputParameters['fk_event']              = $event__id;
 		
         // Get a valid 'type_hypocenter' and update it into '$inputParameters'
-        $response__type_hypocenter						= $this->get($this->uri__type_hypocenter.'?limit=1');
+        $response__type_hypocenter						= $this->get($this->uriTypeHypocenter);
         $data__type_hypocenter							= json_decode($response__type_hypocenter->getContent());
         $type_hypocenter__id							= $data__type_hypocenter->data[0]->id;
         $this->inputParameters['fk_type_hypocenter']	= $type_hypocenter__id;
