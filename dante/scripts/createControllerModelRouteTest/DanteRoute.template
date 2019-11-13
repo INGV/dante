@@ -1,2 +1,2 @@
-        '--db_table_name--'         => '--BaseNamespace--\Controllers\--ControllerNameClass--',
+        '--db_table_name--'         => '--BaseNamespace--\Controllers\Tables\--ControllerNameClass--',
         // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!

@@ -186,7 +186,7 @@ done
 DB_NAME_FIRST_LETTER_UPPER_CASE=$(tr '[:lower:]' '[:upper:]' <<< ${DB_NAME:0:1})${DB_NAME:1}
 
 # Set CONTROLLER variables
-DIR_CONTROLLERS=${DIR_BASE_V1}/Controllers
+DIR_CONTROLLERS=${DIR_BASE_V1}/Controllers/Tables
 if [ ! -d ${DIR_CONTROLLERS} ]; then
 	echo " The CONTROLLER directory \"${DIR_CONTROLLERS}\" doesn't exist; check it and try again"
 	echo ""
@@ -198,7 +198,7 @@ FILE_OUT_CONTROLLER=${DIR_CONTROLLERS}/${CONTROLLER_NAME_CLASS}.php
 FILE_OUT_CONTROLLER_TMP=${DIR_TMP}/${CONTROLLER_NAME_CLASS}.php.tmp
 
 # Set MODEL variables
-DIR_MODELS=${DIR_BASE_V1}/Models
+DIR_MODELS=${DIR_BASE_V1}/Models/Tables
 if [ ! -d ${DIR_MODELS} ]; then
         echo " The MODELS directory \"${DIR_MODELS}\" doesn't exist; check it and try again"
         echo ""

@@ -1,10 +1,10 @@
 <?php
 
-namespace --BaseNamespace--\Controllers;
+namespace --BaseNamespace--\Controllers\Tables;
 
 use Illuminate\Http\Request;
 
-use --BaseNamespace--\Models\--ModelNameClass--;
+use --BaseNamespace--\Models\Tables\--ModelNameClass--;
 use Illuminate\Support\Facades\Validator;
 use App\Api\v1\Controllers\DanteBaseController;
 
