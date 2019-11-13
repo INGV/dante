@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api\v1\Tests\Feature;
+namespace App\Api\v1\Tests\Feature\Tables;
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;

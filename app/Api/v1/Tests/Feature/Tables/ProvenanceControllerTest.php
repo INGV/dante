@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api\v1\Tests\Feature;
+namespace App\Api\v1\Tests\Feature\Tables;
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -8,9 +8,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 use App\Api\v1\Tests\DanteBaseTest;
 
-class EventControllerTest extends DanteBaseTest
+class ProvenanceControllerTest extends DanteBaseTest
 {
-    protected $uri = '/api/eventdb/_table/v1/event';
+    protected $uri = '/api/eventdb/_table/v1/provenance';
     /* 
      * Do not insert all fields that are auto generated; for example:
      *  - 'id' (that is autoincremente) 
@@ -18,26 +18,26 @@ class EventControllerTest extends DanteBaseTest
      *  - 'modified' (that is auto-generated) 
      */
     protected $inputParameters = [
-        'id_locator'        => 0,
-        'fk_pref_hyp'       => null,
-        'fk_pref_mag'       => null,        
-        'fk_events_group'   => 0,
-		'type_group'		=> 0,
-        'fk_type_event'     => 1,
-        'fk_provenance'     => '1'
+        'name'			=> 'INGV',
+        'instance'		=> 'PHPUnit_instance',
+        'softwarename'	=> 'BULLETIN-INGV-A',
+        'username'		=> 'PHPUnit_user',
+        'hostname'		=> 'albus.int.ingv.it',
+        'description'	=> 'PHPUnit_description2',
+		'priority'		=> 0
     ];   
     protected $inputParametersForUpdate = [
-		'fk_events_group' => '10'
+		'description'	=> 'PHPUnit_descriptionUpdate'
     ];
     protected $data = [
         'id',
-        'id_locator',
-        'fk_pref_hyp',
-        'fk_pref_mag',
-        'fk_events_group',
-        'type_group',
-        'fk_type_event',
-        'fk_provenance',
+        'name',
+        'instance',
+        'softwarename',
+        'username',
+        'hostname',
+        'description',
+        'priority',
         'modified',
         'inserted'
     ]; 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api\v1\Tests\Feature;
+namespace App\Api\v1\Tests\Feature\Tables;
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -8,9 +8,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 use App\Api\v1\Tests\DanteBaseTest;
 
-class ScnlControllerTest extends DanteBaseTest
+class EventControllerTest extends DanteBaseTest
 {
-    protected $uri = '/api/eventdb/_table/v1/scnl';
+    protected $uri = '/api/eventdb/_table/v1/event';
     /* 
      * Do not insert all fields that are auto generated; for example:
      *  - 'id' (that is autoincremente) 
@@ -18,26 +18,26 @@ class ScnlControllerTest extends DanteBaseTest
      *  - 'modified' (that is auto-generated) 
      */
     protected $inputParameters = [
-        'net'   => 'G',
-        'sta'   => 'ROCAM',
-        'cha'   => 'BHZ',
-        'loc'   => '00',
-        'lat'   => '-19.755530',
-        'lon'   => '63.370140',
-        'elev'  => '52.000000'
+        'id_locator'        => 0,
+        'fk_pref_hyp'       => null,
+        'fk_pref_mag'       => null,        
+        'fk_events_group'   => 0,
+		'type_group'		=> 0,
+        'fk_type_event'     => 1,
+        'fk_provenance'     => '1'
     ];   
     protected $inputParametersForUpdate = [
-		'elev'  => '48'
+		'fk_events_group' => '10'
     ];
     protected $data = [
         'id',
-        'net',
-        'sta',
-        'cha',
-        'loc',
-        'lat',
-        'lon',
-        'elev',
+        'id_locator',
+        'fk_pref_hyp',
+        'fk_pref_mag',
+        'fk_events_group',
+        'type_group',
+        'fk_type_event',
+        'fk_provenance',
         'modified',
         'inserted'
     ]; 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api\v1\Tests\Feature;
+namespace App\Api\v1\Tests\Feature\Tables;
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -8,9 +8,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 use App\Api\v1\Tests\DanteBaseTest;
 
-class ProvenanceControllerTest extends DanteBaseTest
+class ModelControllerTest extends DanteBaseTest
 {
-    protected $uri = '/api/eventdb/_table/v1/provenance';
+    protected $uri = '/api/eventdb/_table/v1/model';
     /* 
      * Do not insert all fields that are auto generated; for example:
      *  - 'id' (that is autoincremente) 
@@ -18,26 +18,18 @@ class ProvenanceControllerTest extends DanteBaseTest
      *  - 'modified' (that is auto-generated) 
      */
     protected $inputParameters = [
-        'name'			=> 'INGV',
-        'instance'		=> 'PHPUnit_instance',
-        'softwarename'	=> 'BULLETIN-INGV-A',
-        'username'		=> 'PHPUnit_user',
-        'hostname'		=> 'albus.int.ingv.it',
-        'description'	=> 'PHPUnit_description2',
-		'priority'		=> 0
+        'name'      => 'UNKNOWN_PHPUnit',
+        'author'    => null,
+        'note'      => 'When the model is unknown'
     ];   
     protected $inputParametersForUpdate = [
-		'description'	=> 'PHPUnit_descriptionUpdate'
+		'note'      => 'test'
     ];
     protected $data = [
         'id',
         'name',
-        'instance',
-        'softwarename',
-        'username',
-        'hostname',
-        'description',
-        'priority',
+        'author',
+        'note',
         'modified',
         'inserted'
     ]; 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api\v1\Tests\Feature;
+namespace App\Api\v1\Tests\Feature\Tables;
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -8,9 +8,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 use App\Api\v1\Tests\DanteBaseTest;
 
-class TypeAmplitudeControllerTest extends DanteBaseTest
+class LocProgramControllerTest extends DanteBaseTest
 {
-    protected $uri = '/api/eventdb/_table/v1/type_amplitude';
+    protected $uri = '/api/eventdb/_table/v1/loc_program';
     /* 
      * Do not insert all fields that are auto generated; for example:
      *  - 'id' (that is autoincremente) 
@@ -18,28 +18,15 @@ class TypeAmplitudeControllerTest extends DanteBaseTest
      *  - 'modified' (that is auto-generated) 
      */
     protected $inputParameters = [
-        'type'      => 'Acceleration',
-        'priority'  => '0',
-        'remark'    => null,
-        'remark_en' => null
+        'name' => 'IPO-EW__tdmt_invc.c_PHPUnit'
     ];   
     protected $inputParametersForUpdate = [
-		'priority' => '2'
+		'name' => 'IPO-EW__tdmt_invc.c_PHPUnit2'
     ];
     protected $data = [
         'id',
-        'type',
-        'priority',
-        'remark',
-        'remark_en',
+        'name',
         'modified',
         'inserted'
-    ];
-    
-    public function setUp(): void 
-    {
-        parent::setUp();
-        
-        $this->inputParameters['type'] = 'phpunit-'.$this->inputParameters['type'].'-'.date("Y-m-d\TH:i:s");
-    }
+    ]; 
 }

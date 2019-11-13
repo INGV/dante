@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api\v1\Tests\Feature;
+namespace App\Api\v1\Tests\Feature\Tables;
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -8,9 +8,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 use App\Api\v1\Tests\DanteBaseTest;
 
-class TypeMagnitudeControllerTest extends DanteBaseTest
+class ScnlControllerTest extends DanteBaseTest
 {
-    protected $uri = '/api/eventdb/_table/v1/type_magnitude';
+    protected $uri = '/api/eventdb/_table/v1/scnl';
     /* 
      * Do not insert all fields that are auto generated; for example:
      *  - 'id' (that is autoincremente) 
@@ -18,20 +18,26 @@ class TypeMagnitudeControllerTest extends DanteBaseTest
      *  - 'modified' (that is auto-generated) 
      */
     protected $inputParameters = [
-        'name' => 'typePhpUnitTest',
-        'priority' => '0',
-        'remark' => 'remarkPhpUnitTest',
-        'remark_en' => 'remark_enPhpUnitTest'
+        'net'   => 'G',
+        'sta'   => 'ROCAM',
+        'cha'   => 'BHZ',
+        'loc'   => '00',
+        'lat'   => '-19.755530',
+        'lon'   => '63.370140',
+        'elev'  => '52.000000'
     ];   
     protected $inputParametersForUpdate = [
-        'priority' => '1'
+		'elev'  => '48'
     ];
     protected $data = [
         'id',
-        'name',
-        'priority',
-        'remark',
-        'remark_en',
+        'net',
+        'sta',
+        'cha',
+        'loc',
+        'lat',
+        'lon',
+        'elev',
         'modified',
         'inserted'
     ]; 
