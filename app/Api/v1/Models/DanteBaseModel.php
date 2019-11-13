@@ -159,43 +159,6 @@ class DanteBaseModel extends Model
         }
     }
     
-    public static function paginateWithQueryCache($itemPerPage, $cacheExpireInSeconds = 15) {
-        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        $query = self::query();
-
-		// Set cache key
-		$cacheKeyString = $query->getModel()->getConnection()->getDatabaseName().
-							' -->> '.
-							$query->toSql().
-                            ' -->> '.
-							request()->get('page', null);
-		\Log::debug(' cacheKeyString: '.$cacheKeyString);
-		$cacheKeyStringMD5 = md5($cacheKeyString);
-		\Log::debug(' cacheKeyStringMD5: '.$cacheKeyStringMD5);
-        
-        // Closure for executing a query
-        $func_execute_sql = function() use ($query, $itemPerPage) {
-            \Log::debug('  Sending query (DB_NAME="'.$query->getModel()->getConnection()->getDatabaseName().'"): '.$query->toSql());
-            return self::paginate($itemPerPage);
-        };
-        
-		//
-        if ( config('dante.enableQueryCache') ) {
-            \Log::debug(' Query cache enabled');
-            $ret = \Cache::remember($cacheKeyStringMD5, $cacheExpireInSeconds, $func_execute_sql);
-        } else {
-            \Log::debug(' Query cache NOT enabled');
-			if ( \Cache::has($cacheKeyStringMD5) ) {
-				\Log::debug('  forget: '.$cacheKeyStringMD5);
-				\Cache::forget($cacheKeyStringMD5);
-			}
-            $ret = $func_execute_sql();
-        }
-
-		\Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
-        return $ret;
-    }
-    
     public static function queryCache($query, $cacheExpireInSeconds = 120) {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
         
