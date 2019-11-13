@@ -210,7 +210,7 @@ FILE_OUT_MODEL=${DIR_MODELS}/${MODEL_NAME_CLASS}.php
 FILE_OUT_MODEL_TMP=${DIR_TMP}/${MODEL_NAME_CLASS}.php.tmp
 
 # Set TEST variables
-DIR_TESTS=${DIR_BASE_V1_TESTS}
+DIR_TESTS=${DIR_BASE_V1_TESTS}/Tables
 if [ ! -d ${DIR_TESTS} ]; then
         echo " The TESTS directory \"${DIR_TESTS}\" doesn't exist; check it and try again"
         echo ""
