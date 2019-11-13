@@ -44,6 +44,7 @@ Route::prefix('eventdb/_table/v1')->group(function(){
         'type_magnitude'            => 'App\Api\v1\Controllers\Tables\TypeMagnitudeController',
         'vw_event_extended'         => 'App\Api\v1\Controllers\Tables\VwEventExtendedController',
         'vw_event_pref'             => 'App\Api\v1\Controllers\Tables\VwEventPrefController',
+        'instance'                  => 'App\Api\v1\Controllers\Tables\InstanceController',
         // --PLACEHOLDER-- - Used from 'ingv/script.sh'; DO NOT REMOVE!!!
         ],[
             'parameters' => [],
