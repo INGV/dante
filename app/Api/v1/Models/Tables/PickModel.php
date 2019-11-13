@@ -22,7 +22,7 @@ class PickModel extends DanteBaseModel
 		'id_picker'         => 'integer',
 		'weight'            => 'nullable|integer',
 		'arrival_time'		=> 'required|---data_time_with_msec---',
-		'err_arrival_time'  => 'numeric',
+		'err_arrival_time'  => 'nullable|numeric',
 		'firstmotion'		=> 'nullable|string',
 		'emersio'           => 'nullable|string',
 		'pamp'              => 'nullable|numeric',
