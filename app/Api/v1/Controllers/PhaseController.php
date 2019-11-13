@@ -18,7 +18,7 @@ class PhaseController extends DanteBaseController
     public function index()
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        $data = PhaseModel::paginate(config('dante.default_params.limit'));
+        $data = $this->paginateCache(PhaseModel::class);
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $data;
     }

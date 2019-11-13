@@ -18,7 +18,7 @@ class ProvenanceController extends DanteBaseController
     public function index()
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        $data = ProvenanceModel::paginate(config('dante.default_params.limit'));
+        $data = $this->paginateCache(ProvenanceModel::class);
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $data;
     }

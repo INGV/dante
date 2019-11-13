@@ -18,7 +18,7 @@ class TypeMagnitudeController extends DanteBaseController
     public function index()
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        $data = TypeMagnitudeModel::paginate(config('dante.default_params.limit'));
+        $data = $this->paginateCache(TypeMagnitudeModel::class);
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $data;
     }

@@ -18,7 +18,7 @@ class AmplitudeController extends DanteBaseController
     public function index()
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        $data = AmplitudeModel::paginate(config('dante.default_params.limit'));
+        $data = $this->paginateCache(AmplitudeModel::class);
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $data;
     }

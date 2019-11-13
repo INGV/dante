@@ -18,7 +18,7 @@ class TypeAmplitudeController extends DanteBaseController
     public function index()
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        $data = TypeAmplitudeModel::paginate(config('dante.default_params.limit'));
+        $data = $this->paginateCache(TypeAmplitudeModel::class);
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $data;
     }

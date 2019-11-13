@@ -18,7 +18,7 @@ class EventController extends DanteBaseController
     public function index()
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        $data = EventModel::paginate(config('dante.default_params.limit'));
+        $data = $this->paginateCache(EventModel::class);
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $data;
     }

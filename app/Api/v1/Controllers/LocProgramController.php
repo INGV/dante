@@ -18,7 +18,7 @@ class LocProgramController extends DanteBaseController
     public function index()
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        $data = LocProgramModel::paginate(config('dante.default_params.limit'));
+        $data = $this->paginateCache(LocProgramModel::class);
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $data;
     }
