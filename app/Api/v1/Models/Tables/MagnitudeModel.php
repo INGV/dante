@@ -44,7 +44,7 @@ class MagnitudeModel extends DanteBaseModel
      */
     public function hypocenter()
     {
-        return $this->belongsTo('App\Api\v1\Models\HypocenterModel', 'fk_hypocenter', 'id');
+        return $this->belongsTo('App\Api\v1\Models\Tables\HypocenterModel', 'fk_hypocenter', 'id');
     }
     
     /**
@@ -52,7 +52,7 @@ class MagnitudeModel extends DanteBaseModel
      */
     public function amplitudes()
     {
-        return $this->belongsToMany('App\Api\v1\Models\AmplitudeModel', 'st_amp_mag', 'fk_magnitude', 'fk_amplitude')->withPivot(
+        return $this->belongsToMany('App\Api\v1\Models\Tables\AmplitudeModel', 'st_amp_mag', 'fk_magnitude', 'fk_amplitude')->withPivot(
 				'ep_distance',
 				'hyp_distance',
 				'azimut',
@@ -71,7 +71,7 @@ class MagnitudeModel extends DanteBaseModel
      */
     public function type_magnitude()
     {
-        return $this->hasOne('App\Api\v1\Models\TypeMagnitudeModel', 'id', 'fk_type_magnitude');
+        return $this->hasOne('App\Api\v1\Models\Tables\TypeMagnitudeModel', 'id', 'fk_type_magnitude');
     }
 	
     /**
@@ -79,6 +79,6 @@ class MagnitudeModel extends DanteBaseModel
      */
     public function provenance()
     {
-        return $this->hasOne('App\Api\v1\Models\ProvenanceModel', 'id', 'fk_provenance');
+        return $this->hasOne('App\Api\v1\Models\Tables\ProvenanceModel', 'id', 'fk_provenance');
     }
 }
