@@ -17,8 +17,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-/* START - EventDB API */
-Route::prefix('eventdb/_table/v1')->group(function(){
+/* EventDB API Tables micro-services */
+Route::prefix('eventdb/_table/v1')->group(function() {
     Route::apiResources([
         'hypocenter'                => 'App\Api\v1\Controllers\Tables\HypocenterController',
         'magnitude'                 => 'App\Api\v1\Controllers\Tables\MagnitudeController',
@@ -63,4 +63,8 @@ Route::prefix('eventdb/_table/v1')->group(function(){
             ]
         ]);
 });
-/* END - EventDB API */
+
+/* EventDB API services */
+Route::prefix('eventdb/v1')->group(function() {
+    Route::post('event', 'App\Api\v1\Controllers\InsertController@processRequestToInsert');
+});
