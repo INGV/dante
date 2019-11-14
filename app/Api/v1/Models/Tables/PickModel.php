@@ -59,7 +59,7 @@ class PickModel extends DanteBaseModel
      */
     public function hypocenters()
     {
-        return $this->belongsToMany('App\Api\v1\Models\HypocenterModel', 'phase', 'fk_pick', 'fk_hypocenter')->withPivot('ep_distance');
+        return $this->belongsToMany('App\Api\v1\Models\Tables\HypocenterModel', 'phase', 'fk_pick', 'fk_hypocenter')->withPivot('ep_distance');
     }
 
     /**
@@ -67,7 +67,7 @@ class PickModel extends DanteBaseModel
      */
     public function phase()
     {
-        return $this->hasMany('App\Api\v1\Models\PhaseModel', 'fk_pick', 'id');
+        return $this->hasMany('App\Api\v1\Models\Tables\PhaseModel', 'fk_pick', 'id');
     }
 	
     /**
@@ -75,7 +75,7 @@ class PickModel extends DanteBaseModel
      */
     public function provenance()
     {
-        return $this->hasOne('App\Api\v1\Models\ProvenanceModel', 'id', 'fk_provenance');
+        return $this->hasOne('App\Api\v1\Models\Tables\ProvenanceModel', 'id', 'fk_provenance');
     }
 	
     /**
@@ -83,6 +83,6 @@ class PickModel extends DanteBaseModel
      */
     public function scnl()
     {
-        return $this->hasOne('App\Api\v1\Models\ScnlModel', 'id', 'fk_scnl');
+        return $this->hasOne('App\Api\v1\Models\Tables\ScnlModel', 'id', 'fk_scnl');
     }
 }
