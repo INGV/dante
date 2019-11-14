@@ -38,7 +38,7 @@ class ProvenanceModel extends DanteBaseModel
      */
     public function event()
     {
-        return $this->hasMany('App\Api\v1\Models\EventModel', 'fk_provenance', 'id');
+        return $this->hasMany('App\Api\v1\Models\Tables\EventModel', 'fk_provenance', 'id');
     }
     
     public static function danteFirstOrCreate($arrayInput) {

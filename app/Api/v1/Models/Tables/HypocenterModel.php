@@ -102,10 +102,82 @@ class HypocenterModel extends DanteBaseModel
     }
 
     /**
+     * Get the magnitudes for the hypocenter.
+     */    
+    public function magnitudes()
+    {
+        return $this->hasMany('App\Api\v1\Models\Tables\MagnitudeModel', 'fk_hypocenter', 'id');
+    }
+    
+    /**
+     * Get the provenance record associated with the hypocenter.
+     */
+    public function provenance()
+    {
+        return $this->hasOne('App\Api\v1\Models\Tables\ProvenanceModel', 'id', 'fk_provenance');
+    }
+
+    /**
+     * Get the type_hypocenter record associated with the hypocenter.
+     */
+    public function type_hypocenter()
+    {
+        return $this->hasOne('App\Api\v1\Models\Tables\TypeHypocenterModel', 'id', 'fk_type_hypocenter');
+    }
+	
+    /**
+     * Get the model record associated with the hypocenter.
+     */
+    public function model()
+    {
+        return $this->hasOne('App\Api\v1\Models\Tables\ModelModel', 'id', 'fk_model');
+    }
+	
+    /**
+     * Get the loc_program record associated with the hypocenter.
+     */
+    public function loc_program()
+    {
+        return $this->hasOne('App\Api\v1\Models\Tables\LocProgramModel', 'id', 'fk_loc_program');
+    }
+	
+    /**
+     * Get the hypocenter_region_name that owns the hypocenter.
+     */
+    public function hypocenter_region_name()
+    {
+        return $this->belongsTo('App\Api\v1\Models\Tables\HypocenterRegionNameModel', 'id', 'fk_hypocenter');
+    }
+    
+    /**
      * Get the event that owns the hypocenter.
      */
     public function event()
     {
-        return $this->belongsTo('App\Api\v1\Models\EventModel', 'fk_event', 'id');
+        return $this->belongsTo('App\Api\v1\Models\Tables\EventModel', 'fk_event', 'id');
+    }
+    
+    /**
+     * Get the picks and phases that belong to hypocenter.
+     */
+    public function picks()
+    {
+        return $this->belongsToMany('App\Api\v1\Models\Tables\PickModel', 'phase', 'fk_hypocenter', 'fk_pick')->withPivot(
+				'id',
+				'isc_code',
+				'ep_distance',
+				'hyp_distance',
+				'azimut',
+				'take_off',
+				'polarity_is_used',
+				'arr_time_is_used',
+				'residual',
+				'teo_travel_time',
+				'weight_in',
+				'weight_out',
+				'std_error'
+				)
+				->as('phase')
+				->withTimestamps();
     }
 }

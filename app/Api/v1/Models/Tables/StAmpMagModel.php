@@ -42,6 +42,6 @@ class StAmpMagModel extends DanteBaseModel
      */
     public function type_magnitude()
     {
-        return $this->hasOne('App\Api\v1\Models\TypeMagnitudeModel', 'id', 'fk_type_magnitude');
+        return $this->hasOne('App\Api\v1\Models\Tables\TypeMagnitudeModel', 'id', 'fk_type_magnitude');
     }
 }

@@ -45,7 +45,7 @@ class StrongmotionModel extends DanteBaseModel
      */    
     public function strongmotion_rsas()
     {
-        return $this->hasMany('App\Api\v1\Models\StrongmotionRsaModel', 'fk_strongmotion', 'id');
+        return $this->hasMany('App\Api\v1\Models\Tables\StrongmotionRsaModel', 'fk_strongmotion', 'id');
     }
 	
     /**
@@ -53,7 +53,7 @@ class StrongmotionModel extends DanteBaseModel
      */    
     public function strongmotion_alts()
     {
-        return $this->hasMany('App\Api\v1\Models\StrongmotionAltModel', 'fk_strongmotion', 'id');
+        return $this->hasMany('App\Api\v1\Models\Tables\StrongmotionAltModel', 'fk_strongmotion', 'id');
     }
 
 	/**

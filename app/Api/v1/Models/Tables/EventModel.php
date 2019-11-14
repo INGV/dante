@@ -39,7 +39,7 @@ class EventModel extends DanteBaseModel
      */
     public function provenance()
     {
-        return $this->hasOne('App\Api\v1\Models\ProvenanceModel', 'id', 'fk_provenance');
+        return $this->hasOne('App\Api\v1\Models\Tables\ProvenanceModel', 'id', 'fk_provenance');
     }
 	
     /**
@@ -47,7 +47,7 @@ class EventModel extends DanteBaseModel
      */
     public function type_event()
     {
-        return $this->hasOne('App\Api\v1\Models\TypeEventModel', 'id', 'fk_type_event');
+        return $this->hasOne('App\Api\v1\Models\Tables\TypeEventModel', 'id', 'fk_type_event');
     }
     
     /**
@@ -55,6 +55,6 @@ class EventModel extends DanteBaseModel
      */
     public function hypocenters()
     {
-        return $this->hasMany('App\Api\v1\Models\HypocenterModel', 'fk_event', 'id');
+        return $this->hasMany('App\Api\v1\Models\Tables\HypocenterModel', 'fk_event', 'id');
     }
 }

@@ -63,7 +63,7 @@ class AmplitudeModel extends DanteBaseModel
      */
     public function magnitudes()
     {
-        return $this->belongsToMany('App\Api\v1\Models\MagnitudeModel', 'st_amp_mag', 'fk_amplitude', 'fk_magnitude')->withPivot('ep_distance');
+        return $this->belongsToMany('App\Api\v1\Models\Tables\MagnitudeModel', 'st_amp_mag', 'fk_amplitude', 'fk_magnitude')->withPivot('ep_distance');
     }
     
     /**
@@ -71,7 +71,7 @@ class AmplitudeModel extends DanteBaseModel
      */    
     public function st_amp_mag()
     {
-        return $this->hasMany('App\Api\v1\Models\StAmpMagModel', 'fk_amplitude', 'id');
+        return $this->hasMany('App\Api\v1\Models\Tables\StAmpMagModel', 'fk_amplitude', 'id');
     }
 	
     /**
@@ -79,7 +79,7 @@ class AmplitudeModel extends DanteBaseModel
      */
     public function type_magnitude()
     {
-        return $this->hasOne('App\Api\v1\Models\TypeMagnitudeModel', 'id', 'fk_type_magnitude');
+        return $this->hasOne('App\Api\v1\Models\Tables\TypeMagnitudeModel', 'id', 'fk_type_magnitude');
     }
 	
     /**
@@ -87,7 +87,7 @@ class AmplitudeModel extends DanteBaseModel
      */
     public function type_amplitude()
     {
-        return $this->hasOne('App\Api\v1\Models\TypeAmplitudeModel', 'id', 'fk_type_amplitude');
+        return $this->hasOne('App\Api\v1\Models\Tables\TypeAmplitudeModel', 'id', 'fk_type_amplitude');
     }
 	
     /**
@@ -95,7 +95,7 @@ class AmplitudeModel extends DanteBaseModel
      */
     public function scnl()
     {
-        return $this->hasOne('App\Api\v1\Models\ScnlModel', 'id', 'fk_scnl');
+        return $this->hasOne('App\Api\v1\Models\Tables\ScnlModel', 'id', 'fk_scnl');
     }
 	
     /**
@@ -103,6 +103,6 @@ class AmplitudeModel extends DanteBaseModel
      */
     public function provenance()
     {
-        return $this->hasOne('App\Api\v1\Models\ProvenanceModel', 'id', 'fk_provenance');
+        return $this->hasOne('App\Api\v1\Models\Tables\ProvenanceModel', 'id', 'fk_provenance');
     }
 }
