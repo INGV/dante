@@ -47,18 +47,49 @@ class DanteBaseModel extends Model
     }
     
     /**
-     * This method is used to build the Validator roles (for 'store' route) array from 'protected $baseArray' array
+     * This method is used to build the Validator roles array (for 'store' route) from 'protected $baseArray' in each Model
+     *  the option 'removeUnique' is used to remove the 'unique' condition from array
      * 
      * @var array
      */
-    public function getValidatorRulesForStore() {
-        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-
+    public function getValidatorRulesForStore($arrayConf = ['removeUnique' => false]) {
         if ( isset($this->baseArray) ) {
-            \Log::debug("END(1) - ".__CLASS__.' -> '.__FUNCTION__);
+            if($arrayConf['removeUnique']) {
+                $newArray = [];
+                foreach ($this->baseArray as $key => $value) { // ie: $key = 'name' and $val => 'required|string|unique:loc_program,name'
+                    if (strpos($value, 'unique') !== false) {
+                        // true
+                        $explodedValue = explode('|', $value); // ie: 'required','string','unique:loc_program,name']
+                        $string = '';
+                        foreach ($explodedValue as $value2) {
+                            if (strpos($value2, 'unique') !== false) {
+                                // true
+                                continue;
+                            } else {
+                                $string .= $value2.'|';
+                            }
+                        }
+                        $string = rtrim($string,'|');
+                    } else {
+                        $string = $value;
+                    }
+                    $newArray[$key] = $string;
+                }
+                return $newArray;
+            }
             return $this->baseArray;
         }
-        \Log::debug("END(2) - ".__CLASS__.' -> '.__FUNCTION__);
+        return [];
+        /*
+        if (isset($this->baseArray)) {
+            if (isset($searchKeyToReturn) && array_key_exists($searchKeyToReturn, $this->baseArray)) {
+                return [
+                    $searchKeyToReturn => $this->baseArray[$searchKeyToReturn]
+                ];
+            }
+            return $this->baseArray;
+        }
+        */
     }
     
 	/**
