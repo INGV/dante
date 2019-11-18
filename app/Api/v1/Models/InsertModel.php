@@ -10,9 +10,14 @@ use App\Api\v1\Models\Tables\ScnlModel;
 use App\Api\v1\Models\Tables\EventModel;
 use App\Api\v1\Models\Tables\ProvenanceModel;
 use App\Api\v1\Models\Tables\TypeEventModel;
+use App\Api\v1\Models\Tables\AmplitudeModel;
 use App\Api\v1\Models\Tables\ModelModel;
+use App\Api\v1\Models\Tables\MagnitudeModel;
 use App\Api\v1\Models\Tables\LocProgramModel;
+use App\Api\v1\Models\Tables\TypeMagnitudeModel;
+use App\Api\v1\Models\Tables\TypeAmplitudeModel;
 use App\Api\v1\Models\Tables\TypeHypocenterModel;
+use App\Api\v1\Models\Tables\StAmpMagModel;
 use App\Api\v1\Models\Tables\HypocenterModel;
 
 class InsertModel extends Model
@@ -73,27 +78,12 @@ class InsertModel extends Model
      */        
     public static function insertEvent($event) 
     {	
-        /* Set '$arrayFieldsSet' with only fields set */
-        /*
-        $arrayFieldsToCheck = [ 
-            'id_locator',
-            'fk_pref_hyp',
-            'fk_pref_mag',
-            'fk_events_group',
-            'type_group'
-            ];
-        $arrayFieldsSet = self::buildArrayWithOnlyFieldsSet($event, $arrayFieldsToCheck);
-        */
 		/* Get foreign key id */
         $provenanceOutput = self::provenanceFirstOrCreate($event);
         $type_eventOutput = TypeEventModel::firstOrCreate([
             'name' => $event['type_event']
         ]);
-        
-        /* Add foreign key to '$arrayFieldsSet' */
-        //$arrayFieldsSet['fk_type_event'] = $type_eventOutput->id;
-        //$arrayFieldsSet['fk_provenance'] = $provenanceOutput->id;
-        
+                
         /* Add foreign key to '$event' */
         $event['fk_type_event'] = $type_eventOutput->id;
         $event['fk_provenance'] = $provenanceOutput->id;        
@@ -167,53 +157,6 @@ class InsertModel extends Model
     public static function insertHypocenter($hypocenter) 
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        // set params to default 'null' if not set
-        /*
-        $arrayFieldsToSetNull = [
-			'geom',
-            'err_ot', 
-            'err_lat', 
-            'err_lon', 
-            'err_depth', 
-            'err_h', 
-            'err_z', 
-            'e0_az', 
-            'e0_dip', 
-            'e0', 
-            'e1_az', 
-            'e1_dip', 
-            'e1', 
-            'e2_az', 
-            'e2_dip', 
-            'e2', 
-            'max_distance', 
-            'min_distance',
-            'azim_gap',
-            'sec_azim_gap',
-            'rms',
-            'w_rms',
-            'nph',
-            'nph_s',
-            'nph_tot',
-            'nph_fm',
-            'quality'
-            ];
-        foreach ($arrayFieldsToSetNull as $value) {
-            $hypocenter[$value] = (isset($hypocenter[$value]) && !empty($hypocenter[$value])) ? $hypocenter[$value] : null;
-        }
-        
-        // set params to default '0' if not set
-        $arrayFieldsToSetZero = [
-            'is_centroid', 
-            'fix_depth'
-            ];
-        foreach ($arrayFieldsToSetZero as $value) {
-            $hypocenter[$value] = (isset($hypocenter[$value]) && !empty($hypocenter[$value])) ? $hypocenter[$value] : 0;
-        }
-        */
-        // set param to default '68.3' if not set
-        //$hypocenter['confidence_lev'] = (isset($hypocenter['confidence_lev']) && !empty($hypocenter['confidence_lev'])) ? $hypocenter['confidence_lev'] : 68.3;
-
         /* Get foreign key id */
         $provenanceOutput = self::provenanceFirstOrCreate($hypocenter);        
         $modelOutput = ModelModel::firstOrCreate([
@@ -231,7 +174,7 @@ class InsertModel extends Model
         $hypocenter['fk_type_hypocenter']   = $type_hypocenterOutput->id;
         $hypocenter['fk_model']             = $modelOutput->id;
         $hypocenter['fk_loc_program']       = $loc_programOutput->id;
-        $hypocenter['fk_event']             = $hypocenter['eventid'];
+        $hypocenter['fk_event']             = $hypocenter['event_id'];
         
         /* Add supplementary fields */
         $hypocenter['geom']                 = 'POINT('.$hypocenter['lon'].','.$hypocenter['lat'].')';
@@ -239,10 +182,90 @@ class InsertModel extends Model
         /* Insert data */
         $hypocenterOutput = HypocenterModel::create($hypocenter);
         
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return HypocenterModel::find($hypocenterOutput->id);
     }
     
     /**
+     * Used to insert 'magnitude' from JSON.
+     */    
+    public static function insertMagnitude($magnitude) 
+    {
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
+		
+		/* Get foreign key id */
+		$provenanceOutput       = self::provenanceFirstOrCreate($magnitude);
+        $type_magnitudeOutput   = TypeMagnitudeModel::firstOrCreate([
+            'name' => $magnitude['type_magnitude']
+        ]);
+        
+        /* Add foreign key to '$magnitude' */
+        $magnitude['fk_provenance']     = $provenanceOutput->id;
+        $magnitude['fk_hypocenter']		= $magnitude['hypocenter_id'];
+        $magnitude['fk_type_magnitude'] = $type_magnitudeOutput->id;
+
+        /* Insert data */
+        $magnitudeOutput = MagnitudeModel::create($magnitude);
+
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return MagnitudeModel::find($magnitudeOutput->id);
+    }
+    
+    /**
+     * Used to insert 'amplitude' from JSON.
+     */    
+    public static function insertAmplitude($amplitude) 
+    {
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
+        
+		/* Get foreign key id */
+		$provenanceOutput       = self::provenanceFirstOrCreate($amplitude);    
+        $scnlOutput = ScnlModel::firstOrCreate([
+            'net'               => $amplitude['scnl_net'],
+            'sta'               => $amplitude['scnl_sta'],
+            'cha'               => $amplitude['scnl_cha'],
+            'loc'               => $amplitude['scnl_loc'] ?? '--',
+        ]);
+        $type_amplitudeOutput = TypeAmplitudeModel::firstOrCreate([
+            'type'              => $amplitude['type_amplitude']
+        ]);
+        
+        /* Add foreign key to '$amplitude' */
+        $amplitude['fk_scnl']           = $scnlOutput->id;
+        $amplitude['fk_provenance']     = $provenanceOutput->id;
+        $amplitude['fk_type_amplitude'] = $type_amplitudeOutput->id;
+        
+        /* Insert data */
+        $amplitudeOutput = AmplitudeModel::create($amplitude);
+        
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $amplitudeOutput;
+    }
+    
+    public static function buildStAmpMagArray($amplitude)
+    {
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
+        $st_amp_magArray = [];
+        $st_amp_mag__fillable = (new StAmpMagModel)->getFillable();
+        foreach ($amplitude as $amplitudeKey => $amplitudeValue) {
+            if (in_array($amplitudeKey, $st_amp_mag__fillable)) {
+                $st_amp_magArray[$amplitudeKey] = $amplitudeValue;
+            }
+        }
+
+        /* Get foreign key id */
+        $type_magnitudeOutput = TypeMagnitudeModel::firstOrCreate([
+            'name'              => $amplitude['type_magnitude']
+        ]); 
+
+        /* Add foreign key to 'st_amp_mag' */
+        $st_amp_magArray['fk_type_magnitude']    = $type_magnitudeOutput->id;
+            
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $st_amp_magArray;
+    }
+
+        /**
      * Used to insert 'pick' from JSON.
      */
     public static function insertPick($pick)
