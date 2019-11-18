@@ -4,6 +4,8 @@ namespace App\Api\v1\Models\Tables;
 
 use App\Api\v1\Models\DanteBaseModel;
 
+use Illuminate\Support\Facades\Validator;
+
 class ProvenanceModel extends DanteBaseModel
 {
     /* protected $connection = 'mysql_hdbrm_eventdb_ro'; */ /* set other DB connection */
@@ -32,7 +34,7 @@ class ProvenanceModel extends DanteBaseModel
         parent::setFillableFromBaseArray();
         parent::__construct($attributes);
     }
-    
+
     /**
      * Get the event for the provenance.
      */
