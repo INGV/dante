@@ -4,6 +4,8 @@ namespace App\Api\v1\Models\Tables;
 
 use App\Api\v1\Models\DanteBaseModel;
 
+use App\Api\v1\Models\Tables\StAmpMagModel;
+
 class MagnitudeModel extends DanteBaseModel
 {
     /* protected $connection = 'mysql_hdbrm_eventdb_ro'; */ /* set other DB connection */
@@ -52,15 +54,10 @@ class MagnitudeModel extends DanteBaseModel
      */
     public function amplitudes()
     {
+        $st_amp_mag__fillable     = (new StAmpMagModel)->getFillable();
+        $st_amp_mag__fillable[]   = 'id'; 
         return $this->belongsToMany('App\Api\v1\Models\Tables\AmplitudeModel', 'st_amp_mag', 'fk_magnitude', 'fk_amplitude')->withPivot(
-				'ep_distance',
-				'hyp_distance',
-				'azimut',
-				'mag',
-				'err_mag',
-				'mag_correction',
-				'is_used',
-				'fk_type_magnitude'
+				$st_amp_mag__fillable
 				)
 				->as('st_amp_mag')
 				->withTimestamps();
