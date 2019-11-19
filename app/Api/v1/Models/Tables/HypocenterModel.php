@@ -4,6 +4,8 @@ namespace App\Api\v1\Models\Tables;
 
 use App\Api\v1\Models\DanteBaseModel;
 
+use App\Api\v1\Models\Tables\PhaseModel;
+
 class HypocenterModel extends DanteBaseModel
 {
     protected $table = 'hypocenter';
@@ -162,20 +164,10 @@ class HypocenterModel extends DanteBaseModel
      */
     public function picks()
     {
+        $phase__fillable     = (new PhaseModel)->getFillable();
+        $phase__fillable[]   = 'id';
         return $this->belongsToMany('App\Api\v1\Models\Tables\PickModel', 'phase', 'fk_hypocenter', 'fk_pick')->withPivot(
-				'id',
-				'isc_code',
-				'ep_distance',
-				'hyp_distance',
-				'azimut',
-				'take_off',
-				'polarity_is_used',
-				'arr_time_is_used',
-				'residual',
-				'teo_travel_time',
-				'weight_in',
-				'weight_out',
-				'std_error'
+				$phase__fillable
 				)
 				->as('phase')
 				->withTimestamps();
