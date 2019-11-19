@@ -565,8 +565,11 @@ dd($hypocentersInserted);
             
             /* Prepare output */
             //$phasesToReturn['picks'][$n_phase] = PickModel::with('phase')->findOrFail($pickOutput->id)->toArray();
-            dd(PhaseModel::with('pick')->where('fk_pick', '=', $pickOutput->id)->where('fk_hypocenter', '=', $hypocenter->id)->get()->toArray());
-            $phasesToReturn['phases'][$n_phase] = PhaseModel::with('pick')->where('fk_pick', '=', $pickOutput->id)->where('fk_hypocenter', '=', $hypocenter->id);
+            $phasesToReturn['phases'][$n_phase] = PhaseModel::with('pick')
+                    ->where([
+                            ['fk_pick', '=', $pickOutput->id],
+                            ['fk_hypocenter', '=', $hypocenter->id]
+                    ])->first()->toArray();
 
             /* Encrease n_phase */
             $n_phase++;
@@ -659,8 +662,16 @@ dd($hypocentersInserted);
             /* Insert many-to-many relation between magnitude and amplitude */
             $magnitude->amplitudes()->attach($amplitudeOutput->id, $st_amp_magArray);
             
+            /* Get many-to-many relation just inserted ('st_amp_mag') */
+            $st_amp_mag = StAmpMagModel::where([
+                ['fk_magnitude', '=', $magnitude_id],
+                ['fk_amplitude', '=', $amplitudeOutput->id],
+            ])->first();
+            
             /* Prepare output */
-            $amplitudesToReturn['amplitudes'][$n_amplitude] = AmplitudeModel::with('st_amp_mag')->findOrFail($amplitudeOutput->id)->toArray();
+            //$amplitudesToReturn['amplitudes'][$n_amplitude] = AmplitudeModel::with('st_amp_mag')->findOrFail($amplitudeOutput->id)->toArray();
+            $amplitudesToReturn['amplitudes'][$n_amplitude]                 = $amplitudeOutput->toArray();
+            $amplitudesToReturn['amplitudes'][$n_amplitude]['st_amp_mag']   = $st_amp_mag->toArray();
 
             /* Encrease n_amplitude */
             $n_amplitude++;                        
