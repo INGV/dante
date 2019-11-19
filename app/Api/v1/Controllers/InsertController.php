@@ -15,6 +15,7 @@ use App\Api\v1\Models\Tables\EventModel;
 use App\Api\v1\Models\Tables\MagnitudeModel;
 use App\Api\v1\Models\Tables\StrongmotionModel;
 use App\Api\v1\Models\Tables\PickModel;
+use App\Api\v1\Models\Tables\PhaseModel;
 use App\Api\v1\Models\Tables\AmplitudeModel;
 use App\Api\v1\Models\Tables\TypeMagnitudeModel;
 use App\Api\v1\Models\Tables\TypeHypocenterModel;
@@ -285,6 +286,7 @@ dd($hypocentersInserted);
         }
         
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        dd($hypocentersToReturn);
         return $hypocentersToReturn;
     }
 
@@ -475,7 +477,6 @@ dd($hypocentersInserted);
             
             // Encrease n_pick
             $n_pick++;            
-            
         }
         
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
@@ -500,124 +501,75 @@ dd($hypocentersInserted);
             $hypocenter_id = null;
         }
         
+        /* Validate '$hypocenter_id' */
+		$validator = Validator::make(['hypocenter_id' => $hypocenter_id], [
+			'hypocenter_id'	=> $validator_default_check['hypocenter_id']
+		], $validator_default_message)->validate();
+        
+		/* Validate that phases contain arrays */
+		$validator = Validator::make($phases, [
+			'*'	=> 'array'
+		], ['array' => 'Array ":attribute" of "phases" must contains a phase array'])->validate();
+
+        
         /*** START - Set validation rules to validate phase ***/
         /* Get default validation rules from each model */ 
+        $validator_rules_for_pick               = (new PickModel)->getValidatorRulesForStore();
         $validator_rules_for_phase              = (new PhaseModel)->getValidatorRulesForStore();
+        $validator_rules_for_scnl               = (new ScnlModel)->getValidatorRulesForStore(['removeUnique' => true]);
+        
 
         /* Copy validation rules for magnitude, to final validation rules array */
-        $validator_rules = $validator_rules_for_phase;
+        $validator_rules = $validator_rules_for_pick + $validator_rules_for_phase;
 
         /* Remove foreign keys; because are 'required' by default */
         unset(
+                /* from 'pick' */
+                $validator_rules['fk_scnl'],
+                $validator_rules['fk_provenance'],                
+                /* from 'phase' */
+                $validator_rules['fk_pick'],
                 $validator_rules['fk_hypocenter'],
         );
 
         /* Add real value received from JSON */
-        $validator_rules['type_magnitude']      = $validator_rules_for_type_magnitude['name'];
-        $validator_rules['hypocenter_id']       = $validator_default_check['hypocenter_id'];
+        $validator_rules['scnl_net']            = $validator_rules_for_scnl['net'];
+        $validator_rules['scnl_sta']            = $validator_rules_for_scnl['sta'];
+        $validator_rules['scnl_cha']            = $validator_rules_for_scnl['cha'];
+        $validator_rules['scnl_loc']            = $validator_rules_for_scnl['loc'];
         /*** END - Set validation rules to validate phase ***/
         
         // Get 'hypocenter' Model
-        $hypocenter = HypocenterModel::findOrFail($arrayHypocenter['hypocenter_id']);
+        $hypocenter = HypocenterModel::findOrFail($hypocenter_id);
 		
-		// START - Validator for 'phases'
-		$validator = Validator::make($phases, [
-			'*'	=> 'array'
-		], ['array' => 'Array ":attribute" of "phases" must contains a phase array'])->validate();
-		// END - Validator for 'phases'
-		
-        // processing phases
+        /* Processing phases */
         $n_phase=0;
         foreach ($phases as $phase) {
-            // START - Validator
-            $validator = Validator::make($phase, [
-                // 'pick' validation
-                'id_picker'                 => 'integer',
-                'weight_picker'             => $validator_default_check['weight_integer'],
-                'arrival_time'              => $validator_default_check['data_time_with_msec'],
-                'err_arrival_time'          => 'numeric|nullable',
-                'firstmotion'               => 'string|size:1|nullable',
-                'emersio'                   => 'string|size:1|nullable',
-                'pamp'                      => 'numeric|nullable',
-                'provenance_name'           => $validator_default_check['provenance__name'],
-				'provenance_priority'       => $validator_default_check['provenance__priority'],
-                'provenance_instance'       => $validator_default_check['provenance__instance'],
-                'provenance_softwarename'   => $validator_default_check['provenance__softwarename'],
-                'provenance_username'       => $validator_default_check['provenance__username'],
-                'provenance_hostname'       => $validator_default_check['provenance__hostname'],
-                'provenance_description'    => $validator_default_check['provenance__description'],
-                'scnl_net'                  => $validator_default_check['net']."|required",
-                'scnl_sta'                  => $validator_default_check['sta']."|required",
-                'scnl_cha'                  => $validator_default_check['cha']."|required",
-                'scnl_loc'                  => $validator_default_check['loc'],
-                // 'phase' validation
-                'isc_code'                  => 'string|not_in:"0"|min:1|max:8',
-                "ep_distance"               => $validator_default_check['distance'],
-                "hyp_distance"              => $validator_default_check['distance'],
-                "azimut"                    => 'numeric|nullable',
-                "take_off"                  => 'numeric|nullable',
-                "polarity_is_used"          => 'integer|nullable',
-                "arr_time_is_used"          => 'integer|nullable',
-                "residual"                  => 'numeric|nullable',
-                "teo_travel_time"           => 'date_format:"Y-m-d H:i:s"|nullable',
-                "weight_phase_a_priori"     => $validator_default_check['weight_integer'],
-                "weight_phase_localization" => $validator_default_check['weight_float'],
-                "std_error"                 => 'integer|nullable',
-            ], $validator_default_message)->validate();
-            // END - Validator
+            /*** START - Validate phase ***/
+            /* Validate Provenance */
+            $this->validateProvenance($phase);
             
-            // START - Build 'phase' array
-            // set params to default 'null' if not set
-            $arrayFieldsToSetNull = [
-                'isc_code', 
-                'ep_distance', 
-                'hyp_distance', 
-                'azimut', 
-                'take_off', 
-                'polarity_is_used', 
-                'arr_time_is_used',
-                'residual',
-                'teo_travel_time',
-                'weight_phase_a_priori',
-                'weight_phase_localization',
-                'std_error',
-                ];
-            foreach ($arrayFieldsToSetNull as $value) {
-                $phase[$value] = (isset($phase[$value]) && !empty($phase[$value])) ? $phase[$value] : null;
-            }
+            /* Validate */
+            Validator::make($phase, $validator_rules, $validator_default_message)->validate();            
+            /*** END - Validate phase ***/
             
-            // build 'phase' array to link 'hypocenter' and 'pick'
-            $phaseInput = [
-                "isc_code"          => $phase['isc_code'],
-                "ep_distance"       => $phase['ep_distance'],
-                "hyp_distance"      => $phase['hyp_distance'],
-                "azimut"            => $phase['azimut'],
-                "take_off"          => $phase['take_off'],
-                "polarity_is_used"  => $phase['polarity_is_used'],
-                "arr_time_is_used"  => $phase['arr_time_is_used'],
-                "residual"          => $phase['residual'],
-                "teo_travel_time"   => $phase['teo_travel_time'],
-                "weight_in"         => $phase['weight_phase_a_priori'],
-                "weight_out"        => $phase['weight_phase_localization'],
-                "std_error"         => $phase['std_error'],
-            ];
-            // END - Build 'pick' array
+            /* Insert pick */
+            $pickOutput = InsertModel::insertPick($phase);
             
-            // Insert pick
-            $pickOutput = InsertModel::insertPick($phase);      
-            
-            // Link 'pick' to 'hypocenter' to many to many 'phase' table
-            $hypocenter->picks()->attach($pickOutput->id, $phaseInput);
+            /* Build pivot array fileds for many-to-many relation between 'hypocenter' and 'pick' (that is 'phase') */
+            $phaseArray = InsertModel::buildPhaseArray($phase);
+        //    dd($pickOutput->id, $hypocenter->id);
 
-            $phaseOutput = PickModel::findOrFail($pickOutput->id)->phase->where('fk_hypocenter', $hypocenter->id)->first();
-
-            // Prepare output
-            $phasesToReturn['phases'][$n_phase] = $pickOutput->toArray();
-            $phasesToReturn['phases'][$n_phase]['pivot'] = $phaseOutput;
-
-            // Encrease n_phase
-            $n_phase++;            
+            /* Insert many-to-many relation between magnitude and amplitude */
+            $hypocenter->picks()->attach($pickOutput->id, $phaseArray);
             
+            /* Prepare output */
+            //$phasesToReturn['picks'][$n_phase] = PickModel::with('phase')->findOrFail($pickOutput->id)->toArray();
+            dd(PhaseModel::with('pick')->where('fk_pick', '=', $pickOutput->id)->where('fk_hypocenter', '=', $hypocenter->id)->get()->toArray());
+            $phasesToReturn['phases'][$n_phase] = PhaseModel::with('pick')->where('fk_pick', '=', $pickOutput->id)->where('fk_hypocenter', '=', $hypocenter->id);
+
+            /* Encrease n_phase */
+            $n_phase++;
         }
         
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
@@ -629,7 +581,6 @@ dd($hypocentersInserted);
         
         $validator_default_check    = config('dante.validator_default_check');
         $validator_default_message  = config('dante.validator_default_messages');
-        $n_amplitude=0;
         
         /* Get '$amplitudes' array to process */
         $amplitudes = $data['amplitudes'];
@@ -666,12 +617,14 @@ dd($hypocentersInserted);
 
         /* Remove foreign keys; because are 'required' by default */
         unset(
-                $validator_rules['fk_scnl'],
+                /* from 'amplitude' */
+                $validator_rules['fk_type_amplitude'],
                 $validator_rules['fk_provenance'],
+                $validator_rules['fk_scnl'],
+                /* from 'st_amp_mag' */
                 $validator_rules['fk_magnitude'],
                 $validator_rules['fk_amplitude'],
                 $validator_rules['fk_type_magnitude'],
-                $validator_rules['fk_type_amplitude'],
         );
 
         /* Add real value received from JSON */
@@ -687,6 +640,7 @@ dd($hypocentersInserted);
         $magnitude = MagnitudeModel::findOrFail($magnitude_id);
 
         /* Processing amplitudes */
+        $n_amplitude=0;
         foreach ($amplitudes as $amplitude) {          
             /*** START - Validate amplitude ***/
             /* Validate Provenance */
@@ -699,7 +653,7 @@ dd($hypocentersInserted);
             /* Insert amplitude */
             $amplitudeOutput = InsertModel::insertAmplitude($amplitude);
             
-            /* Build pivot array fileds for many-to-many relation between magnitude and amplitude (that is st_amp_mag) */
+            /* Build pivot array fileds for many-to-many relation between 'magnitude' and 'amplitude' (that is 'st_amp_mag') */
             $st_amp_magArray = InsertModel::buildStAmpMagArray($amplitude);
 
             /* Insert many-to-many relation between magnitude and amplitude */
@@ -708,7 +662,7 @@ dd($hypocentersInserted);
             /* Prepare output */
             $amplitudesToReturn['amplitudes'][$n_amplitude] = AmplitudeModel::with('st_amp_mag')->findOrFail($amplitudeOutput->id)->toArray();
 
-            // Encrease n_amplitude
+            /* Encrease n_amplitude */
             $n_amplitude++;                        
         }
         

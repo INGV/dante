@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Support\Facades\DB;
 use App\Api\v1\Models\Tables\PickModel;
+use App\Api\v1\Models\Tables\PhaseModel;
 use App\Api\v1\Models\Tables\ScnlModel;
 use App\Api\v1\Models\Tables\EventModel;
 use App\Api\v1\Models\Tables\ProvenanceModel;
@@ -220,11 +221,11 @@ class InsertModel extends Model
         
 		/* Get foreign key id */
 		$provenanceOutput       = self::provenanceFirstOrCreate($amplitude);    
-        $scnlOutput = ScnlModel::firstOrCreate([
-            'net'               => $amplitude['scnl_net'],
-            'sta'               => $amplitude['scnl_sta'],
-            'cha'               => $amplitude['scnl_cha'],
-            'loc'               => $amplitude['scnl_loc'] ?? '--',
+        $scnlOutput             = ScnlModel::firstOrCreate([
+            'net'                   => $amplitude['scnl_net'],
+            'sta'                   => $amplitude['scnl_sta'],
+            'cha'                   => $amplitude['scnl_cha'],
+            'loc'                   => $amplitude['scnl_loc'] ?? '--',
         ]);
         $type_amplitudeOutput = TypeAmplitudeModel::firstOrCreate([
             'type'              => $amplitude['type_amplitude']
@@ -234,9 +235,18 @@ class InsertModel extends Model
         $amplitude['fk_scnl']           = $scnlOutput->id;
         $amplitude['fk_provenance']     = $provenanceOutput->id;
         $amplitude['fk_type_amplitude'] = $type_amplitudeOutput->id;
-        
+
+        /* Build array with only field fillable for 'amplitude' table */
+        $amplitudeWithOnlyFillableToStore = [];
+        $amplitude__fillable = (new AmplitudeModel)->getFillable();
+        foreach ($amplitude as $amplitudeKey => $amplitudeValue) {
+            if (in_array($amplitudeKey, $amplitude__fillable)) {
+                $amplitudeWithOnlyFillableToStore[$amplitudeKey] = $amplitudeValue;
+            }
+        }
+
         /* Insert data */
-        $amplitudeOutput = AmplitudeModel::create($amplitude);
+        $amplitudeOutput = AmplitudeModel::create($amplitudeWithOnlyFillableToStore);
         
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $amplitudeOutput;
@@ -245,11 +255,11 @@ class InsertModel extends Model
     public static function buildStAmpMagArray($amplitude)
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        $st_amp_magArray = [];
+        $st_amp_magWithOnlyFillableToStore = [];
         $st_amp_mag__fillable = (new StAmpMagModel)->getFillable();
         foreach ($amplitude as $amplitudeKey => $amplitudeValue) {
             if (in_array($amplitudeKey, $st_amp_mag__fillable)) {
-                $st_amp_magArray[$amplitudeKey] = $amplitudeValue;
+                $st_amp_magWithOnlyFillableToStore[$amplitudeKey] = $amplitudeValue;
             }
         }
 
@@ -259,10 +269,10 @@ class InsertModel extends Model
         ]); 
 
         /* Add foreign key to 'st_amp_mag' */
-        $st_amp_magArray['fk_type_magnitude']    = $type_magnitudeOutput->id;
+        $st_amp_magWithOnlyFillableToStore['fk_type_magnitude']    = $type_magnitudeOutput->id;
             
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
-        return $st_amp_magArray;
+        return $st_amp_magWithOnlyFillableToStore;
     }
 
         /**
@@ -271,62 +281,67 @@ class InsertModel extends Model
     public static function insertPick($pick)
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-
-        // set params to default 'null' if not set
-        $arrayFieldsToSetNull = [
-            'weight_picker',
-            'err_arrival_time',
-            'firstmotion',
-            'emersio',
-            'pamp',
-            ];
-        foreach ($arrayFieldsToSetNull as $value) {
-            $pick[$value] = (isset($pick[$value]) && !empty($pick[$value])) ? $pick[$value] : null;
-        }
-        // set params to default '0' if not set
-        $arrayFieldsToSetNull = [
-            'id_picker'
-            ];
-        foreach ($arrayFieldsToSetNull as $value) {
-            $pick[$value] = (isset($pick[$value]) && !empty($pick[$value])) ? $pick[$value] : 0;
-        }
-
-        $provenanceOutput = self::provenanceFirstOrCreate($pick);
-
-        $scnlOutput = ScnlModel::firstOrCreate([
+        
+		/* Get foreign key id */
+		$provenanceOutput   = self::provenanceFirstOrCreate($pick);
+        $scnlOutput         = ScnlModel::firstOrCreate([
             'net'               => $pick['scnl_net'],
             'sta'               => $pick['scnl_sta'],
             'cha'               => $pick['scnl_cha'],
             'loc'               => $pick['scnl_loc'] ?? '--',
         ]);
-
-        // CAST 'arrival_time' to 'DATETIME(3)' using MySQL.
-        //  Eseguo il CAST via MySQL in quanto potrebbe variare rispetto a quello fatto di PHP e la UNIQUE potrebbe non verificarsi.
+        
+        /* Add foreign key to '$pick' */
+        $pick['fk_scnl']           = $scnlOutput->id;
+        $pick['fk_provenance']     = $provenanceOutput->id;
+        
+        /* CAST 'arrival_time' to 'DATETIME(3)' using MySQL.
+         *  Eseguo il CAST via MySQL in quanto potrebbe variare rispetto a quello fatto di PHP e la UNIQUE potrebbe non verificarsi.
+         */
         $arrival_time_casted = \DB::select(DB::raw("SELECT CONVERT( CAST('".$pick['arrival_time']."' AS DATETIME(3)), CHAR) AS arrival_time" ))[0]->arrival_time;
         $pick['arrival_time'] = $arrival_time_casted;
+        
+        /* Build array with only field fillable for 'pick' table */
+        $pickWithOnlyFillableToStore = [];
+        $pick__fillable = (new PickModel)->getFillable();
+        foreach ($pick as $pickKey => $pickValue) {
+            if (in_array($pickKey, $pick__fillable)) {
+                $pickWithOnlyFillableToStore[$pickKey] = $pickValue;
+            }
+        }
+
+        /* Fields  'UNIQUE' in 'pick' table */
+        $pick_unique = array_intersect_key($pickWithOnlyFillableToStore, array_flip(['arrival_time', 'fk_provenance', 'fk_scnl']));
+                
+        /* Fields NOT 'UNIQUE' in 'pick' table */
+        $pick_not_unique = array_diff($pickWithOnlyFillableToStore, $pick_unique);
 
         /*
          * NOTA: 'arrival_time', 'fk_provenance', and 'fk_scnl' are 'UNIQUE' in 'pick' table;
-         *  then, the check of 'updateOrCreate' must be executed only on these fields. If these 4 records do not exist, the INSERT/UPDATE will be
-         *  with all 9 fileds.
+         *  then, the check of 'firstOrCreate' must be executed only on these fields. 
+         *  If these 3 records do not exist, the INSERT will be done with all 9 fileds.
          */
         $pickOutput = PickModel::firstOrCreate(
-            [
-                'arrival_time'      => $pick['arrival_time'],
-                'fk_provenance'     => $provenanceOutput->id,
-                'fk_scnl'           => $scnlOutput->id,
-            ],
-            [
-                'id_picker'         => $pick['id_picker'],
-                'weight'            => $pick['weight_picker'],
-                'err_arrival_time'  => $pick['err_arrival_time'],
-                'firstmotion'       => $pick['firstmotion'],
-                'emersio'           => $pick['emersio'],
-                'pamp'              => $pick['pamp']
-            ]
+            $pick_unique,
+            $pick_not_unique
         );
 
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $pickOutput;
+    }
+    
+    public static function buildPhaseArray($phase)
+    {
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
+        $phaseWithOnlyFillableToStore = [];
+        $phase__fillable = (new PhaseModel)->getFillable();
+        foreach ($phase as $phaseKey => $phaseValue) {
+            if (in_array($phaseKey, $phase__fillable)) {
+                $phaseWithOnlyFillableToStore[$phaseKey] = $phaseValue;
+            }
+        }
+            
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $phaseWithOnlyFillableToStore;
     }
 }
