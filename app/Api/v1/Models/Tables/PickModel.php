@@ -23,8 +23,8 @@ class PickModel extends DanteBaseModel
 		'weight'            => 'nullable|integer',
 		'arrival_time'		=> 'required|---data_time_with_msec---',
 		'err_arrival_time'  => 'nullable|numeric',
-		'firstmotion'		=> 'nullable|string',
-		'emersio'           => 'nullable|string',
+		'firstmotion'		=> 'nullable|string|size:1',
+		'emersio'           => 'nullable|string|size:1',
 		'pamp'              => 'nullable|numeric',
 		'fk_provenance'		=> 'required|integer',
 		'fk_scnl'           => 'required|integer'
