@@ -19,7 +19,7 @@ class PhaseModel extends DanteBaseModel
      * @var array
      */     
     protected $baseArray = [
-		'isc_code'          => 'required|string',
+		'isc_code'          => 'required|string|not_in:"0"|min:1|max:8',
 		'fk_hypocenter'		=> 'required|integer',
 		'fk_pick'           => 'required|integer',
 		'ep_distance'		=> 'nullable|numeric',
@@ -29,7 +29,7 @@ class PhaseModel extends DanteBaseModel
 		'polarity_is_used'	=> 'nullable|integer',
 		'arr_time_is_used'	=> 'nullable|integer',
 		'residual'          => 'nullable|numeric',
-		'teo_travel_time'	=> 'nullable|date',
+		'teo_travel_time'	=> 'nullable|date_format:"Y-m-d H:i:s"',
 		'weight_in'         => 'nullable|integer',
 		'weight_out'		=> 'nullable|numeric',
 		'std_error'         => 'nullable|integer'
@@ -39,5 +39,13 @@ class PhaseModel extends DanteBaseModel
         parent::updateBaseArray();
         parent::setFillableFromBaseArray();
         parent::__construct($attributes);
+    }
+    
+    /**
+     * Get the event that owns the hypocenter.
+     */
+    public function pick()
+    {
+        return $this->belongsTo('App\Api\v1\Models\Tables\PickModel', 'fk_pick', 'id');
     }
 }
