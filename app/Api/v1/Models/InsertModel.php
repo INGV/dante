@@ -20,6 +20,9 @@ use App\Api\v1\Models\Tables\TypeAmplitudeModel;
 use App\Api\v1\Models\Tables\TypeHypocenterModel;
 use App\Api\v1\Models\Tables\StAmpMagModel;
 use App\Api\v1\Models\Tables\HypocenterModel;
+use App\Api\v1\Models\Tables\StrongmotionModel;
+use App\Api\v1\Models\Tables\StrongmotionAltModel;
+use App\Api\v1\Models\Tables\StrongmotionRsaModel;
 
 class InsertModel extends Model
 {
@@ -100,56 +103,47 @@ class InsertModel extends Model
     /**
      * Used to update 'event' from JSON.
      */        
-    public static function updateEvent($eventToUpdateFromDb, $newEvent) 
+    public static function updateEvent($eventToUpdate, $newData) 
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
         
-        // Check 'provenance'
-        if (
-                isset($newEvent['provenance_name']) && !empty($newEvent['provenance_name'])
-                &&
-                isset($newEvent['provenance_softwarename']) && !empty($newEvent['provenance_softwarename'])
-                &&
-                isset($newEvent['provenance_username']) && !empty($newEvent['provenance_username'])
-                &&
-                isset($newEvent['provenance_hostname']) && !empty($newEvent['provenance_hostname'])
-            ) {
-            $provenanceOutput = $this->provenanceFirstOrCreate($newEvent);
-            $eventToUpdateFromDb->fk_provenance = $provenanceOutput->id;
-        }
+        /* Get/Set 'provenance' foreign key id */
+        $provenanceOutput = self::provenanceFirstOrCreate($newData);
+        $eventToUpdate->fk_provenance = $provenanceOutput->id;
 
-        // Check 'id_locator'
-        if (isset($newEvent['id_locator']) && !empty($newEvent['id_locator'])) {
-            $eventToUpdateFromDb->id_locator = $newEvent['id_locator'];
+        /* Check 'id_locator' */
+        if (isset($newData['id_locator']) && !empty($newData['id_locator'])) {
+            $eventToUpdate->id_locator = $newData['id_locator'];
         }
         
-        // Check 'fk_events_group'
-        if (isset($newEvent['fk_events_group']) && !empty($newEvent['fk_events_group'])) {
-            $eventToUpdateFromDb->fk_events_group = $newEvent['fk_events_group'];
+        /* Check 'fk_events_group' */
+        if (isset($newData['fk_events_group']) && !empty($newData['fk_events_group'])) {
+            $eventToUpdate->fk_events_group = $newData['fk_events_group'];
         }
         
-        // Check 'fk_pref_hyp'
-        if (isset($newEvent['fk_pref_hyp']) && !empty($newEvent['fk_pref_hyp'])) {
-            $eventToUpdateFromDb->fk_pref_hyp = $newEvent['fk_pref_hyp'];
+        /* Check 'fk_pref_hyp' */
+        if (isset($newData['fk_pref_hyp']) && !empty($newData['fk_pref_hyp'])) {
+            $eventToUpdate->fk_pref_hyp = $newData['fk_pref_hyp'];
         }
         
-        // Check 'fk_pref_mag'
-        if (isset($newEvent['fk_pref_mag']) && !empty($newEvent['fk_pref_mag'])) {
-            $eventToUpdateFromDb->fk_pref_mag = $newEvent['fk_pref_mag'];
+        /* Check 'fk_pref_mag' */
+        if (isset($newData['fk_pref_mag']) && !empty($newData['fk_pref_mag'])) {
+            $eventToUpdate->fk_pref_mag = $newData['fk_pref_mag'];
         }        
         
-        // Check 'type_event'
-        if (isset($newEvent['type_event']) && !empty($newEvent['type_event'])) {
+        /* Check 'type_event' */
+        if (isset($newData['type_event']) && !empty($newData['type_event'])) {
             $type_eventOutput = TypeEventModel::firstOrCreate([
-                'name' => $newEvent['type_event']
+                'name' => $newData['type_event']
             ]);            
-            $eventToUpdateFromDb->fk_type_event = $type_eventOutput->id;
+            $eventToUpdate->fk_type_event = $type_eventOutput->id;
         }
         
-        $eventToUpdateFromDb->save();
+        /* Update data */
+        $eventToUpdate->save();
 
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
-        return $eventToUpdateFromDb;
+        return $eventToUpdate;
     }
     
     /**
@@ -275,7 +269,7 @@ class InsertModel extends Model
         return $st_amp_magWithOnlyFillableToStore;
     }
 
-        /**
+    /**
      * Used to insert 'pick' from JSON.
      */
     public static function insertPick($pick)
@@ -311,13 +305,13 @@ class InsertModel extends Model
         }
 
         /* Fields  'UNIQUE' in 'pick' table */
-        $pick_unique = array_intersect_key($pickWithOnlyFillableToStore, array_flip(['arrival_time', 'fk_provenance', 'fk_scnl']));
+        $pick_unique = array_intersect_key($pickWithOnlyFillableToStore, array_flip(['arrival_time', 'fk_provenance', 'fk_scnl', 'pamp']));
                 
         /* Fields NOT 'UNIQUE' in 'pick' table */
         $pick_not_unique = array_diff($pickWithOnlyFillableToStore, $pick_unique);
 
-        /*
-         * NOTA: 'arrival_time', 'fk_provenance', and 'fk_scnl' are 'UNIQUE' in 'pick' table;
+        /* Insert data
+         * NOTA: 'arrival_time', 'fk_provenance', 'fk_scnl' and 'pamp' are 'UNIQUE' in 'pick' table;
          *  then, the check of 'firstOrCreate' must be executed only on these fields. 
          *  If these 3 records do not exist, the INSERT will be done with all 9 fileds.
          */
@@ -343,5 +337,115 @@ class InsertModel extends Model
             
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $phaseWithOnlyFillableToStore;
+    }
+    
+    /**
+     * Used to insert 'strongmotion' from JSON.
+     */    
+    public static function insertStrongmotion($strongmotion) 
+    {
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
+        
+		/* Get foreign key id */
+		$provenanceOutput       = self::provenanceFirstOrCreate($strongmotion);
+        $scnlOutput             = ScnlModel::firstOrCreate([
+            'net'                   => $strongmotion['scnl_net'],
+            'sta'                   => $strongmotion['scnl_sta'],
+            'cha'                   => $strongmotion['scnl_cha'],
+            'loc'                   => $strongmotion['scnl_loc'] ?? '--',
+        ]);
+        
+        /* Add foreign key to '$amplitude' */
+        $strongmotion['fk_scnl']            = $scnlOutput->id;
+        $strongmotion['fk_event']           = $strongmotion['event_id'];
+        $strongmotion['fk_provenance']      = $provenanceOutput->id;
+        
+		/* Check if '$value['period']' are standard (0.30, 1.00, 3.00) or not; if 'yes' it will be inserted in the 'strongmotion' table 
+		 * otherwise a new line in the in the 'strongmotion_rsa' will be created
+		 */
+		$strongmotion_rsa__count = 0;
+		$strongmotion_rsa__arrayToInsert = [];
+		if (is_array($strongmotion['rsa'])) {
+			foreach ($strongmotion['rsa'] as $value) {
+				if( abs($value['period'] - 0.3) < 0.001)  {
+					 $strongmotion['rsa_030'] = $value['value'];
+				}else if( abs($value['period'] - 1) < 0.001 ) {
+					 $strongmotion['rsa_100'] = $value['value'];
+				}else if( abs($value['period'] - 3) < 0.001 ) {
+					 $strongmotion['rsa_300'] = $value['value'];
+				}else{
+					$strongmotion_rsa__arrayToInsert[$strongmotion_rsa__count]['period'] = $value['period'];
+					$strongmotion_rsa__arrayToInsert[$strongmotion_rsa__count]['value']  = $value['value'];
+					$strongmotion_rsa__count++;
+				}
+			}
+		}
+        
+        /* Build array with only field fillable for 'strongmotion' table */
+        $strongmotionWithOnlyFillableToStore = [];
+        $strongmotion__fillable = (new StrongmotionModel)->getFillable();
+        foreach ($strongmotion as $strongmotionKey => $strongmotionValue) {
+            if (in_array($strongmotionKey, $strongmotion__fillable)) {
+                $strongmotionWithOnlyFillableToStore[$strongmotionKey] = $strongmotionValue;
+            }
+        }
+        
+        /* Fields  'UNIQUE' in 'strongmotion' table */
+        $strongmotion_unique = array_intersect_key($strongmotionWithOnlyFillableToStore, array_flip(['fk_event', 'fk_provenance', 'fk_scnl']));
+                
+        /* Fields NOT 'UNIQUE' in 'strongmotion' table */
+        $strongmotion_not_unique = array_diff($strongmotionWithOnlyFillableToStore, $strongmotion_unique);
+        
+        /* Insert data
+         * NOTA: 'fk_event', 'fk_provenance', and 'fk_scnl' are 'UNIQUE' in 'strongmotion' table;
+         *  then, the check of 'firstOrCreate' must be executed only on these fields. 
+         *  If these 3 records do not exist, the INSERT will be done with all fileds.
+         */
+        $strongmotionOutput = StrongmotionModel::firstOrCreate(
+            $strongmotion_unique,
+            $strongmotion_not_unique
+        );
+
+		/* Update or create 'strongmotion_rsa' tuple */
+		if ($strongmotion_rsa__count > 0) {
+			foreach ($strongmotion_rsa__arrayToInsert as $value) {            
+				$strongmotionRsaOutput = StrongmotionRsaModel::updateOrCreate(
+					[
+						'fk_strongmotion'   => $strongmotionOutput->id,
+						'period'	        => $value['period'],
+					],
+					[
+						'value'				=> $value['value'],
+					]
+				);
+			}
+		}
+		
+		/* Update or create 'strongmotion_alt' tuple */
+		if ( array_key_exists('alternate_time', $strongmotion) && $strongmotion['alternate_time'] != '1970-01-01 00:00:00.000' ) {
+			$alternate_time = $strongmotion['alternate_time'];
+		}else{
+			$alternate_time = null;
+		}
+		if ( array_key_exists('alternate_code', $strongmotion) && $strongmotion['alternate_code'] != 0 ) {
+			$alternate_code = $strongmotion['alternate_code'];
+		}else{
+			$alternate_code = null;
+		}
+		if (!is_null($alternate_time) && !is_null($alternate_code)) {
+			$strongmotionAltOutput = StrongmotionAltModel::updateOrCreate(
+				[
+					'fk_strongmotion'   => $strongmotionOutput->id,
+					't_alt_dt'	        => $alternate_time,
+					'altcode'			=> $alternate_code,
+				]
+			);
+		}
+		
+		/* Retrieve complete data */
+		$strongmotionOutput = StrongmotionModel::with('strongmotion_rsas','strongmotion_alts')->find($strongmotionOutput->id);
+
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $strongmotionOutput;
     }
 }

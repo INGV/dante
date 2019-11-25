@@ -14,6 +14,8 @@ use App\Api\v1\Models\Tables\HypocenterModel;
 use App\Api\v1\Models\Tables\EventModel;
 use App\Api\v1\Models\Tables\MagnitudeModel;
 use App\Api\v1\Models\Tables\StrongmotionModel;
+use App\Api\v1\Models\Tables\StrongmotionAltModel;
+use App\Api\v1\Models\Tables\StrongmotionRsaModel;
 use App\Api\v1\Models\Tables\PickModel;
 use App\Api\v1\Models\Tables\PhaseModel;
 use App\Api\v1\Models\Tables\AmplitudeModel;
@@ -45,6 +47,8 @@ use App\Api\Jobs\SetPreferredJob;
  */
 class InsertController extends DanteBaseController
 {
+    protected $httpStatusCodeToReturn = 201;
+    
     /*
      * 
      */
@@ -113,7 +117,7 @@ class InsertController extends DanteBaseController
      * @param type $data Array completo 'event' (vedere lo Swagger).
      * @return array $eventToReturn E' l'array di output a seguito dell'inseriemnto.
      */
-    public function insertEvent($data) {
+    public function processEvent($data) {
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         $eventToStore = $data['event'];
                 
@@ -131,6 +135,7 @@ class InsertController extends DanteBaseController
 			$event = $getEvent->select('event.*')->first();
 			\Log::debug('  2/2 - already exists and is "id='.$event->id.'".');
 			$eventOutput = InsertModel::updateEvent($event, $eventToStore);
+            $this->httpStatusCodeToReturn = 200;
 		} else {
 			\Log::debug('  2/2 - does not exist; inserting.');
 			/* Insert event */
@@ -143,49 +148,12 @@ class InsertController extends DanteBaseController
         /* Check if 'hypocenters' array key, exists */
         if ( (isset($eventToStore['hypocenters'])) && !empty($eventToStore['hypocenters']) ) {
             $hypocentersInserted = $this->insertHypocenters($eventToStore, $eventOutput->id);          
-dd($hypocentersInserted);            
             $eventToReturn['event'] = array_merge($eventToReturn['event'], $hypocentersInserted);
         }
         
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $eventToReturn;
-    }
-    
-    /**
-     * @brief Update a complete JSON event into the DB.
-     * 
-     * Questo metodo permette di aggioranre i valori di 'event' prendendo in input l'id del 'event' da aggiornare e un array contenente i valori d'aggioranre.
-     * 
-     * @param type $data Array del solo tag 'event' (vedere lo Swagger). 
-     * @param type $eventIdToUpdate 'id' delle tabella 'event' d'aggiornare
-     * 
-     * @return array $eventToReturn E' l'array di output a seguito dell'inseriemnto.
-     */
-    public function updateEvent($data, $eventIdToUpdate) {
-        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        
-        /* get event to update, if exists */
-        try {
-            $eventToUpdateFromDb = EventModel::findOrFail($eventIdToUpdate);
-        } catch (ModelNotFoundException $e) {
-            \Log::debug(" Exception");
-            abort(404, '"event.id='.$eventIdToUpdate.'" not found!');
-        }
-        
-        $newEvent = $data['event'];
-        
-        /* Validate 'event' */
-        $this->validateEvent($newEvent);
-
-        /* Update event */
-        $eventOutput = EventModel::updateEvent($eventToUpdateFromDb, $newEvent);
-  
-        /* Prepare output */
-        $eventToReturn['event'] = $eventOutput->toArray();
-        
-        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
-        return $eventToReturn;
-    }    
+    }   
     
     /**
      * @brief Insert a complete JSON 'hypocenters' into the DB.
@@ -220,7 +188,7 @@ dd($hypocentersInserted);
         /* Get '$hypocenters' array to process */
         $hypocenters = $data['hypocenters'];
 
-        // Get, set and validate input parameters
+        /* Get 'event_id' to attach hypocenters */
         if( isset($eventidToAttachTo) && !empty($eventidToAttachTo) ) {
             $event_id = $eventidToAttachTo;
         } elseif( isset($data['eventid']) && !empty($data['eventid']) ) {
@@ -286,11 +254,10 @@ dd($hypocentersInserted);
         }
         
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
-        dd($hypocentersToReturn);
         return $hypocentersToReturn;
     }
 
-    public function insertMagnitudes($data, $receivedHypocenter_id=null) {
+    public function insertMagnitudes($data, $hypocenteridToAttachTo=null) {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
 
         $validator_default_check    = config('dante.validator_default_check');
@@ -301,8 +268,8 @@ dd($hypocentersInserted);
         $magnitudes = $data['magnitudes'];
         
         /* Get 'hypocenter_id' to attach to magnitudes to processed */
-        if( isset($receivedHypocenter_id) && !empty($receivedHypocenter_id) ) {
-            $hypocenter_id = $receivedHypocenter_id;
+        if( isset($hypocenteridToAttachTo) && !empty($hypocenteridToAttachTo) ) {
+            $hypocenter_id = $hypocenteridToAttachTo;
         } elseif( isset($data['hypocenter_id']) && !empty($data['hypocenter_id']) ) {
             $hypocenter_id = $data['hypocenter_id'];
         } else {
@@ -362,68 +329,88 @@ dd($hypocentersInserted);
         return $magnitudesToReturn;
     }
 	
-    public function insertStrongmotions($data, $receivedEvent_id=null) {
+    public function insertStrongmotions($data, $eventidToAttachTo=null) {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
 
         $validator_default_check    = config('dante.validator_default_check');
         $validator_default_message  = config('dante.validator_default_messages');
-        $n_strongmotion=0;
         
-        // Get, set and validate input parameters
+        /* Get '$strongmotions' array to process */
         $strongmotions = $data['strongmotions'];
-        if( (isset($receivedEvent_id)) && !empty($receivedEvent_id) ) {
-            $arrayEvent['event_id'] = $receivedEvent_id;
+
+        /* Get 'event_id' to attach stronmotions */
+        if( isset($eventidToAttachTo) && !empty($eventidToAttachTo) ) {
+            $event_id = $eventidToAttachTo;
+        } elseif( isset($data['event_id']) && !empty($data['event_id']) ) {
+            $event_id = $data['event_id'];
         } else {
-            $arrayEvent['event_id'] = $data['event_id'];
+            $event_id = null;
         }
         
-        // START - Validator for 'event_id'
-        $validator = Validator::make($arrayEvent, [
-            'event_id'             => $validator_default_check['event_id']
-        ], $validator_default_message)->validate();
-        // END - Validator for 'event_id'
+        /* Validate '$event_id' */
+		$validator = Validator::make(['event_id' => $event_id], [
+			'event_id'	=> $validator_default_check['event_id']
+		], $validator_default_message)->validate();
         
-        // processing strongmotions
+		/* Validate that strongmotions contains arrays */
+		$validator = Validator::make($strongmotions, [
+			'*'	=> 'array'
+		], ['array' => 'Array ":attribute" of "strongmotions" must contains a strongmotion array'])->validate();
+        
+        /*** START - Set validation rules to validate strongmotion ***/
+        /* Get default validation rules from each model */ 
+        $validator_rules_for_strongmotion       = (new StrongmotionModel)->getValidatorRulesForStore();
+        $validator_rules_for_strongmotion_alt   = (new StrongmotionAltModel)->getValidatorRulesForStore();
+        $validator_rules_for_strongmotion_rsa   = (new StrongmotionRsaModel)->getValidatorRulesForStore();
+        $validator_rules_for_scnl               = (new ScnlModel)->getValidatorRulesForStore(['removeUnique' => true]);
+
+        /* Copy validation rules for strongmotion, to final validation rules array */
+        $validator_rules = $validator_rules_for_strongmotion;
+
+        /* Remove foreign keys; because are 'required' by default */
+        unset(
+                $validator_rules['fk_scnl'],
+                $validator_rules['fk_event'],
+                $validator_rules['fk_provenance'],
+        );
+
+        /* Add real value received from JSON */
+        $validator_rules['scnl_net']            = $validator_rules_for_scnl['net'];
+        $validator_rules['scnl_sta']            = $validator_rules_for_scnl['sta'];
+        $validator_rules['scnl_cha']            = $validator_rules_for_scnl['cha'];
+        $validator_rules['scnl_loc']            = $validator_rules_for_scnl['loc'];
+        $validator_rules['alternate_time']      = $validator_rules_for_strongmotion_alt['t_alt_dt'];
+        $validator_rules['alternate_code']      = $validator_rules_for_strongmotion_alt['altcode'];
+        $validator_rules['rsa.*.value']         = $validator_rules_for_strongmotion_rsa['value'];
+        $validator_rules['rsa.*.period']         = $validator_rules_for_strongmotion_rsa['period'];
+        /*** END - Set validation rules to validate strongmotion ***/
+
+        /* Get 'event' Model */
+        $event = EventModel::findOrFail($event_id);
+        
+        /* Processing strongmotions */
+        $n_strongmotion=0;
         foreach ($strongmotions as $strongmotion) {
-            $strongmotion['event_id'] = $arrayEvent['event_id'];
-
-            // START - Validator
-            $validator = Validator::make($strongmotion, [
-                't_dt'                      => $validator_default_check['data_time_with_msec'],
-                'pga'                       => 'nullable|numeric',
-                'tpga_dt'                   => 'nullable|date',
-                'pgv'						=> 'nullable|numeric',
-                'tpgv_dt'                   => 'nullable|date',
-                'pgd'						=> 'nullable|numeric',
-                'tpgd_dt'                   => 'nullable|date',
-				'alternate_time'			=> 'nullable|date',
-				'alternate_code'			=> 'nullable|integer',
-                'scnl_net'                  => $validator_default_check['net'],
-                'scnl_sta'                  => $validator_default_check['sta'],
-                'scnl_cha'                  => $validator_default_check['cha'],
-                'scnl_loc'                  => $validator_default_check['loc'],
-				'rsa.*.value'				=> 'nullable|numeric',
-				'rsa.*.period'				=> 'nullable|numeric',
-                'provenance_name'           => $validator_default_check['provenance__name'],
-				'provenance_priority'       => $validator_default_check['provenance__priority'],
-                'provenance_instance'       => $validator_default_check['provenance__instance'],
-                'provenance_softwarename'   => $validator_default_check['provenance__softwarename'],
-                'provenance_username'       => $validator_default_check['provenance__username'],
-                'provenance_hostname'       => $validator_default_check['provenance__hostname'],
-                'provenance_description'    => $validator_default_check['provenance__description']
-            ], $validator_default_message)->validate();
-            // END - Validator
-
-            // Insert strongmotion
-            $strongmotionOutput = StrongmotionModel::insertStrongmotion($strongmotion);
+            $strongmotion['event_id'] = $event_id;
             
+            /*** START - Validate strongmotion ***/
+            /* Validate Provenance */
+            $this->validateProvenance($strongmotion);
+
+            /* Validate strongmotion params */
+            Validator::make($strongmotion, $validator_rules, $validator_default_message)->validate();
+            /*** END - Validate strongmotion ***/
+
+            /* Insert strongmotion */
+            $strongmotionOutput = InsertModel::insertStrongmotion($strongmotion);
+                        
             // Prepare output
             $strongmotionsToReturn['strongmotions'][$n_strongmotion] = $strongmotionOutput->toArray();
             
             // Encrease n_strongmotion
             $n_strongmotion++;            
         }
-        
+
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $strongmotionsToReturn;
     }
@@ -483,7 +470,7 @@ dd($hypocentersInserted);
         return $picksToReturn;
     }
     
-    public function insertPhases($data, $receivedHypocenter_id=null) {
+    public function insertPhases($data, $hypocenteridToAttachTo=null) {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
         
         $validator_default_check    = config('dante.validator_default_check');
@@ -493,8 +480,8 @@ dd($hypocentersInserted);
         $phases = $data['phases'];
         
         /* Get 'hypocenter_id' to attach to magnitudes to processed */
-        if( isset($receivedHypocenter_id) && !empty($receivedHypocenter_id) ) {
-            $hypocenter_id = $receivedHypocenter_id;
+        if( isset($hypocenteridToAttachTo) && !empty($hypocenteridToAttachTo) ) {
+            $hypocenter_id = $hypocenteridToAttachTo;
         } elseif( isset($data['hypocenter_id']) && !empty($data['hypocenter_id']) ) {
             $hypocenter_id = $data['hypocenter_id'];
         } else {
@@ -506,18 +493,16 @@ dd($hypocentersInserted);
 			'hypocenter_id'	=> $validator_default_check['hypocenter_id']
 		], $validator_default_message)->validate();
         
-		/* Validate that phases contain arrays */
+		/* Validate that phases contains arrays */
 		$validator = Validator::make($phases, [
 			'*'	=> 'array'
 		], ['array' => 'Array ":attribute" of "phases" must contains a phase array'])->validate();
-
         
         /*** START - Set validation rules to validate phase ***/
         /* Get default validation rules from each model */ 
         $validator_rules_for_pick               = (new PickModel)->getValidatorRulesForStore();
         $validator_rules_for_phase              = (new PhaseModel)->getValidatorRulesForStore();
         $validator_rules_for_scnl               = (new ScnlModel)->getValidatorRulesForStore(['removeUnique' => true]);
-        
 
         /* Copy validation rules for magnitude, to final validation rules array */
         $validator_rules = $validator_rules_for_pick + $validator_rules_for_phase;
@@ -549,7 +534,7 @@ dd($hypocentersInserted);
             /* Validate Provenance */
             $this->validateProvenance($phase);
             
-            /* Validate */
+            /* Validate phase params */
             Validator::make($phase, $validator_rules, $validator_default_message)->validate();            
             /*** END - Validate phase ***/
             
@@ -558,7 +543,6 @@ dd($hypocentersInserted);
             
             /* Build pivot array fileds for many-to-many relation between 'hypocenter' and 'pick' (that is 'phase') */
             $phaseArray = InsertModel::buildPhaseArray($phase);
-        //    dd($pickOutput->id, $hypocenter->id);
 
             /* Insert many-to-many relation between magnitude and amplitude */
             $hypocenter->picks()->attach($pickOutput->id, $phaseArray);
@@ -712,7 +696,7 @@ dd($hypocentersInserted);
             \DB::beginTransaction();
             if( (isset($input_parameters['data']['event'])) && !empty($input_parameters['data']['event']) ) {
                 $event = $input_parameters['data'];
-                $eventReturned = $this->insertEvent($event);
+                $eventReturned = $this->processEvent($event);
             } else if( (isset($input_parameters['data']['hypocenters'])) && !empty($input_parameters['data']['hypocenters']) ) {
                 $hypocenters = $input_parameters['data'];
                 $hypocentersReturned = $this->insertHypocenters($hypocenters);
@@ -744,6 +728,7 @@ dd($hypocentersInserted);
 			\Log::debug("  rollBack() - ".__FUNCTION__);
             \DB::rollBack();
         }
+    return response()->json($eventReturned, $this->httpStatusCodeToReturn);
         /* END - Insert new data */
         
 		/* START - setPreferred hyp and mag */
@@ -815,7 +800,7 @@ dd($hypocentersInserted);
 		\Log::info("END - Actions");
 		/* END - Synchronous actions */
         
-        return response()->json($output, 201);
+        return response()->json($output, $this->httpStatusCodeToReturn);
 
         
         
@@ -827,7 +812,7 @@ dd($hypocentersInserted);
         ];
         
         /* Set arrayOutputOptions */
-        $this->setArrayOutputOptions(['status' => 201, 'headers' => $headers]);       
+        $this->setArrayOutputOptions(['status' => $this->httpStatusCodeToReturn, 'headers' => $headers]);       
         
         /* prepare output */
         $prepareOutput = $this->prepareOutput($output, $this->arrayOutputOptions);
@@ -835,43 +820,6 @@ dd($hypocentersInserted);
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $prepareOutput;
     }
-    
-    public function processRequestToUpdate(Request $request, $id)
-    {
-        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        $input_parameters = $request->all();
-        
-        $output = $this->update($input_parameters, $id);
-        
-        return $output;
-        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
-    }    
-
-	public function update($input_parameters, $id)
-	{
-		\Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-
-		if( (isset($input_parameters['data']['event'])) && !empty($input_parameters['data']['event']) ) {
-			$event = $input_parameters['data'];
-			$eventReturned = $this->updateEvent($event, $id);
-			IngvNTSetPreferredController::setPreferred($id);
-			$output = $eventReturned;
-		}
-
-		/* set headers */
-		$headers = [
-			'Location' => route('event.show', 'toDo')
-		];
-
-		/* Set arrayOutputOptions */
-		$this->setArrayOutputOptions(['status' => 200, 'headers' => $headers]);       
-
-		/* prepare output */
-		$prepareOutput = $this->prepareOutput($output, $this->arrayOutputOptions);
-
-		\Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
-		return $prepareOutput;
-	}
 
     /**
      * Remove the specified resource from storage.
