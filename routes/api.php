@@ -67,6 +67,7 @@ Route::prefix('eventdb/_table/v1')->group(function() {
 
 /* EventDB API services */
 Route::prefix('eventdb/v1')->group(function() {
-    Route::post('event',        'App\Api\v1\Controllers\InsertController@processRequestToInsert');
-    Route::post('strongmotion', 'App\Api\v1\Controllers\InsertController@processRequestToInsert');
+    Route::post('pick',         'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_pick.store');
+    Route::post('event',        'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_event.store');
+    Route::post('strongmotion', 'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_strongmotion.store');
 });
