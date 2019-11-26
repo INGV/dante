@@ -104,7 +104,6 @@ class InsertPickControllerTest extends TestCase
         /* Init class */
         $DanteBaseTest = new DanteBaseTest();
         
-        //$response = $this->post($this->uri, $this->inputParameters);
         $response = $this->post(route('insert_pick.store', $this->inputParameters));
         $response->assertStatus(201);
 
