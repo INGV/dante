@@ -3,12 +3,10 @@
 namespace App\Api\v1\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests;
 
 use Event;
 use Illuminate\Support\Facades\Validator;
 use App\Api\v1\Controllers\DanteBaseController;
-use App\Api\v1\Controllers\NTSetPreferredController;
 use App\Api\v1\Models\Tables\ScnlModel;
 use App\Api\v1\Models\Tables\HypocenterModel;
 use App\Api\v1\Models\Tables\EventModel;
@@ -668,19 +666,6 @@ class InsertController extends DanteBaseController
     {       
         return $this->store($request->all());
     }
-    
-    public function setRabbitMQArray($type, $body) {
-        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-            if (config('dante.rabbitmq_push_enable')) {
-                $rabbitmq_eventdb_type_to_push = config('dante.rabbitmq_eventdb_type_to_push');
-                if (in_array($type, $rabbitmq_eventdb_type_to_push)) {
-                    $this->rabbitMQArrayType = ['type' => $type, 'body' => $body];
-                }
-            } else {
-                \Log::debug(" 'dante.rabbitmq_push_enable' is set to FALSE");
-            }
-        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
-    }
 
     public function store($input_parameters)
     {
@@ -696,6 +681,7 @@ class InsertController extends DanteBaseController
             if( (isset($input_parameters['data']['event'])) && !empty($input_parameters['data']['event']) ) {
                 $event = $input_parameters['data'];
                 $eventReturned = $this->processEvent($event);
+    return response()->json($eventReturned, $this->httpStatusCodeToReturn);
             } else if( (isset($input_parameters['data']['hypocenters'])) && !empty($input_parameters['data']['hypocenters']) ) {
                 $hypocenters = $input_parameters['data'];
                 $hypocentersReturned = $this->insertHypocenters($hypocenters);
@@ -818,27 +804,5 @@ class InsertController extends DanteBaseController
 
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $prepareOutput;
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        try {
-            $event = EventModel::findOrFail($id);
-        } catch (ModelNotFoundException $e) {
-            \Log::debug(" Exception");
-            abort(404, 'event not found');
-        }
-
-        $event->delete();
-
-        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
-        return response(null, 204);
     }
 }
