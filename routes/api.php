@@ -71,3 +71,8 @@ Route::prefix('eventdb/v1')->group(function() {
     Route::post('event',        'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_event.store');
     Route::post('strongmotion', 'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_strongmotion.store');
 });
+
+/* EventDB for Earthworm API services */
+Route::prefix('eventdb/ew/v1')->group(function() {
+    Route::post('quake2k',      'App\Api\v1\Controllers\InsertEwController@quake2k')->name('insert_ew_quake2k.store');
+});
