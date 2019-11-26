@@ -421,48 +421,47 @@ class InsertController extends DanteBaseController
         $validator_default_check    = config('dante.validator_default_check');
         $validator_default_message  = config('dante.validator_default_messages');
         
+        /* Get '$picks' array to process */
         $picks = $data['picks'];
 		
-		// START - Validator for 'picks'
+        /* Validate that picks contains arrays */
 		$validator = Validator::make($picks, [
 			'*'	=> 'array'
 		], ['array' => 'Array ":attribute" of "picks" must contains a pick array'])->validate();
-		// END - Validator for 'picks'
   
-        // processing picks
+        /*** START - Set validation rules to validate pick ***/
+        /* Get default validation rules from each model */
+        $validator_rules_for_pick               = (new PickModel)->getValidatorRulesForStore();
+        
+        /* Copy validation rules for magnitude, to final validation rules array */
+        $validator_rules = $validator_rules_for_pick;
+        
+        /* Remove foreign keys; because are 'required' by default */
+        unset(
+                /* from 'pick' */
+                $validator_rules['fk_scnl'],
+                $validator_rules['fk_provenance'],
+        );
+        /*** END - Set validation rules to validate pick ***/
+        
+        /* Processing pick */
         $n_pick = 0;
         foreach ($picks as $pick) {
-            // START - Validator
-            $validator = Validator::make($pick, [
-                // 'phase' validation
-                'id_picker'                 => 'integer|nullable',
-                'weight_picker'             => $validator_default_check['weight_integer'],
-                'arrival_time'              => $validator_default_check['data_time_with_msec'],
-                'err_arrival_time'          => 'numeric|nullable',
-                'firstmotion'               => 'string|size:1|nullable',
-                'emersio'                   => 'string|size:1|nullable',
-                'pamp'                      => 'numeric|nullable',
-                'provenance_name'           => $validator_default_check['provenance__name'],
-				'provenance_priority'       => $validator_default_check['provenance__priority'],
-                'provenance_instance'       => $validator_default_check['provenance__instance'],
-                'provenance_softwarename'   => $validator_default_check['provenance__softwarename'],
-                'provenance_username'       => $validator_default_check['provenance__username'],
-                'provenance_hostname'       => $validator_default_check['provenance__hostname'],
-                'provenance_description'    => $validator_default_check['provenance__description'],
-                'scnl_net'                  => $validator_default_check['net'],
-                'scnl_sta'                  => $validator_default_check['sta'],
-                'scnl_cha'                  => $validator_default_check['cha'],
-                'scnl_loc'                  => $validator_default_check['loc'],
-            ], $validator_default_message)->validate();
-            // END - Validator
+            /*** START - Validate pick ***/
+            /* Validate Provenance */
+            $this->validateProvenance($pick);
+            
+            /* Validate phase params */
+            Validator::make($pick, $validator_rules, $validator_default_message)->validate();            
+            /*** END - Validate pick ***/
 
-            // Insert pick
+            /* Insert pick */
             $pickOutput = InsertModel::insertPick($pick);
             
-            // Prepare output
+            /* Prepare output */
             $picksToReturn['picks'][$n_pick] = $pickOutput->toArray();
             
-            // Encrease n_pick
+            /* Encrease  n_pick */
             $n_pick++;            
         }
         
@@ -728,7 +727,7 @@ class InsertController extends DanteBaseController
 			\Log::debug("  rollBack() - ".__FUNCTION__);
             \DB::rollBack();
         }
-    return response()->json($eventReturned, $this->httpStatusCodeToReturn);
+    return response()->json($output, $this->httpStatusCodeToReturn);
         /* END - Insert new data */
         
 		/* START - setPreferred hyp and mag */
