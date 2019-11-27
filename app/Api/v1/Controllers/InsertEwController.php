@@ -89,7 +89,7 @@ class InsertEwController extends DanteBaseController
         /* Validate '$input_parameters['data']' contains 'ewMessage' */
         InsertEwModel::validateInputToContainsEwMessage($input_parameters['data']);
         
-        // Get 'ewLogo' and 'ewMessage'
+        /* Get 'ewLogo' and 'ewMessage' */
         $ewLogo     = $input_parameters['data']['ewLogo'];
         $ewMessage  = $input_parameters['data']['ewMessage'];
         
@@ -138,7 +138,7 @@ class InsertEwController extends DanteBaseController
         $hypocenterToInsert['model']                    = '2strati';
         $hypocenterToInsert['loc_program']              = 'binder';
         
-        // Check phases
+        /* Check phases */
         if ( (isset($ewMessage['phases'])) && !empty($ewMessage['phases']) ) {
             $n_phase=-1;
             foreach ($ewMessage['phases'] as $phase) {
@@ -226,6 +226,121 @@ class InsertEwController extends DanteBaseController
         
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $insertController->store($dataToInsert);
+    }
+    
+    public function magnitude(Request $request) {
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
+        
+        $input_parameters = $request->all();
+        
+        /* Validate '$input_parameters'; it must have 'data' array */
+        $this->validateInputToContainsData($input_parameters);
+        
+        /* Validate '$input_parameters['data']' contains 'ewLogo' */
+        InsertEwModel::validateInputToContainsEwLogo($input_parameters['data']);
+        
+        /* Validate '$input_parameters['data']' contains 'ewMessage' */
+        InsertEwModel::validateInputToContainsEwMessage($input_parameters['data']);
+        
+        /* Get 'ewLogo' and 'ewMessage' */
+        $ewLogo = $input_parameters['data']['ewLogo'];
+        $ewMessage = $input_parameters['data']['ewMessage'];
+        
+        /* Validate ewLogo */
+        InsertEwModel::validateEwLogo($ewLogo);
+        
+        /* Validate '$ewMessage' */
+        InsertEwModel::validateMagnitudeEwMessage($ewMessage);
+		
+        /* Get instance of 'InsertController' */
+        $insertController = new InsertController;
+		
+        /* START - Check if hypocenter already exists */
+		$getEvent = $insertController->getFilteredEvent([
+			'instance'		=> $ewLogo['instance'], 
+			'id_locator'	=> $ewMessage['quakeId']
+			]);
+        $getHypocenter = $getEvent
+				->join('hypocenter',		'hypocenter.fk_event',	'=', 'event.id')
+				->join('type_hypocenter',	'type_hypocenter.id',	'=', 'hypocenter.fk_type_hypocenter')
+                ->where('type_hypocenter.name',						'=', $ewMessage['version'])
+                ->select('hypocenter.id AS hypocenter__id')
+                ->first();
+       
+        if ($getHypocenter->exists()) {
+            // Build 'magnitude' section
+            $magnitudeToInsert['mag']                       = $ewMessage['mag'];
+            $magnitudeToInsert['err']                       = $ewMessage['error'];
+            $magnitudeToInsert['quality']                   = $ewMessage['quality'];
+            $magnitudeToInsert['min_dist']                  = $ewMessage['minDist'];
+            $magnitudeToInsert['azimut']                    = $ewMessage['azimuth'];
+            $magnitudeToInsert['nsta']                      = $ewMessage['nStations'];
+            $magnitudeToInsert['ncha']                      = $ewMessage['nChannels'];
+            //$magnitudeToInsert['nsta_used']               = $ewMessage[''];
+            $magnitudeToInsert['mag_quality']               = $ewMessage['ingvQuality'];
+            $magnitudeToInsert['type_magnitude']            = $ewMessage['magType'].'-'.$ewMessage['algorithm'];
+            $magnitudeToInsert['provenance_name']           = $ewLogo['installation'];
+            $magnitudeToInsert['provenance_instance']       = $ewLogo['instance'];
+            $magnitudeToInsert['provenance_softwarename']   = $ewLogo['module'];
+            $magnitudeToInsert['provenance_username']       = $ewLogo['user'];
+            $magnitudeToInsert['provenance_hostname']       = $ewLogo['hostname'];
+            $magnitudeToInsert['hypocenter_id']             = $getHypocenter->hypocenter__id;
+
+            // Check phases arary (that are amplitudes in EW message)
+            if ( (isset($ewMessage['phases'])) && !empty($ewMessage['phases']) ) {
+                $n_amplitude=0;
+                foreach ($ewMessage['phases'] as $phase) {
+                    /* Validate ewMessage['phases'] */
+                    InsertEwModel::validateMagnitudeEwMessagePhase($phase);
+
+                    /* Build 'amplitude' section */
+                    $amplitudeToInsert['scnl_net']                  = $phase['net'];
+                    $amplitudeToInsert['scnl_sta']                  = $phase['sta'];
+                    $amplitudeToInsert['scnl_cha']                  = $phase['comp'];
+                    $amplitudeToInsert['scnl_loc']                  = $phase['loc'];
+                    $amplitudeToInsert['type_amplitude']            = (strtolower($ewMessage['magType']) == 'ml' ? 'WoodAnderson' : 'unknown');
+                    $amplitudeToInsert['type_magnitude']            = $magnitudeToInsert['type_magnitude'];
+                    $amplitudeToInsert['time1']                     = $phase['time1'];
+                    $amplitudeToInsert['amp1']                      = $phase['amp1'];
+                    $amplitudeToInsert['period1']                   = $phase['period1'];
+                    $amplitudeToInsert['time2']                     = $phase['time2'];
+                    $amplitudeToInsert['amp2']                      = $phase['amp2'];
+                    $amplitudeToInsert['period2']                   = $phase['period2'];
+                    $amplitudeToInsert['mag']                       = $phase['mag'];
+                    $amplitudeToInsert['ep_distance']               = $phase['dist'];
+                    $amplitudeToInsert['mag_correction']            = $phase['corr'];
+                    $amplitudeToInsert['provenance_name']           = $ewLogo['installation'];
+                    $amplitudeToInsert['provenance_instance']       = $ewLogo['instance'];
+                    $amplitudeToInsert['provenance_softwarename']   = $ewLogo['module'];
+                    $amplitudeToInsert['provenance_username']       = $ewLogo['user'];
+                    $amplitudeToInsert['provenance_hostname']       = $ewLogo['hostname'];
+
+                    $magnitudeToInsert['amplitudes'][$n_amplitude]      = $amplitudeToInsert;
+
+                    $n_amplitude++;
+                }
+            }
+        } else {
+            $text = 'The hypocenter with:'
+                    . '"event.id_locator='.$ewMessage['quakeId'].'"'
+                    . ', '
+                    . '"provenance.instance='.$ewLogo['instance'].'"'
+                    . ' and '                    
+                    . '"hypocenter.fk_type_hypocenter=<id_of__type_hypocenter.name='.$ewMessage['version'].'>"'
+                    . 'doesn\'t exists!';
+            abort(422, $text);
+        }
+        /* END - Check if hypocenter already exists */
+        
+        //
+        $dataToInsert['data']['hypocenter_id']    = $getHypocenter->hypocenter__id;
+        $dataToInsert['data']['magnitudes'][0]    = $magnitudeToInsert;
+
+        /* Store data */
+        $output = $insertController->store($dataToInsert);
+
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $output;                    
     }
     
     public function pick_scnl(Request $request) {
