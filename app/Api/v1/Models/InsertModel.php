@@ -72,7 +72,7 @@ class InsertModel extends Model
             $arrayRequired,
             $arrayOptional
         );
-                
+
 		$provenanceOutput = ProvenanceModel::find($provenanceInserted->id);
         return $provenanceOutput;
     }

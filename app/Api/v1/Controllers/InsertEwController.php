@@ -98,14 +98,6 @@ class InsertEwController extends DanteBaseController
         
         /* Validate '$ewMessage' */
         InsertEwModel::validateHyp2000ArcEwMessage($ewMessage);
-
-        // START - 1/2 - Check if event already exists
-        //$eventExists = 0;
-        //$getEvent = $this->getFilteredEvent($ewLogo, $ewMessage);
-        //if ( $getEvent->count() == 1 ) {
-        //    $eventExists = 1;
-        //}
-        // END - 1/2 - Check if event already exists
         
         // Build 'hypocenter' section
         $hypocenterToInsert['ot']                       = $ewMessage['originTime'];
@@ -203,23 +195,16 @@ class InsertEwController extends DanteBaseController
             }
         }
 
-        // START - 2/2 - Choice if store 'event' and 'hypocenter' or attach the 'hypocenter' to an existing 'event'
-        //if ($eventExists == 1) {
-        //    $eventid = $getEvent->select('event.id')->first()->id;
-            
-        //    $dataToInsert['data']['eventid'] = $eventid;
-        //    $dataToInsert['data']['hypocenters'][0] = $hypocenterToInsert;
-        //} else {
-            $dataToInsert['data']['event']['provenance_name']           = $ewLogo['installation'];
-            $dataToInsert['data']['event']['provenance_softwarename']   = $ewLogo['module'];
-            $dataToInsert['data']['event']['provenance_username']       = $ewLogo['user'];
-            $dataToInsert['data']['event']['provenance_hostname']       = $ewLogo['hostname'];
-            $dataToInsert['data']['event']['provenance_instance']       = $ewLogo['instance'];
-            $dataToInsert['data']['event']['type_event']                = 'earthquake';
-            $dataToInsert['data']['event']['id_locator']                = $ewMessage['quakeId'];
-            $dataToInsert['data']['event']['hypocenters'][0]            = $hypocenterToInsert;
-        //}
-		// END - 2/2 - Choice if store 'event' and 'hypocenter' or attach the 'hypocenter' to an existing 'event'
+        /* START - 2/2 - Choice if store 'event' and 'hypocenter' or attach the 'hypocenter' to an existing 'event' */
+        $dataToInsert['data']['event']['provenance_name']           = $ewLogo['installation'];
+        $dataToInsert['data']['event']['provenance_softwarename']   = $ewLogo['module'];
+        $dataToInsert['data']['event']['provenance_username']       = $ewLogo['user'];
+        $dataToInsert['data']['event']['provenance_hostname']       = $ewLogo['hostname'];
+        $dataToInsert['data']['event']['provenance_instance']       = $ewLogo['instance'];
+        $dataToInsert['data']['event']['type_event']                = 'earthquake';
+        $dataToInsert['data']['event']['id_locator']                = $ewMessage['quakeId'];
+        $dataToInsert['data']['event']['hypocenters'][0]            = $hypocenterToInsert;
+		/* END - 2/2 - Choice if store 'event' and 'hypocenter' or attach the 'hypocenter' to an existing 'event' */
         
         /* Get instance of 'InsertController' */
         $insertController = new InsertController;

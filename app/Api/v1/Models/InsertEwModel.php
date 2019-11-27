@@ -158,12 +158,6 @@ class InsertEwModel extends Model
         });
         
         $validator->validate();
-        /*
-		if ($validator->fails()) {
-			IngvUtilsModel::abortWhenValidatorFails($validator, $phase);
-		}
-         * 
-         */
 
 		\Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
 	}
