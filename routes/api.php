@@ -76,4 +76,5 @@ Route::prefix('eventdb/v1')->group(function() {
 Route::prefix('eventdb/ew/v1')->group(function() {
     Route::post('quake2k',      'App\Api\v1\Controllers\InsertEwController@quake2k')->name('insert_ew_quake2k.store');
     Route::post('pick_scnl',    'App\Api\v1\Controllers\InsertEwController@pick_scnl')->name('insert_ew_pick_scnl.store');
+    Route::post('hyp2000arc',   'App\Api\v1\Controllers\InsertEwController@hyp2000arc')->name('insert_ew_hyp2000arc.store');
 });
