@@ -681,7 +681,7 @@ class InsertController extends DanteBaseController
             if( (isset($input_parameters['data']['event'])) && !empty($input_parameters['data']['event']) ) {
                 $event = $input_parameters['data'];
                 $eventReturned = $this->processEvent($event);
-    return response()->json($eventReturned, $this->httpStatusCodeToReturn);
+    $output = $eventReturned;
             } else if( (isset($input_parameters['data']['hypocenters'])) && !empty($input_parameters['data']['hypocenters']) ) {
                 $hypocenters = $input_parameters['data'];
                 $hypocentersReturned = $this->insertHypocenters($hypocenters);
