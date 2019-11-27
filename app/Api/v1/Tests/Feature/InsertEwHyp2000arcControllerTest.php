@@ -18,50 +18,42 @@ class InsertEwPickScnlControllerTest extends TestCase
      *  - 'modified' (that is auto-generated) 
      */
     protected $inputParameters_json = '{
-        "data" : {
-          "ewMessage" : {
-            "depth" : 35.950000000000003,
-            "quakeId" : 205340,
-            "longitude" : 10.6258,
-            "originTime" : "2019-11-27 00:04:17.120000",
-            "rms" : 0.029999999999999999,
-            "latitude" : 44.441299999999998,
-            "dmin" : 10.6,
-            "nph" : 6,
-            "gap" : 196,
-            "ravg" : 42.799999999999997
+        "data": {
+          "ewLogo": {
+            "type": "TYPE_QUAKE2K",
+            "module": "MOD_BINDER_EW",
+            "installation": "INST_INGV",
+            "user": "PHPUnit_user",
+            "hostname": "albus.int.ingv.it",
+            "instance": "PHPUnit_instance"
           },
-          "ewLogo" : {
-            "user" : "ew",
-            "instance" : "hew10_mole",
-            "module" : "MOD_BINDER_EW",
-            "type" : "TYPE_QUAKE2K",
-            "hostname" : "hew10",
-            "installation" : "INST_INGV"
+          "ewMessage": {
+            "pickId": 182491,
+            "network": "G",
+            "station": "ROCAM",
+            "component": "BHZ",
+            "location": "00",
+            "firstMotion": "D",
+            "pickWeight": 2,
+            "timeOfPick": "2017-04-12 08:46:30.930000",
+            "pAmplitude": [
+              109,
+              101,
+              122
+            ]
           }
         }
-      }';
+      }';  
 
     /* Output structure expected */
-    protected $data_json = '{
-        "picks": [
-            {
-                "arrival_time": "2017-04-12 08:46:30.930",
-                "fk_scnl": 173021,
-                "fk_provenance": 1820,
-                "id_picker": 182491,
-                "firstmotion": "D",
-                "modified": "2019-11-26 16:06:23",
-                "inserted": "2019-11-26 16:06:23",
-                "id": 468718074
-            }
-        ]
-    }';
+    protected $data_json = '{}';
+    
+    protected $quakeId = null;
     
     public function setUp(): void 
     {
         parent::setUp();
-    
+        
         /* Init class */
         $DanteBaseTest = new DanteBaseTest();
                 
@@ -76,19 +68,25 @@ class InsertEwPickScnlControllerTest extends TestCase
     }
     
     public function test_store_json() 
-    {       
+    {
+        /* Init class */
+        $DanteBaseTest = new DanteBaseTest();
+        
+        
         $response = $this->post(route('insert_ew_pick_scnl.store', $this->inputParameters));
         $response->assertStatus(201);
         
         /* Get output data */
         $data = json_decode($response->getContent(), true);
+        print_r($data);
 
         /* Check JSON structure */
         $response->assertJsonStructure($this->data);
         
         /* Remove all inserted picks */
-        foreach ($data['picks'] as $pick) {
-            $this->delete(route('pick.destroy', $pick['id']))->assertStatus(204);
+        foreach ($data['picks'] as $value) {
+            $pick_id = $value['id'];
+            $this->delete(route('pick.destroy', $pick_id))->assertStatus(204);
         }
     }
 }
