@@ -17,7 +17,7 @@ class InsertEwHyp2000arcControllerTest extends TestCase
      *  - 'inserted' (that is auto-generated)
      *  - 'modified' (that is auto-generated) 
      */
-    protected $inputParameters_json = '{
+    protected $input_hyp2000arc_json = '{
         "data" : {
           "ewMessage" : {
             "Md" : 0,
@@ -400,7 +400,7 @@ class InsertEwHyp2000arcControllerTest extends TestCase
             "nph" : 8,
             "originTime" : "2019-11-27 00:04:17.820000",
             "Mpref" : 0,
-            "quakeId" : 2053400,
+            "quakeId" : 2053405,
             "longitude" : 10.672667000000001,
             "e0dp" : 68,
             "nphS" : 0,
@@ -426,7 +426,7 @@ class InsertEwHyp2000arcControllerTest extends TestCase
       }';
 
     /* Output structure expected */
-    protected $data_json = '{
+    protected $output_json = '{
         "event": {
             "id": 21968864,
             "id_locator": 205340,
@@ -753,41 +753,41 @@ class InsertEwHyp2000arcControllerTest extends TestCase
         }
     }';
     
+    public function setInputParameters() 
+    {
+        /* Set a valid 'Pat' value */
+        $input_hyp2000arc_json__decoded = json_decode($this->input_hyp2000arc_json, true);
+        foreach ($input_hyp2000arc_json__decoded['data']['ewMessage']['phases'] as &$value) {
+            $value['Pat'] = date("Y-m-d H:i:s").'.'.rand(100, 999);
+        }
+        
+        return $input_hyp2000arc_json__decoded;
+    }
+        
     public function setUp(): void 
     {
         parent::setUp();
         
-        /* Set '$inputParameters' using '$inputParameters_json' */
-        $inputParameters_json__decoded = json_decode($this->inputParameters_json, true);
-        $this->inputParameters = $inputParameters_json__decoded;
-        
-        /* Set a valid 'Pat' value */
-        foreach ($this->inputParameters['data']['ewMessage']['phases'] as &$value) {
-            $value['Pat'] = date("Y-m-d H:i:s").'.'.rand(100, 999);
-        }
-        
-        /* set JSON data structure into $this->data */
-        $DanteBaseTest = new DanteBaseTest();        
-        $data_json__decoded = json_decode($this->data_json, true);    
-        $data_json__structure = $DanteBaseTest->getArrayStructure($data_json__decoded);
-        $this->data_structure = $data_json__structure;
+        $this->input_hyp2000arc = $this->setInputParameters();
     }
-    
-    public function test_store_json() 
+
+    public function test_store_hyp2000arc() 
     {
-        $response = $this->post(route('insert_ew_hyp2000arc.store', $this->inputParameters));
+        $response = $this->post(route('insert_ew_hyp2000arc.store', $this->input_hyp2000arc));
         $response->assertStatus(201);
         
         /* Get output data */
-        $data = json_decode($response->getContent(), true);
-        print_r($data);
+        $this->output_hyp2000arc_decoded = json_decode($response->getContent(), true);
 
         /* Check JSON structure */
-        $response->assertJsonStructure($this->data_structure);
-
-        /*** START - Remove all inserted data ***/       
+        $output_json__decoded = json_decode($this->output_json, true);    
+        $output_json__structure = (new DanteBaseTest)->getArrayStructure($output_json__decoded);
+        $response->assertJsonStructure($output_json__structure);
+    }
+    
+    public function tearDown(): void {
         /* Remove 'hypocenters' */
-        foreach ($data['event']['hypocenters'] as $hypocenter) {
+        foreach ($this->output_hyp2000arc_decoded['event']['hypocenters'] as $hypocenter) {
             /* Remove 'phases' */
             foreach ($hypocenter['phases'] as $phase) {
                 /* Remove 'phase' */
@@ -797,9 +797,9 @@ class InsertEwHyp2000arcControllerTest extends TestCase
             }            
             $this->delete(route('hypocenter.destroy', $hypocenter['id']))->assertStatus(204);
         }
-        
         /* Remove 'event' */
-        $this->delete(route('event.destroy', $data['event']['id']))->assertStatus(204);
-        /*** END - Remove all inserted data ***/
+        $this->delete(route('event.destroy', $this->output_hyp2000arc_decoded['event']['id']))->assertStatus(204);
+        
+        parent::tearDown();
     }
 }

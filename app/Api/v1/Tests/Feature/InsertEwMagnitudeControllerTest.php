@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 use App\Api\v1\Tests\DanteBaseTest;
+use App\Api\v1\Tests\Feature\InsertEwHyp2000arcControllerTest;
 
 class InsertEwMagnitudeControllerTest extends TestCase
 {
@@ -17,15 +18,15 @@ class InsertEwMagnitudeControllerTest extends TestCase
      *  - 'inserted' (that is auto-generated)
      *  - 'modified' (that is auto-generated) 
      */
-    protected $inputParameters_json = '{
+    protected $input_magnitude_json = '{
         "data": {
             "ewLogo": {
                 "type": "TYPE_MAGNITUDE",
                 "module": "MOD_LOCALMAG_PREL",
                 "installation": "INST_INGV",
-                "instance": "hew10_mole",
+                "instance": "hew10_mole_phpunit",
                 "user": "ew",
-                "hostname": "hew10"
+                "hostname": "hew10_phpunit"
             },
             "ewMessage": {
                 "quakeId": 205340,
@@ -290,7 +291,7 @@ class InsertEwMagnitudeControllerTest extends TestCase
     }';
 
     /* Output structure expected */
-    protected $data_json = '{
+    protected $output_json = '{
         "magnitudes": [
             {
                 "id": 68846025,
@@ -782,46 +783,64 @@ class InsertEwMagnitudeControllerTest extends TestCase
     {
         parent::setUp();
         
-        /* Set '$inputParameters' using '$inputParameters_json' */
-        $inputParameters_json__decoded = json_decode($this->inputParameters_json, true);
-        $this->inputParameters = $inputParameters_json__decoded;
+        /* Insert an hypocenter to attach the magnitude */
+        $input_hyp2000arc                   = (new InsertEwHyp2000arcControllerTest)->setInputParameters();
+        $response                           = $this->post(route('insert_ew_hyp2000arc.store', $input_hyp2000arc));
+        $this->output_hyp2000arc_decoded    = json_decode($response->getContent(), true);
+        $hyp2000arc_ewLogo_instance         = $input_hyp2000arc['data']['ewLogo']['instance'];
+        $hyp2000arc_ewMessage_quakeId       = $input_hyp2000arc['data']['ewMessage']['quakeId'];
+        $hyp2000arc_ewMessage_version       = $input_hyp2000arc['data']['ewMessage']['version'];
         
-        /* Set a valid 'Pat' value */
-        //foreach ($this->inputParameters['data']['ewMessage']['phases'] as &$value) {
-        //    $value['Pat'] = date("Y-m-d H:i:s").'.'.rand(100, 999);
-        //}
-        
-        /* set JSON data structure into $this->data */
-        $DanteBaseTest = new DanteBaseTest();        
-        $data_json__decoded = json_decode($this->data_json, true);    
-        $data_json__structure = $DanteBaseTest->getArrayStructure($data_json__decoded);
-        $this->data_structure = $data_json__structure;
+        /* Set '$input_magnitude' using '$input_magnitude_json' */
+        $input_magnitude_json__decoded = json_decode($this->input_magnitude_json, true);
+        $input_magnitude_json__decoded['data']['ewLogo']['instance']     = $hyp2000arc_ewLogo_instance;
+        $input_magnitude_json__decoded['data']['ewMessage']['quakeId']   = $hyp2000arc_ewMessage_quakeId;
+        $input_magnitude_json__decoded['data']['ewMessage']['version']   = $hyp2000arc_ewMessage_version;
+        $this->input_magnitude = $input_magnitude_json__decoded;
     }
     
-    public function test_store_json() 
+    public function test_store_magnitude() 
     {
-        $response = $this->post(route('insert_ew_magnitude.store', $this->inputParameters));
+        $response = $this->post(route('insert_ew_magnitude.store', $this->input_magnitude));
         $response->assertStatus(201);
         
         /* Get output data */
-        $data = json_decode($response->getContent(), true);
-        //print_r($data);
-
+        $this->output_magnitude_decoded = json_decode($response->getContent(), true);
+        
         /* Check JSON structure */
-        $response->assertJsonStructure($this->data_structure);
-
-        /*** START - Remove all inserted data ***/       
-        /* Remove 'magnitudes' */
-        foreach ($data['magnitudes'] as $magnitude) {
-            /* Remove 'amplitudes' */
+        $output_json__decoded   = json_decode($this->output_json, true);    
+        $output_json__structure = (new DanteBaseTest)->getArrayStructure($output_json__decoded);
+        $response->assertJsonStructure($output_json__structure);
+    }
+    
+    public function tearDown(): void 
+    {
+        /* Remove magnitude */
+        foreach ($this->output_magnitude_decoded['magnitudes'] as $magnitude) {
             foreach ($magnitude['amplitudes'] as $amplitude) {
                 /* Remove 'st_amp_mag' */
                 $this->delete(route('st_amp_mag.destroy', $amplitude['st_amp_mag']['id']))->assertStatus(204);
                 /* Remove 'amplitude' */
                 $this->delete(route('amplitude.destroy', $amplitude['id']))->assertStatus(204);
-            }            
+            }
+            /* Remove 'magnitude' */
             $this->delete(route('magnitude.destroy', $magnitude['id']))->assertStatus(204);
+        }        
+        
+        /* Remove 'hypocenters' */
+        foreach ($this->output_hyp2000arc_decoded['event']['hypocenters'] as $hypocenter) {
+            /* Remove 'phases' */
+            foreach ($hypocenter['phases'] as $phase) {
+                /* Remove 'phase' */
+                $this->delete(route('phase.destroy', $phase['id']))->assertStatus(204);
+                /* Remove 'pick' */
+                $this->delete(route('pick.destroy', $phase['pick']['id']))->assertStatus(204);
+            }            
+            $this->delete(route('hypocenter.destroy', $hypocenter['id']))->assertStatus(204);
         }
-        /*** END - Remove all inserted data ***/
+        /* Remove 'event' */
+        $this->delete(route('event.destroy', $this->output_hyp2000arc_decoded['event']['id']))->assertStatus(204);
+        
+        parent::tearDown();
     }
 }

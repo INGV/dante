@@ -17,15 +17,15 @@ class InsertEwPickScnlControllerTest extends TestCase
      *  - 'inserted' (that is auto-generated)
      *  - 'modified' (that is auto-generated) 
      */
-    protected $inputParameters_json = '{
+    protected $input_pick_scnl_json = '{
         "data": {
           "ewLogo": {
             "type": "TYPE_QUAKE2K",
             "module": "MOD_BINDER_EW",
             "installation": "INST_INGV",
             "user": "PHPUnit_user",
-            "hostname": "albus.int.ingv.it",
-            "instance": "PHPUnit_instance"
+            "hostname": "hew10_phpunit",
+            "instance": "hew10_mole_phpunit"
           },
           "ewMessage": {
             "pickId": 182491,
@@ -46,7 +46,7 @@ class InsertEwPickScnlControllerTest extends TestCase
       }';
 
     /* Output structure expected */
-    protected $data_json = '{
+    protected $output_json = '{
         "picks": [
             {
                 "arrival_time": "2017-04-12 08:46:30.930",
@@ -64,34 +64,33 @@ class InsertEwPickScnlControllerTest extends TestCase
     public function setUp(): void 
     {
         parent::setUp();
-    
-        /* Init class */
-        $DanteBaseTest = new DanteBaseTest();
-                
-        /* Set '$inputParameters' using '$inputParameters_json' */
-        $inputParameters_json__decoded = json_decode($this->inputParameters_json, true);
-        $this->inputParameters = $inputParameters_json__decoded;
-        
-        /* Set JSON data structure into $this->data */
-        $data_json__decoded = json_decode($this->data_json, true);    
-        $data_json__structure = $DanteBaseTest->getArrayStructure($data_json__decoded);
-        $this->data = $data_json__structure;
+
+        /* Set '$input_pick_scnl' using '$input_pick_scnl_json' */
+        $input_pick_scnl_json__decoded = json_decode($this->input_pick_scnl_json, true);
+        $this->input_pick_scnl = $input_pick_scnl_json__decoded;
     }
     
     public function test_store_json() 
     {       
-        $response = $this->post(route('insert_ew_pick_scnl.store', $this->inputParameters));
+        $response = $this->post(route('insert_ew_pick_scnl.store', $this->input_pick_scnl));
         $response->assertStatus(201);
         
         /* Get output data */
-        $data = json_decode($response->getContent(), true);
+        $this->output_pick_scnl_decoded = json_decode($response->getContent(), true);
 
         /* Check JSON structure */
-        $response->assertJsonStructure($this->data);
-        
-        /* Remove all inserted picks */
-        foreach ($data['picks'] as $pick) {
+        $output_json__decoded   = json_decode($this->output_json, true);    
+        $output_json__structure = (new DanteBaseTest)->getArrayStructure($output_json__decoded);
+        $response->assertJsonStructure($output_json__structure);
+    }
+    
+    public function tearDown(): void 
+    {
+        /* Remove all picks */
+        foreach ($this->output_pick_scnl_decoded['picks'] as $pick) {
             $this->delete(route('pick.destroy', $pick['id']))->assertStatus(204);
         }
+        
+        parent::tearDown();
     }
 }

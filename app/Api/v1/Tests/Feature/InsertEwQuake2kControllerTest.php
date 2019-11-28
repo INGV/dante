@@ -17,15 +17,15 @@ class InsertEwQuake2kControllerTest extends TestCase
      *  - 'inserted' (that is auto-generated)
      *  - 'modified' (that is auto-generated) 
      */
-    protected $inputParameters_json = '{
+    protected $input_quake2k_json = '{
         "data": {
           "ewLogo": {
             "type": "TYPE_QUAKE2K",
             "module": "MOD_BINDER_EW",
             "installation": "INST_INGV",
             "user": "PHPUnit_user",
-            "hostname": "albus.int.ingv.it",
-            "instance": "PHPUnit_instance"
+            "hostname": "hew10_phpunit",
+            "instance": "hew10_mole_phpunit"
           },
           "ewMessage": {
             "quakeId": 182491,
@@ -43,7 +43,7 @@ class InsertEwQuake2kControllerTest extends TestCase
       }';  
 
     /* Output structure expected */
-    protected $data_json = '{
+    protected $output_json = '{
         "event": {
             "id": 21968613,
             "id_locator": 182492,
@@ -58,43 +58,39 @@ class InsertEwQuake2kControllerTest extends TestCase
         }
     }';
     
+    public function setInputParameters() 
+    {
+        /* Set a new valid 'quakeId' value */
+        $input_quake2k_json__decoded = json_decode($this->input_quake2k_json, true);
+        $input_quake2k_json__decoded['data']['ewMessage']['quakeId'] = rand(2000000, 2999999);
+        
+        return $input_quake2k_json__decoded;
+    }
+    
     public function setUp(): void 
     {
         parent::setUp();
         
-        /* Init class */
-        $DanteBaseTest = new DanteBaseTest();
-                
-        /* Set '$inputParameters' using '$inputParameters_json' */
-        $inputParameters_json__decoded = json_decode($this->inputParameters_json, true);
-        $this->inputParameters = $inputParameters_json__decoded;
-        
-        /* Set JSON data structure into $this->data */
-        $data_json__decoded = json_decode($this->data_json, true);    
-        $data_json__structure = $DanteBaseTest->getArrayStructure($data_json__decoded);
-        $this->data = $data_json__structure;
-        
-        /* Set a new valid 'quakeId' value */
-        $this->inputParameters['data']['ewMessage']['quakeId'] = rand(2000000, 2999999);
+        $this->input_quake2k = $this->setInputParameters();
     }
-    
+
     public function test_store_json() 
-    {
-        /* Init class */
-        $DanteBaseTest = new DanteBaseTest();
-        
-        
-        $response = $this->post(route('insert_ew_quake2k.store', $this->inputParameters));
+    {        
+        $response = $this->post(route('insert_ew_quake2k.store', $this->input_quake2k));
         $response->assertStatus(201);
         
         /* Get output data */
-        $data = json_decode($response->getContent(), true);
-        print_r($data);
+        $this->output_quake2k_decoded = json_decode($response->getContent(), true);
 
-        // Check JSON structure
-        $response->assertJsonStructure($this->data);
-        
-        /* Remove temp record */
-        $this->delete(route('event.destroy', $data['event']['id']))->assertStatus(204);
+        /* Check JSON structure */
+        $output_json__decoded   = json_decode($this->output_json, true);    
+        $output_json__structure = (new DanteBaseTest)->getArrayStructure($output_json__decoded);
+        $response->assertJsonStructure($output_json__structure);
+    }
+    
+    public function tearDown(): void 
+    {
+        $this->delete(route('event.destroy', $this->output_quake2k_decoded['event']['id']))->assertStatus(204);
+        parent::tearDown();
     }
 }
