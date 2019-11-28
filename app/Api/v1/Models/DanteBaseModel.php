@@ -226,4 +226,57 @@ class DanteBaseModel extends Model
 		\Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $ret;
     }
+    
+	/**
+	 * @brief Used to request an URL that return a JSON (for example a Web Services) and cache it.
+	 *
+	 * Questo metodo prende in input una URL (che restituisce un JSON), effettua la richiesta, lo converte in ARRAY e fa il cache del risultato
+	 * 
+	 * @param type $requestUrl Url to request that returns a JSON
+	 * @param type $cacheExpireInSeconds Minute to cache the output
+     * @return array JSON from request converted to ARRAY
+	 *
+	 */	
+    public static function cacheJsonRequestUrl($requestUrl, $cacheExpireInSeconds = 120) {
+        \Log::debug("  START - ".__CLASS__.' -> '.__FUNCTION__);
+        
+		$cacheKeyString = $requestUrl;
+		$cacheKeyStringMD5 = md5($cacheKeyString);
+        \Log::debug(' cacheKeyString: '.$cacheKeyString);
+        \Log::debug(' cacheKeyStringMD5: '.$cacheKeyStringMD5);
+        
+        /* Closure to get data */
+        $func_execute_request_url = function() use ($requestUrl) {
+            \Log::debug('    Set GuzzleHttp Client: ');
+            $client = new \GuzzleHttp\Client([
+                'timeout'  => 10.0,
+            ]);
+			\Log::debug('    Done');
+			\Log::debug('    Sending request url: '.$requestUrl);
+			$res = $client->request('GET', $requestUrl);
+			\Log::debug('    Done');
+			\Log::debug("     getStatusCode=".$res->getStatusCode());
+			if ($res->getStatusCode() == 200) {
+				$ret = json_decode($res->getBody(), true);
+			} else {
+				$ret = null;
+			}
+			return $ret;
+        };
+
+        /* Caching */
+        if ( config('dante.enableCache') ) {
+            \Log::debug('   Cache enabled (timeout='.$cacheExpireInSeconds.'sec)');
+            $ret = \Cache::remember($cacheKeyStringMD5, $cacheExpireInSeconds, $func_execute_request_url);
+        } else {
+            \Log::debug('   Cache NOT enabled');
+			if ( \Cache::has($cacheKeyStringMD5) ) {
+				\Log::debug('    forget: '.$cacheKeyStringMD5);
+				\Cache::forget($cacheKeyStringMD5);
+			}
+            $ret = $func_execute_request_url();
+        }
+        \Log::debug("  END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $ret;
+    }
 }
