@@ -74,7 +74,7 @@ class DanteBaseController extends Controller
         
 		/* Caching */
         if ( config('dante.enableCache') ) {
-            \Log::debug(' Cache enabled');
+            \Log::debug(' Cache enabled (timeout='.$cacheExpireInSeconds.'sec)');
             $ret = \Cache::remember($cacheKeyStringMD5, $cacheExpireInSeconds, $func_get_data);
         } else {
             \Log::debug(' Cache NOT enabled');
