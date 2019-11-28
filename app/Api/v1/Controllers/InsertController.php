@@ -24,11 +24,11 @@ use App\Api\v1\Models\Tables\LocProgramModel;
 use App\Api\v1\Models\Tables\ProvenanceModel;
 use App\Api\v1\Models\Tables\StAmpMagModel;
 use App\Api\v1\Models\InsertModel;
-#use App\Api\V1\Jobs\DanteSetRegionJob;
+use App\Api\Jobs\SetRegionJob;
 #use App\Api\V1\Jobs\DanteInsertEventFromEventdbToSeisevJob;
 #use App\Dante\Events\DanteExceptionWasThrownEvent;
 use App\Api\Jobs\SetPreferredJob;
-#use App\Api\V1\Jobs\DanteEventClusteringJob;
+use App\Api\Jobs\SetEventClusteringJob;
 #use App\Api\v1\Controllers\NTRabbitMQPushController;
 
 
@@ -133,7 +133,7 @@ class InsertController extends DanteBaseController
 			$event = $getEvent->select('event.*')->first();
 			\Log::debug('  2/2 - already exists and is "id='.$event->id.'".');
 			$eventOutput = InsertModel::updateEvent($event, $eventToStore);
-            $this->httpStatusCodeToReturn = 200;
+    //        $this->httpStatusCodeToReturn = 200;
 		} else {
 			\Log::debug('  2/2 - does not exist; inserting.');
 			/* Insert event */
@@ -730,8 +730,6 @@ class InsertController extends DanteBaseController
 		}
         \Log::info("END - Call \"SetPreferredJob\" Job");
 		/* END - setPreferred hyp and mag */
-        
-return response()->json($output, $this->httpStatusCodeToReturn);        
 
 		/* Get inserted hypocenter(s) */
 		if ( isset($eventReturned['event']['hypocenters']) && !empty($eventReturned['event']['hypocenters']) ) {
@@ -748,24 +746,25 @@ return response()->json($output, $this->httpStatusCodeToReturn);
 			foreach ($hypocenters as $hypocenter) {
 				$hypocenter_id=$hypocenter['id'];
                 /* START - Set region */
-                if (1==2) {
-				\Log::info(" START - Call \"DanteSetRegionJob\" Job on hypocenter=".$hypocenter_id);
+				\Log::info(" START - Call \"SetRegionJob\" Job on hypocenter=".$hypocenter_id);
 				try {
 					\Log::debug("  dispatch");
-					DanteSetRegionJob::dispatch($hypocenter_id)->onQueue('high');
+		//			SetRegionJob::dispatch($hypocenter_id)->onQueue('high');
+                    SetRegionJob::dispatchNow($hypocenter_id);
 					\Log::debug("  dispatched");
 				}
 				catch (Exception $e) {
 					\Log::debug("  dispatch_exception");
 					/* trigger the Event 'DanteExceptionWasThrownEvent' to send email */
-					$eventArray['message']          = 'Error calling "DanteSetRegionJob" Job on hypocenter='.$hypocenter_id;
+        /*
+					$eventArray['message']          = 'Error calling "SetRegionJob" Job on hypocenter='.$hypocenter_id;
 					$eventArray['status']           = 404;
 					$eventArray['random_string']    = config('dante.random_string');
 					$eventArray['log_file']         = config('dante.log_file');
 					Event::fire(new DanteExceptionWasThrownEvent($eventArray));
+        */
 				}
-				\Log::info(" END - Call \"DanteSetRegionJob\" Job on hypocenter=".$hypocenter_id);
-                }
+				\Log::info(" END - Call \"SetRegionJob\" Job on hypocenter=".$hypocenter_id);
 				/* END - Set region */
 
 				/* START - Run clustering */
@@ -774,7 +773,8 @@ return response()->json($output, $this->httpStatusCodeToReturn);
 				if (config('dante.enableClustering')) {
 					$hypocenter_ot=$hypocenter['ot'];
 					\Log::debug("  Processing ot=\"".$hypocenter_ot."\"");
-                    DanteEventClusteringJob::dispatch($hypocenter_ot);
+        //          SetEventClusteringJob::dispatch($hypocenter_ot);
+                    SetEventClusteringJob::dispatchNow($hypocenter_ot);
 				}
 				\Log::info(" END - Clustering");
 				/* END - Run clustering */
@@ -784,25 +784,9 @@ return response()->json($output, $this->httpStatusCodeToReturn);
 		}
 		\Log::info("END - Actions");
 		/* END - Synchronous actions */
-        
-        return response()->json($output, $this->httpStatusCodeToReturn);
-
-        
-        
-        
-        
-        /* set headers */
-        $headers = [
-            'Location' => route('event.show', 'toDo')
-        ];
-        
-        /* Set arrayOutputOptions */
-        $this->setArrayOutputOptions(['status' => $this->httpStatusCodeToReturn, 'headers' => $headers]);       
-        
-        /* prepare output */
-        $prepareOutput = $this->prepareOutput($output, $this->arrayOutputOptions);
 
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
-        return $prepareOutput;
+
+        return response()->json($output, $this->httpStatusCodeToReturn);
     }
 }
