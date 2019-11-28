@@ -228,8 +228,8 @@ class InsertEwController extends DanteBaseController
         InsertEwModel::validateInputToContainsEwMessage($input_parameters['data']);
         
         /* Get 'ewLogo' and 'ewMessage' */
-        $ewLogo = $input_parameters['data']['ewLogo'];
-        $ewMessage = $input_parameters['data']['ewMessage'];
+        $ewLogo     = $input_parameters['data']['ewLogo'];
+        $ewMessage  = $input_parameters['data']['ewMessage'];
         
         /* Validate ewLogo */
         InsertEwModel::validateEwLogo($ewLogo);
@@ -343,8 +343,8 @@ class InsertEwController extends DanteBaseController
         InsertEwModel::validateInputToContainsEwMessage($input_parameters['data']);
         
         /* Get 'ewLogo' and 'ewMessage' */
-        $ewLogo = $input_parameters['data']['ewLogo'];
-        $ewMessage = $input_parameters['data']['ewMessage'];
+        $ewLogo     = $input_parameters['data']['ewLogo'];
+        $ewMessage  = $input_parameters['data']['ewMessage'];
         
         /* Validate ewLogo */
         InsertEwModel::validateEwLogo($ewLogo);
@@ -391,4 +391,79 @@ class InsertEwController extends DanteBaseController
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $outputToReturn;
     }
+    
+    public function strongmotionii(Request $request) {
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
+        
+        $input_parameters = $request->all();
+        
+        /* Validate '$input_parameters'; it must have 'data' array */
+        $this->validateInputToContainsData($input_parameters);       
+        
+        /* Validate '$input_parameters['data']' contains 'ewLogo' */
+        InsertEwModel::validateInputToContainsEwLogo($input_parameters['data']);
+        
+        /* Validate '$input_parameters['data']' contains 'ewMessage' */
+        InsertEwModel::validateInputToContainsEwMessage($input_parameters['data']);
+        
+        /* Get 'ewLogo' and 'ewMessage' */
+        $ewLogo     = $input_parameters['data']['ewLogo'];
+        $ewMessage  = $input_parameters['data']['ewMessage'];
+        
+        /* Validate ewLogo */
+        InsertEwModel::validateEwLogo($ewLogo);
+        
+        /* Validate '$ewMessage' */
+        InsertEwModel::validateStrongmotioniiEwMessage($ewMessage);
+		
+        /* Get instance of 'InsertController' */
+        $insertController = new InsertController;
+		
+        /* START - Check if hypocenter already exists */
+		$getEvent = $insertController->getFilteredEvent([
+			'instance'		=> $ewLogo['instance'], 
+			'id_locator'	=> $ewMessage['quakeId']
+			]);     
+
+		if ($getEvent->exists()) {
+			// Build 'strongmotion' section
+			$strongmotionToInsert['t_dt']                       = $ewMessage['time'];
+			$strongmotionToInsert['pga']                        = $ewMessage['pga'];
+			$strongmotionToInsert['tpga_dt']                    = $ewMessage['pgaTime'];
+			$strongmotionToInsert['pgv']                        = $ewMessage['pgv'];
+			$strongmotionToInsert['tpgv_dt']                    = $ewMessage['pgvTime'];
+			$strongmotionToInsert['pgd']                        = $ewMessage['pgd'];
+			$strongmotionToInsert['tpgd_dt']                    = $ewMessage['pgdTime'];
+			$strongmotionToInsert['alternate_time']             = $ewMessage['alternateTime'];
+			$strongmotionToInsert['alternate_code']             = $ewMessage['alternateCode'];
+			$strongmotionToInsert['scnl_net']					= $ewMessage['network'];
+			$strongmotionToInsert['scnl_sta']					= $ewMessage['station'];
+			$strongmotionToInsert['scnl_cha']					= $ewMessage['component'];
+			$strongmotionToInsert['scnl_loc']					= $ewMessage['location'];
+			$strongmotionToInsert['rsa']						= $ewMessage['RSA'];
+			$strongmotionToInsert['provenance_name']            = $ewLogo['installation'];
+			$strongmotionToInsert['provenance_instance']        = $ewLogo['instance'];
+			$strongmotionToInsert['provenance_softwarename']	= $ewLogo['module'];
+			$strongmotionToInsert['provenance_username']		= $ewLogo['user'];
+			$strongmotionToInsert['provenance_hostname']		= $ewLogo['hostname'];
+		} else {
+            $text = 'The event with:'
+                    . '"event.id_locator='.$ewMessage['quakeId'].'"'
+                    . ', '
+                    . '"provenance.instance='.$ewLogo['instance'].'"'
+                    . 'doesn\'t exists!';
+            abort(422, $text);
+        }
+        /* END - Check if hypocenter already exists */
+        
+        //
+		$dataToInsert['data']['event_id']               = $getEvent->select('event.*')->first()->id;
+		$dataToInsert['data']['strongmotions'][0]       = $strongmotionToInsert;
+
+        /* Store data */
+        $output = $insertController->store($dataToInsert);
+
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $output;
+	}
 }
