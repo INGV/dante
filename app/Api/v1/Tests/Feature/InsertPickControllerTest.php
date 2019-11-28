@@ -17,7 +17,7 @@ class InsertPickControllerTest extends TestCase
      *  - 'inserted' (that is auto-generated)
      *  - 'modified' (that is auto-generated) 
      */
-    protected $inputParameters_json = '{
+    protected $input_pick_json = '{
         "data": {
           "picks": [
             {
@@ -63,7 +63,7 @@ class InsertPickControllerTest extends TestCase
       }';  
 
     /* Output structure expected */
-    protected $data_json = '{
+    protected $output_json = '{
         "picks": [
             {
                 "arrival_time": "2017-04-12 08:47:06.990",
@@ -85,18 +85,10 @@ class InsertPickControllerTest extends TestCase
     public function setUp(): void 
     {
         parent::setUp();
-        
-        /* Init class */
-        $DanteBaseTest = new DanteBaseTest();
                 
-        /* Set '$inputParameters' using '$inputParameters_json' */
-        $inputParameters_json__decoded = json_decode($this->inputParameters_json, true);
-        $this->inputParameters = $inputParameters_json__decoded;
-        
-        /* set JSON data structure into $this->data */
-        $data_json__decoded = json_decode($this->data_json, true);    
-        $data_json__structure = $DanteBaseTest->getArrayStructure($data_json__decoded);
-        $this->data = $data_json__structure;
+        /* Set '$input_pick' using '$input_pick_json' */
+        $input_pick_json__decoded = json_decode($this->input_pick_json, true);
+        $this->input_pick = $input_pick_json__decoded;
     }
     
     public function test_store_json() 
@@ -104,20 +96,25 @@ class InsertPickControllerTest extends TestCase
         /* Init class */
         $DanteBaseTest = new DanteBaseTest();
         
-        $response = $this->post(route('insert_pick.store', $this->inputParameters));
+        $response = $this->post(route('insert_pick.store', $this->input_pick));
         $response->assertStatus(201);
 
         /* Get output data */
-        $data = json_decode($response->getContent(), true);
-        //print_r($data);
+        $this->output_pick_decoded = json_decode($response->getContent(), true);
 
         /* Check JSON structure */
-        $response->assertJsonStructure($this->data);
-        
-        /* Remove all inserted picks */
-        foreach ($data['picks'] as $value) {
-            $pick_id = $value['id'];
-            $this->delete(route('pick.destroy', $pick_id))->assertStatus(204);
+        $output_json__decoded = json_decode($this->output_json, true);    
+        $output_json__structure = (new DanteBaseTest)->getArrayStructure($output_json__decoded);
+        $response->assertJsonStructure($output_json__structure);
+    }
+    
+    public function tearDown(): void 
+    {
+        /* Remove all picks */
+        foreach ($this->output_pick_decoded['picks'] as $pick) {
+            $this->delete(route('pick.destroy', $pick['id']))->assertStatus(204);
         }
+        
+        parent::tearDown();
     }
 }
