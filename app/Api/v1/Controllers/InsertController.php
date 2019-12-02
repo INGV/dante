@@ -116,7 +116,7 @@ class InsertController extends DanteBaseController
      * @return array $eventToReturn E' l'array di output a seguito dell'inseriemnto.
      */
     public function processEvent($data) {
-        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
         $eventToStore = $data['event'];
                 
         /* Validate 'event' */
