@@ -32,9 +32,6 @@ class GetController extends DanteBaseController
     {
         \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
         
-        $validator_default_check    = config('dante.validator_default_check');
-        $validator_default_message  = config('dante.validator_default_messages');
-        
         $input_parameters = $request->only([
 			'starttime', 'endtime',
 			'minlat', 'maxlat', 'minlon', 'maxlon',
@@ -46,7 +43,9 @@ class GetController extends DanteBaseController
             'page'
         ]);
 
-        /* Validate input */
+        /* Validator */
+        $validator_default_check    = config('dante.validator_default_check');
+        $validator_default_message  = config('dante.validator_default_messages');
         $validator = Validator::make($input_parameters, [
             'starttime'			=> [new StartOrEndDateRule],
             'endtime'			=> [new StartOrEndDateRule],
@@ -84,7 +83,7 @@ class GetController extends DanteBaseController
             'page'				=> $validator_default_check['page'],
         ], $validator_default_message)->validate();
                                 
-        // get data
+        /* get data */
         $data = GetModel::getEventsPref($input_parameters);
         
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
@@ -95,9 +94,8 @@ class GetController extends DanteBaseController
      * 
      */
     public function getEvents(Request $request)
-    {
-        $validator_default_check    = config('dante.validator_default_check');
-        $validator_default_message  = config('dante.validator_default_messages');
+    {   
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
         
         $input_parameters = $request->only([
 			'starttime', 'endtime',
@@ -114,7 +112,9 @@ class GetController extends DanteBaseController
 			'event_group_id'
         ]);
         
-        /* Validate input */
+        /* Validator */
+        $validator_default_check    = config('dante.validator_default_check');
+        $validator_default_message  = config('dante.validator_default_messages');
         $validator = Validator::make($input_parameters, [
             'starttime'				=> [new StartOrEndDateRule],
             'endtime'				=> [new StartOrEndDateRule],
@@ -177,8 +177,37 @@ class GetController extends DanteBaseController
 			'event_group_id'		=> $validator_default_check['event__fk_events_group'],
         ], $validator_default_message)->validate();
                                     
-        // get data
+        /* get data */
         $data = GetModel::getEvents($input_parameters);
+        
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
+        return $data;
+    }
+    
+    public function getEvent(Request $request)
+    {   
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
+        
+        $input_parameters = $request->only([
+			'originid',
+			'eventid'
+        ]);
+        
+        /* Validator */
+        $validator_default_check    = config('dante.validator_default_check');
+        $validator_default_message  = config('dante.validator_default_messages');
+        $validator = Validator::make($input_parameters, [
+            'originid'      => 'integer|exists:hypocenter,id',
+			'eventid'       => 'integer|exists:event,id',
+            'orderby'       => $validator_default_check['orderby'].',ot-asc,ot-desc,mag-asc,mag-desc',            
+            'page'          => $validator_default_check['page'],
+            'format'        => $validator_default_check['format'],
+            'formatted'     => $validator_default_check['formatted'],
+            'limit'         => $validator_default_check['limit'],
+        ], $validator_default_message)->validate();
+        
+        /* get data */
+        $data = GetModel::getEvent($input_parameters);
         
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $data;
