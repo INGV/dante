@@ -204,7 +204,7 @@ class DanteBaseModel extends Model
 		\Log::debug(' cacheKeyStringMD5: '.$cacheKeyStringMD5);
         
         // Closure for executing a query
-        $func_execute_sql = function() use ($query, $itemPerPage) {
+        $func_execute_sql = function() use ($query) {
             \Log::debug('  Sending query (DB_NAME="'.$query->getModel()->getConnection()->getDatabaseName().'"): '.$query->toSql());
 			\Log::debug('   with bindings: ',$query->getBindings());
             return $query->get();
@@ -278,5 +278,80 @@ class DanteBaseModel extends Model
         }
         \Log::debug("  END - ".__CLASS__.' -> '.__FUNCTION__);
         return $ret;
+    }
+    
+	/**
+	 * Compute distance
+	 *
+	 * @return SQL string containing specific function for MySQL or PostgreSQL
+	 */
+	public static function sqlComputeDistanceDegree($sqlLon1, $sqlLat1, $sqlLon2, $sqlLat2) {
+		$sql_compute_distance_function = '';
+		/* TODO  define SQL string for raw computation based on the following code. It must be SQL compliant. */
+		$sql_raw_compute_distance_function_inline = '';
+		/*
+		DECLARE l_lon1            DOUBLE DEFAULT RADIANS(in_lon1);
+		DECLARE l_lat1            DOUBLE DEFAULT RADIANS(in_lat1);
+		DECLARE l_lon2            DOUBLE DEFAULT RADIANS(in_lon2);
+		DECLARE l_lat2            DOUBLE DEFAULT RADIANS(in_lat2);
+		DECLARE delta_lat         DOUBLE DEFAULT ABS( l_lat1 - l_lat2 );
+		DECLARE delta_lon         DOUBLE DEFAULT ABS( l_lon1 - l_lon2 );
+		DECLARE delta             DOUBLE DEFAULT  0;
+		IF (delta_lat + delta_lon) > 0.000001 THEN
+			-- Great-circle distance http://en.wikipedia.org/wiki/Great-circle_distance
+			SET delta = ACOS( ( SIN(l_lat1) * SIN(l_lat2) ) + ( COS(l_lat1) * COS(l_lat2) * COS(delta_lon) ) );
+		END IF;
+		RETURN delta;
+		 */
+		switch(env('DB_CONNECTION')) {
+		case 'pgsql' :
+			/* PostGIS is required for st_distance() */
+			$sql_compute_distance_function = '(st_distance(st_makepoint('.$sqlLon1.', '.$sqlLat1.'),st_makepoint('.$sqlLon2.', '.$sqlLat2.'))';
+			break;
+		case 'mysql':
+			/* MySQL 5.6 or greater is required */
+			$sql_compute_distance_function = 'ST_Distance(POINT('.$sqlLon1.', '.$sqlLat1.') , POINT('.$sqlLon2.', '.$sqlLat2.'))';
+			break;
+		default:
+			/* TODO */
+			$sql_compute_distance_function = $sql_raw_compute_distance_function_inline;
+			break;
+		}
+		return $sql_compute_distance_function;
+	}
+    
+	/**
+	 * Compute distance
+	 *
+	 * @return SQL string containing specific function for MySQL or PostgreSQL
+	 */
+	public static function sqlComputeDistanceKm($sqlLon1, $sqlLat1, $sqlLon2, $sqlLat2) {
+		$sql_compute_distance_function = '';
+		switch(env('DB_CONNECTION')) {
+		case 'pgsql' :
+			/* PostGIS is required for st_distance() */
+			$sql_compute_distance_function = '(st_distance_sphere(st_makepoint('.$sqlLon1.', '.$sqlLat1.'),st_makepoint('.$sqlLon2.', '.$sqlLat2.'))';
+			break;
+		default:
+			$sql_compute_distance_function = '('.self::sqlComputeDistanceDegree($sqlLon1, $sqlLat1, $sqlLon2, $sqlLat2).' * '.Config('ingv.default_degreeToKm').')';
+			break;
+		}
+		return $sql_compute_distance_function;
+	}
+    
+    /**
+     * Used to reset multidimensional array keys
+     */
+    public static function resetArrayKeys($array) {
+        $numberCheck = false;
+        foreach ($array as $k => $val) {
+            if (is_array($val)) $array[$k] = self::resetArrayKeys($val); //recurse
+            if (is_numeric($k)) $numberCheck = true;
+        }
+        if ($numberCheck === true) {
+            return array_values($array);
+        } else {
+            return $array;
+        }
     }
 }
