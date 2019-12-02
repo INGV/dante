@@ -416,6 +416,7 @@ class GetModel extends Model
                 
         /* Send query and get data */
         $getQuery = DanteBaseModel::queryCache($query, 1)->toArray();
+        //$getQuery = $query->get()->toArray();
 
         /* Inizialize output array */
         $arrayToReturnNew = [];
