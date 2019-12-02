@@ -11,6 +11,10 @@
 |
 */
 
+/*
 Route::get('/', function () {
     return view('welcome');
 });
+*/
+
+Route::redirect('/', '/swagger-ui/dist/?url='.request()->getSchemeAndHttpHost().'/api/0.0.1/oa3.yaml');
