@@ -66,14 +66,33 @@ Route::prefix('eventdb/_table/v1')->group(function() {
 });
 
 /* EventDB API services */
-Route::prefix('eventdb/v1')->group(function() {
+Route::group([
+    'prefix'        => 'eventdb/v1',
+], function() {
     Route::post('pick',         'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_pick.store');
     Route::post('event',        'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_event.store');
     Route::post('strongmotion', 'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_strongmotion.store');
+    Route::get('events_pref',   'App\Api\v1\Controllers\getController@getEventsPref')->name('get_events_pref.index');
+    Route::get('events',        'App\Api\v1\Controllers\getController@processRequestToInsert')->name('get_events.index');
+    Route::get('event',         'App\Api\v1\Controllers\getController@processRequestToInsert')->name('get_event.index');
 });
 
 /* EventDB for Earthworm API services */
-Route::prefix('eventdb/ew/v1')->group(function() {
+/*
+Route::middleware('throttle:70,1,pippo')->group(function () {
+    Route::post('quake2k',          'App\Api\v1\Controllers\InsertEwController@quake2k')->name('insert_ew_quake2k.store');
+    Route::post('eventdb/ew/v1/magnitude',        'App\Api\v1\Controllers\InsertEwController@magnitude')->name('insert_ew_magnitude.store');    
+    Route::post('pick_scnl',        'App\Api\v1\Controllers\InsertEwController@pick_scnl')->name('insert_ew_pick_scnl.store');
+    Route::post('hyp2000arc',       'App\Api\v1\Controllers\InsertEwController@hyp2000arc')->name('insert_ew_hyp2000arc.store');
+    Route::post('strongmotionii',   'App\Api\v1\Controllers\InsertEwController@strongmotionii')->name('insert_ew_strongmotionii.store');    
+});
+*/
+Route::group([
+    'prefix'        => 'eventdb/ew/v1',
+    'middleware'    => [
+        'throttle:70,1,pippo'
+    ],
+], function() {
     Route::post('quake2k',          'App\Api\v1\Controllers\InsertEwController@quake2k')->name('insert_ew_quake2k.store');
     Route::post('magnitude',        'App\Api\v1\Controllers\InsertEwController@magnitude')->name('insert_ew_magnitude.store');    
     Route::post('pick_scnl',        'App\Api\v1\Controllers\InsertEwController@pick_scnl')->name('insert_ew_pick_scnl.store');
