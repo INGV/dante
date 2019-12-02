@@ -251,8 +251,8 @@ class InsertEwController extends DanteBaseController
                 ->where('type_hypocenter.name',						'=', $ewMessage['version'])
                 ->select('hypocenter.id AS hypocenter__id')
                 ->first();
-       
-        if ($getHypocenter->exists()) {
+
+        if ($getHypocenter !== null) {
             // Build 'magnitude' section
             $magnitudeToInsert['mag']                       = $ewMessage['mag'];
             $magnitudeToInsert['err']                       = $ewMessage['error'];
@@ -425,7 +425,7 @@ class InsertEwController extends DanteBaseController
 			'id_locator'	=> $ewMessage['quakeId']
 			]);     
 
-		if ($getEvent->exists()) {
+		if ($getEvent !== null) {
 			// Build 'strongmotion' section
 			$strongmotionToInsert['t_dt']                       = $ewMessage['time'];
 			$strongmotionToInsert['pga']                        = $ewMessage['pga'];
