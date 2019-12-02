@@ -72,9 +72,9 @@ Route::group([
     Route::post('pick',         'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_pick.store');
     Route::post('event',        'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_event.store');
     Route::post('strongmotion', 'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_strongmotion.store');
-    Route::get('events_pref',   'App\Api\v1\Controllers\getController@getEventsPref')->name('get_events_pref.index');
-    Route::get('events',        'App\Api\v1\Controllers\getController@processRequestToInsert')->name('get_events.index');
-    Route::get('event',         'App\Api\v1\Controllers\getController@processRequestToInsert')->name('get_event.index');
+    Route::get('events_pref',   'App\Api\v1\Controllers\GetController@getEventsPref')->name('get_events_pref.index');
+    Route::get('events',        'App\Api\v1\Controllers\GetController@getEvents')->name('get_events.index');
+    Route::get('event',         'App\Api\v1\Controllers\GetController@processRequestToInsert')->name('get_event.index');
 });
 
 /* EventDB for Earthworm API services */

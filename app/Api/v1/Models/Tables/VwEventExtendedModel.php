@@ -10,7 +10,6 @@ class VwEventExtendedModel extends DanteBaseModel
     protected $table = 'vw_event_extended';
     
 	/**
-	 *
 	 * Date Mutators
 	 * - https://laravel.com/docs/6.x/eloquent-mutators#date-mutators
      * ATTENTION: do not insert 'hyp_ot', It is casted from 'newQuery()' function
@@ -19,6 +18,17 @@ class VwEventExtendedModel extends DanteBaseModel
         'hyp_modified',
         'hyp_inserted',
     ];
+    
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    /*
+    protected $casts = [
+        'hyp_ot' => 'datetime:Y-m-d\TH:i:s',
+    ];
+    */
     
     /**
      * This array is used, from "__construct" to:

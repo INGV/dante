@@ -59,7 +59,7 @@ class HypocenterModel extends DanteBaseModel
 		'fk_event'              => '---event_id---',
 		'fk_model'              => '---model_id---',
 		'fk_loc_program'		=> '---loc_program_id---',
-    ];
+    ];   
     
     public function __construct(array $attributes = []) {
         parent::updateBaseArray();

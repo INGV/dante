@@ -31,6 +31,16 @@ class DanteBaseModel extends Model
     const CREATED_AT = 'inserted';
     
     /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'modified' => 'datetime:Y-m-d H:i:s',
+        'inserted' => 'datetime:Y-m-d H:i:s',
+    ];
+    
+    /**
      * This method is used to build the 'protected $fillable' array (used for attributes that are mass assignable) from 
      * 'protected $baseArray' array
      * 

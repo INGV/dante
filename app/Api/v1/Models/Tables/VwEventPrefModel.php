@@ -11,6 +11,7 @@ class VwEventPrefModel extends DanteBaseModel
     
 	/**
 	 * Date Mutators
+	 * - https://laravel.com/docs/6.x/eloquent-mutators#date-mutators
      * ATTENTION: do not insert 'hyp_ot', It is casted from 'newQuery()' function
 	 */    
     protected $dates = [
