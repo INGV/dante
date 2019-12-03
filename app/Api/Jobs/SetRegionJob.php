@@ -94,11 +94,15 @@ class SetRegionJob implements ShouldQueue
         $region = DanteBaseModel::cacheJsonRequestUrl($requestUrl, 1440)['data']['region_name'];
 
         // Set region
-        \Log::info(" set \"hypocenter_region_name.region=".$region."\"");
-        HypocenterRegionNameModel::firstOrCreate([
-            'fk_hypocenter'             => $hypocenterId,
-            'region'					=> $region,
-        ]);
+        if (is_null($region)) {
+            \Log::info(" the 'region' is 'null'; nothing to do.");
+        } else {
+            \Log::info(" set \"hypocenter_region_name.region=".$region."\"");
+            HypocenterRegionNameModel::firstOrCreate([
+                'fk_hypocenter'             => $hypocenterId,
+                'region'					=> $region,
+            ]);
+        }
 
         \Log::info("END - ".__CLASS__.' -> '.__FUNCTION__);
     }

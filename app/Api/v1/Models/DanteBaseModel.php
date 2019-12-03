@@ -259,18 +259,25 @@ class DanteBaseModel extends Model
         $func_execute_request_url = function() use ($requestUrl) {
             \Log::debug('    Set GuzzleHttp Client: ');
             $client = new \GuzzleHttp\Client([
-                'timeout'  => 10.0,
+                'timeout'  => 5.0,
             ]);
 			\Log::debug('    Done');
-			\Log::debug('    Sending request url: '.$requestUrl);
-			$res = $client->request('GET', $requestUrl);
-			\Log::debug('    Done');
-			\Log::debug("     getStatusCode=".$res->getStatusCode());
-			if ($res->getStatusCode() == 200) {
-				$ret = json_decode($res->getBody(), true);
-			} else {
-				$ret = null;
-			}
+			
+            try {
+                \Log::debug('    Sending request url: '.$requestUrl);
+                $res = $client->request('GET', $requestUrl);
+                \Log::debug('    Done');
+                if ($res->getStatusCode() == 200) {
+                    $ret = json_decode($res->getBody(), true);
+                } else {
+                    \Log::debug("     getStatusCode=".$res->getStatusCode());
+                    $ret = null;
+                }
+            } catch (\GuzzleHttp\Exception\RequestException $e) {
+                \Log::debug('     Exception: '.$e->getResponse()->getStatusCode().' -> '.$e->getResponse()->getReasonPhrase());
+                $ret = null;
+            }
+
 			return $ret;
         };
 
