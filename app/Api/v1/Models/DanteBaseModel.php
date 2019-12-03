@@ -371,4 +371,65 @@ class DanteBaseModel extends Model
             return $array;
         }
     }
+    
+    /**
+	 * Where LIKE conditions from $pattern StationXML network, station, channel, location
+	 *
+	 * Use in the scope:
+	 *
+	 * i.e. query->whereLikePatternRaw($fieldname, $pattern)
+	 *
+	 * Wildcards and lists in channel constraints parameters
+	 *
+	 * The channel constraint parameters (network, station, location and
+	 * channel) may include two specific wildcard characters with the following
+	 * meaning:
+	 *
+	 *   * Matches zero to many characters
+	 *   ? Matches any single character
+	 *
+	 * The channel constraint parameters may also be submitted as
+	 * comma-separated lists in order to select two or more values with a
+	 * single request. For example, the channel parameter may be used to
+	 * specify multiple channels:
+	 *
+	 *   channel=LHE,LHN,LHZ,BHZ (the individual values may also include wildcards)
+	 *
+	 * @return Eloquent query
+	 */
+	public function scopeWhereLikePatternRaw($query, $fieldname, $pattern)
+	{
+        $pattern = trim(str_replace('*', '%', str_replace('?', '_', $pattern)));
+
+		/* Avoid WHERE condition when pattern is '%' */
+		if($pattern != '%') {
+
+			$query = $query->where(function($query) use ($fieldname, $pattern) {
+				$list = explode(',', $pattern);
+				foreach($list as $single_pattern) {
+					$query = $query->orWhere($fieldname, 'LIKE', $single_pattern);
+				}
+			});
+
+		}
+
+		return $query;
+	}
+    
+	public function scopeOrderBySplitted($query, $orderBy)
+	{
+        $splitOrderBy = explode('-', $orderBy);
+
+        if (end($splitOrderBy) == 'asc' || end($splitOrderBy) == 'desc') {
+            $typeOrder = end($splitOrderBy);
+            
+            /* remove last element from array */
+            array_pop($splitOrderBy);            
+        } else {
+            $typeOrder = 'desc';
+        }
+
+        $query = $query->orderBy(implode('-', $splitOrderBy), $typeOrder);
+		return $query;
+	}
 }
