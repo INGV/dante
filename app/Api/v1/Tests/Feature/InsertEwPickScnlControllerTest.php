@@ -19,31 +19,31 @@ class InsertEwPickScnlControllerTest extends TestCase
      */
     protected $input_pick_scnl_json = '{
         "data": {
-          "ewLogo": {
-            "type": "TYPE_QUAKE2K",
-            "module": "MOD_BINDER_EW",
-            "installation": "INST_INGV",
-            "user": "PHPUnit_user",
-            "hostname": "hew10_phpunit",
-            "instance": "hew10_mole_phpunit"
-          },
-          "ewMessage": {
-            "pickId": 182491,
-            "network": "G",
-            "station": "ROCAM",
-            "component": "BHZ",
-            "location": "00",
-            "firstMotion": "D",
-            "pickWeight": 2,
-            "timeOfPick": "2017-04-12 08:46:30.930000",
-            "pAmplitude": [
-              109,
-              101,
-              122
-            ]
-          }
+            "ewLogo": {
+                "type": "TYPE_PICK_SCNL",
+                "module": "MOD_PICK_EW",
+                "installation": "INST_INGV",
+                "instance": "hew10_mole",
+                "user": "ew",
+                "hostname": "hew10"
+            },
+            "ewMessage": {
+                "pickId": 32997252,
+                "network": "IV",
+                "station": "CPGN",
+                "component": "EHZ",
+                "location": "--",
+                "firstMotion": "?",
+                "pickWeight": "2",
+                "timeOfPick": "2019-12-01 23:59:55.129999",
+                "pAmplitude": [
+                    269,
+                    314,
+                    287
+                ]
+            }
         }
-      }';
+    }';
 
     /* Output structure expected */
     protected $output_json = '{
