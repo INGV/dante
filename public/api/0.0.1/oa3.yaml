@@ -51,7 +51,55 @@ paths:
           $ref: '#/components/responses/429TooManyRequests'
         '500':
           $ref: '#/components/responses/429TooManyRequests'
-      summary: Insert a new quake2k message to the DB
+      summary: Insert a new hyp2000arc message to the DB
+      tags:
+      - earthworm_api
+  /eventdb/ew/v1/magnitude/:
+    post:
+      description: Insert a new magnitude message to the DB using ew2openapi module
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: '#/components/schemas/magnitudeSchema'
+        description: JSON to send
+        required: true
+      responses:
+        '201':
+          description: record inserted
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/429TooManyRequests'
+      summary: Insert a new magnitude message to the DB
+      tags:
+      - earthworm_api
+  /eventdb/ew/v1/pick_scnl/:
+    post:
+      description: Insert a new pick_scnl message to the DB using ew2openapi module
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: '#/components/schemas/pick_scnlSchema'
+        description: JSON to send
+        required: true
+      responses:
+        '201':
+          description: record inserted
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/429TooManyRequests'
+      summary: Insert a new pick_scnl message to the DB
       tags:
       - earthworm_api
   /eventdb/ew/v1/quake2k/:
@@ -222,6 +270,34 @@ components:
           format: uri
           type: string
       type: object
+    amplitude__amp1:
+      description: Amplitude value | double
+      example: -0.358
+      format: double
+      type: number
+    amplitude__amp2:
+      description: Amplitude value | double
+      example: 0.292
+      format: double
+      type: number
+    amplitude__period1:
+      description: Amlitude period | double
+      example: -1
+      format: double
+      type: number
+    amplitude__period2:
+      description: Amplitude period | double
+      example: -1
+      format: double
+      type: number
+    amplitude__time1:
+      description: ' | datetime(3)'
+      example: '2017-04-28 06:34:15.350'
+      type: string
+    amplitude__time2:
+      description: ' | datetime(3)'
+      example: '2017-04-28 06:34:15.850'
+      type: string
     cha:
       description: Channel code | char(3)
       example: HHZ
@@ -229,6 +305,11 @@ components:
     depth:
       description: Depth in Km | double
       example: 0.02
+      format: double
+      type: number
+    ep_distance:
+      description: Distance from epicenter of the station | double
+      example: 694
       format: double
       type: number
     event__id_locator:
@@ -589,8 +670,8 @@ components:
       format: int64
       type: integer
     hypocenter__ot:
-      description: Origin time | datetime(6)
-      example: '2016-06-22 16:52:06.260000'
+      description: Origin time | datetime(3)
+      example: '2016-06-22 16:52:06.260'
       type: string
     hypocenter__rms:
       description: Root mean square | double
@@ -605,10 +686,233 @@ components:
       type: string
     longitude:
       $ref: '#/components/schemas/Longitude'
+    magnitudeSchema:
+      allOf:
+      - $ref: '#/components/schemas/magnitude__base'
+      - properties:
+          ewLogo:
+            properties:
+              hostname:
+                $ref: '#/components/schemas/ewLogo__hostname'
+              installation:
+                $ref: '#/components/schemas/ewLogo__installation'
+              instance:
+                $ref: '#/components/schemas/ewLogo__instance'
+              module:
+                description: Module description | ???
+                example: MOD_LOCALMAG_PREL
+                type: string
+              type:
+                description: Type description | ???
+                example: TYPE_MAGNITUDE
+                type: string
+              user:
+                $ref: '#/components/schemas/ewLogo__user'
+            required:
+            - type
+            - module
+            - installation
+            - instance
+        type: object
+    magnitude__azimut:
+      description: Azimut | double
+      format: double
+      type: number
+    magnitude__base:
+      properties:
+        ewMessage:
+          properties:
+            algorithm:
+              description: algorithm description
+              example: MED
+              format: double
+              type: string
+            azimuth:
+              $ref: '#/components/schemas/magnitude__azimut'
+            error:
+              $ref: '#/components/schemas/magnitude__err'
+            iMagType:
+              description: iMagType description
+              example: 1
+              format: double
+              type: number
+            ingvQuality:
+              $ref: '#/components/schemas/magnitude__mag_quality'
+            mag:
+              $ref: '#/components/schemas/magnitude__mag'
+            magType:
+              $ref: '#/components/schemas/type_magnitude__name'
+            minDist:
+              $ref: '#/components/schemas/magnitude__min_dist'
+            nChannels:
+              $ref: '#/components/schemas/magnitude__ncha'
+            nStations:
+              $ref: '#/components/schemas/magnitude__nsta'
+            phases:
+              $ref: '#/components/schemas/magnitude__phases'
+            qAuthor:
+              description: qAuthor description
+              example: 014101073:028130073
+              type: string
+            qddsVersion:
+              description: qddsVersion description
+              example: 0
+              format: double
+              type: number
+            quakeId:
+              $ref: '#/components/schemas/event__id_locator'
+            quality:
+              $ref: '#/components/schemas/magnitude__quality'
+            version:
+              $ref: '#/components/schemas/type_hypocenter__name'
+          required:
+          - quakeId
+          - version
+          - mag
+    magnitude__err:
+      description: Magnitudo error | double
+      example: 2.01
+      format: double
+      type: number
+    magnitude__mag:
+      description: Magnitudo value | double
+      example: 3.01
+      format: double
+      type: number
+    magnitude__mag_quality:
+      description: INGV quality code of the magnitude (computed by ew2moledb) | char(2)
+      example: BB
+      type: string
+    magnitude__min_dist:
+      description: Minimal distance from station to hypocenter | double
+      format: double
+      type: number
+    magnitude__ncha:
+      description: Number of the channel on magnitudo calculation | int(11)
+      format: int64
+      type: integer
+    magnitude__nsta:
+      description: Number of the stations on magnitudo calculation | int(11)
+      format: int64
+      type: integer
+    magnitude__phases:
+      items:
+        properties:
+          amp1:
+            $ref: '#/components/schemas/amplitude__amp1'
+          amp2:
+            $ref: '#/components/schemas/amplitude__amp2'
+          comp:
+            $ref: '#/components/schemas/cha'
+          corr:
+            $ref: '#/components/schemas/st_amp_mag__mag_correction'
+          dist:
+            $ref: '#/components/schemas/ep_distance'
+          loc:
+            $ref: '#/components/schemas/loc'
+          mag:
+            $ref: '#/components/schemas/st_amp_mag__mag'
+          net:
+            $ref: '#/components/schemas/net'
+          period1:
+            $ref: '#/components/schemas/amplitude__period1'
+          period2:
+            $ref: '#/components/schemas/amplitude__period2'
+          sta:
+            $ref: '#/components/schemas/sta'
+          time1:
+            $ref: '#/components/schemas/amplitude__time1'
+          time2:
+            $ref: '#/components/schemas/amplitude__time2'
+        required:
+        - net
+        - sta
+        - comp
+        - loc
+        - time1
+        - amp1
+        - time2
+        - amp2
+      type: array
+    magnitude__quality:
+      description: quality | double
+      format: double
+      type: number
     net:
       description: Channel net code | char(2)
       example: IV
       type: string
+    pick__arrival_time:
+      description: arrival time | datetime(3)
+      example: '2017-04-12 08:46:30.9300'
+      type: string
+    pick__firstmotion:
+      description: Up or down | char(1)
+      example: D
+      type: string
+    pick__weight:
+      description: Picking weight of the phase | int(11)
+      example: 2
+      format: int64
+      type: integer
+    pick_scnlSchema:
+      allOf:
+      - $ref: '#/components/schemas/pick_scnl__base'
+      - properties:
+          ewLogo:
+            properties:
+              hostname:
+                $ref: '#/components/schemas/ewLogo__hostname'
+              installation:
+                $ref: '#/components/schemas/ewLogo__installation'
+              instance:
+                $ref: '#/components/schemas/ewLogo__instance'
+              module:
+                description: Module description | ???
+                example: MOD_PICK_EW
+                type: string
+              type:
+                description: Type description | ???
+                example: TYPE_PICK_SCNL
+                type: string
+              user:
+                $ref: '#/components/schemas/ewLogo__user'
+            required:
+            - type
+            - module
+            - installation
+            - instance
+        type: object
+    pick_scnl__base:
+      properties:
+        ewMessage:
+          properties:
+            component:
+              $ref: '#/components/schemas/cha'
+            firstMotion:
+              $ref: '#/components/schemas/pick__firstmotion'
+            location:
+              $ref: '#/components/schemas/loc'
+            network:
+              $ref: '#/components/schemas/net'
+            pAmplitude:
+              description: Todo description | ???
+              example:
+              - 109
+              - 101
+              - 122
+              items: null
+              type: array
+            pickId:
+              $ref: '#/components/schemas/event__id_locator'
+            pickWeight:
+              $ref: '#/components/schemas/pick__weight'
+            station:
+              $ref: '#/components/schemas/sta'
+            timeOfPick:
+              $ref: '#/components/schemas/pick__arrival_time'
+          required:
+          - pickId
     quake2kSchema:
       allOf:
       - $ref: '#/components/schemas/quake2k__base'
@@ -674,6 +978,16 @@ components:
           - latitude
           - longitude
           - depth
+    st_amp_mag__mag:
+      description: Amplitude magnitude value | double
+      example: 3.04
+      format: double
+      type: number
+    st_amp_mag__mag_correction:
+      description: magnitude correction | double
+      example: 0
+      format: double
+      type: number
     sta:
       description: Channel station code | varchar(5)
       example: ACER
@@ -681,4 +995,8 @@ components:
     type_hypocenter__name:
       description: Localization name (es:01,XX,WW,..) | varchar(255)
       example: ew prelim
+      type: string
+    type_magnitude__name:
+      description: Type of the magnitude | varchar(50)
+      example: ML-VAX
       type: string
