@@ -68,6 +68,9 @@ Route::prefix('eventdb/_table/v1')->group(function() {
 /* EventDB API services */
 Route::group([
     'prefix'        => 'eventdb/v1',
+    'middleware'    => [
+        //'throttle:70,1,pippo'
+    ],
 ], function() {
     Route::post('pick',         'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_pick.store');
     Route::post('event',        'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_event.store');
@@ -90,7 +93,7 @@ Route::middleware('throttle:70,1,pippo')->group(function () {
 Route::group([
     'prefix'        => 'eventdb/ew/v1',
     'middleware'    => [
-        'throttle:70,1,pippo'
+        //'throttle:70,1'
     ],
 ], function() {
     Route::post('quake2k',          'App\Api\v1\Controllers\InsertEwController@quake2k')->name('insert_ew_quake2k.store');
