@@ -38,7 +38,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            //'throttle:60,1',
+            //'throttle:60,1', // Ho commentato questa riga perche l'override di questo valore di default non sembra possibile: https://stackoverflow.com/questions/44202247/laravel-5-4-override-api-throttle60-1
             'bindings',
             'CorsMiddleware' => \App\Api\Middleware\CorsMiddleware::class,
         ],
