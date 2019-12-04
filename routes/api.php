@@ -74,6 +74,10 @@ Route::group([
 ], function() {
     Route::post('pick',         'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_pick.store');
     Route::post('event',        'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_event.store');
+    Route::post('hypocenter',   'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_hypocenter.store');
+    Route::post('magnitude',    'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_magnitude.store');
+    Route::post('phase',        'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_phase.store');
+    Route::post('amplitude',    'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_amplitude.store');
     Route::post('strongmotion', 'App\Api\v1\Controllers\InsertController@processRequestToInsert')->name('insert_strongmotion.store');
     Route::get('events_pref',   'App\Api\v1\Controllers\GetController@getEventsPref')->name('get_events_pref.index');
     Route::get('events',        'App\Api\v1\Controllers\GetController@getEvents')->name('get_events.index');
