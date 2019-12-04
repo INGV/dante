@@ -50,7 +50,7 @@ paths:
         '429':
           $ref: '#/components/responses/429TooManyRequests'
         '500':
-          $ref: '#/components/responses/429TooManyRequests'
+          $ref: '#/components/responses/500InternalServerError'
       summary: Insert a new hyp2000arc message to the DB
       tags:
       - earthworm_api
@@ -74,7 +74,7 @@ paths:
         '429':
           $ref: '#/components/responses/429TooManyRequests'
         '500':
-          $ref: '#/components/responses/429TooManyRequests'
+          $ref: '#/components/responses/500InternalServerError'
       summary: Insert a new magnitude message to the DB
       tags:
       - earthworm_api
@@ -98,7 +98,7 @@ paths:
         '429':
           $ref: '#/components/responses/429TooManyRequests'
         '500':
-          $ref: '#/components/responses/429TooManyRequests'
+          $ref: '#/components/responses/500InternalServerError'
       summary: Insert a new pick_scnl message to the DB
       tags:
       - earthworm_api
@@ -122,10 +122,106 @@ paths:
         '429':
           $ref: '#/components/responses/429TooManyRequests'
         '500':
-          $ref: '#/components/responses/429TooManyRequests'
+          $ref: '#/components/responses/500InternalServerError'
       summary: Insert a new quake2k message to the DB
       tags:
       - earthworm_api
+  /eventdb/ew/v1/strongmotionii/:
+    post:
+      description: Insert a new strongmotionii message to the DB using ew2openapi
+        module
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: '#/components/schemas/strongmotioniiSchema'
+        description: JSON to send
+        required: true
+      responses:
+        '201':
+          description: record inserted
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+      summary: Insert a new strongmotionii message to the DB
+      tags:
+      - earthworm_api
+  /eventdb/v1/events/:
+    get:
+      description: This API returns the preferred hypocenter and the preferred magnitude
+        from the same instance
+      parameters:
+      - $ref: '#/components/parameters/starttime__REQUIRED'
+      - $ref: '#/components/parameters/endtime__REQUIRED'
+      - $ref: '#/components/parameters/minlat'
+      - $ref: '#/components/parameters/maxlat'
+      - $ref: '#/components/parameters/minlon'
+      - $ref: '#/components/parameters/maxlon'
+      - $ref: '#/components/parameters/lat'
+      - $ref: '#/components/parameters/lon'
+      - $ref: '#/components/parameters/minradius'
+      - $ref: '#/components/parameters/maxradius'
+      - $ref: '#/components/parameters/minradiuskm'
+      - $ref: '#/components/parameters/maxradiuskm'
+      - $ref: '#/components/parameters/minmag'
+      - $ref: '#/components/parameters/maxmag'
+      - $ref: '#/components/parameters/mindepth'
+      - $ref: '#/components/parameters/maxdepth'
+      - $ref: '#/components/parameters/orderby'
+      - $ref: '#/components/parameters/fk_events_group'
+      responses:
+        '200':
+          $ref: '#/components/responses/200EventsAndEventsPref'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+      summary: This API returns the preferred hypocenter and the preferred magnitude
+        from the same instance.
+      tags:
+      - get_data
+  /eventdb/v1/events_pref/:
+    get:
+      description: This API returns the preferred hypocenter and the preferred magnitude
+        from all clusterd events.
+      parameters:
+      - $ref: '#/components/parameters/starttime__REQUIRED'
+      - $ref: '#/components/parameters/endtime__REQUIRED'
+      - $ref: '#/components/parameters/minlat'
+      - $ref: '#/components/parameters/maxlat'
+      - $ref: '#/components/parameters/minlon'
+      - $ref: '#/components/parameters/maxlon'
+      - $ref: '#/components/parameters/lat'
+      - $ref: '#/components/parameters/lon'
+      - $ref: '#/components/parameters/minradius'
+      - $ref: '#/components/parameters/maxradius'
+      - $ref: '#/components/parameters/minradiuskm'
+      - $ref: '#/components/parameters/maxradiuskm'
+      - $ref: '#/components/parameters/minmag'
+      - $ref: '#/components/parameters/maxmag'
+      - $ref: '#/components/parameters/mindepth'
+      - $ref: '#/components/parameters/maxdepth'
+      - $ref: '#/components/parameters/orderby'
+      responses:
+        '200':
+          $ref: '#/components/responses/200EventsAndEventsPref'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+      summary: This API returns the preferred hypocenter and the preferred magnitude
+        from all clusterd events.
+      tags:
+      - get_data
 components:
   headers:
     Retry-After:
@@ -150,7 +246,430 @@ components:
       schema:
         format: int32
         type: integer
+  parameters:
+    endtime__REQUIRED:
+      description: Select date end. - [ **YYYY-MM-DDThh:mm:ss** | **YYYY-MM-DD** ]
+        (ex. 2013-02-19T17:06:38)
+      in: query
+      name: endtime
+      required: true
+      schema:
+        format: date-time
+        type: string
+    fk_events_group:
+      description: Select events with same event_group_id.
+      format: integer
+      in: query
+      name: event_group_id
+      required: false,
+      type: integer
+    lat:
+      description: Specify the central latitude point for a radial search (in WGS84).
+      in: query
+      name: lat
+      required: false
+      schema:
+        $ref: '#/components/schemas/latitude'
+    lon:
+      description: Specify the central longitude point for a radial search (in WGS84).
+      in: query
+      name: lon
+      required: false
+      schema:
+        $ref: '#/components/schemas/longitude'
+    maxdepth:
+      description: Specify maximum depth (kilometers), values increase positively
+        with depth.
+      in: query
+      name: maxdepth
+      required: false
+      schema:
+        format: double
+        type: number
+    maxlat:
+      description: Specify northern boundary for search (in WGS84).
+      in: query
+      name: maxlat
+      required: false
+      schema:
+        $ref: '#/components/schemas/latitude'
+    maxlon:
+      description: Specify eastern boundary for search (in WGS84).
+      in: query
+      name: maxlon
+      required: false
+      schema:
+        $ref: '#/components/schemas/longitude'
+    maxmag:
+      description: Limit to events with a magnitude smaller than or equal to the specified
+        maximum.
+      in: query
+      name: maxmag
+      required: false
+      schema:
+        $ref: '#/components/schemas/magnitude'
+    maxradius:
+      description: Specify maximum distance from the geographic point defined by latitude
+        and longitude (in Degrees).
+      in: query
+      name: maxradius
+      required: false
+      schema:
+        format: double
+        type: number
+    maxradiuskm:
+      description: Specify maximum distance from the geographic point defined by latitude
+        and longitude. Kilometers. **This is an INGV extension to the FDSN specification.**
+      in: query
+      name: maxradiuskm
+      required: false
+      schema:
+        format: double
+        type: number
+    mindepth:
+      description: Specify minimum depth (kilometers), values increase positively
+        with depth.
+      in: query
+      name: mindepth
+      required: false
+      schema:
+        format: double
+        type: number
+    minlat:
+      description: Specify southern boundary for search (in WGS84).
+      in: query
+      name: minlat
+      required: false
+      schema:
+        $ref: '#/components/schemas/latitude'
+    minlon:
+      description: Specify western boundary for search (in WGS84).
+      in: query
+      name: minlon
+      required: false
+      schema:
+        $ref: '#/components/schemas/longitude'
+    minmag:
+      description: Limit to events with a magnitude larger than or equal to the specified
+        minimum.
+      in: query
+      name: minmag
+      required: false
+      schema:
+        $ref: '#/components/schemas/magnitude'
+    minradius:
+      description: Specify minimum distance from the geographic point defined by latitude
+        and longitude (in Degrees).
+      in: query
+      name: minradius
+      required: false
+      schema:
+        format: double
+        type: number
+    minradiuskm:
+      description: Specify minimum distance from the geographic point defined by latitude
+        and longitude. Kilometers. **This is an INGV extension to the FDSN specification.**
+      in: query
+      name: minradiuskm
+      required: false
+      schema:
+        format: double
+        type: number
+    orderby:
+      description: Select order
+      in: query
+      name: orderby
+      required: false
+      schema:
+        enum:
+        - id
+        - id-asc
+        - id-desc
+        - modified
+        - modified-asc
+        - modified-desc
+        - hyp_ot-asc
+        - hyp_ot-desc
+        - mag_mag-asc
+        - mag_mag-desc
+        type: string
+    starttime__REQUIRED:
+      description: Select date start. - [ **YYYY-MM-DDThh:mm:ss** | **YYYY-MM-DD**
+        ] (ex. 2013-02-18T15:06:38)
+      in: query
+      name: starttime
+      required: true
+      schema:
+        format: date-time
+        type: string
   responses:
+    200EventsAndEventsPref:
+      content:
+        application/json:
+          schema:
+            allOf:
+            - properties:
+                current_page:
+                  description: Current page.
+                  example: '1'
+                  type: string
+                first_page_url:
+                  description: URL first page.
+                  example: http://localhost:8087/api/eventdb/v1/events_pref/?page=2
+                  type: string
+                from:
+                  description: Showed record from.
+                  example: '1'
+                  type: string
+                last_page:
+                  description: Last page.
+                  example: '967'
+                  type: string
+                last_page_url:
+                  description: URL last page.
+                  example: http://localhost:8087/api/eventdb/v1/events_pref/?page=4
+                  type: string
+                next_page_url:
+                  description: URL next page.
+                  example: http://localhost:8087/api/eventdb/v1/events_pref/?page=3
+                  type: string
+                path:
+                  description: URL base path.
+                  example: http://localhost:8087
+                  type: string
+                per_page:
+                  description: Record per page.
+                  example: '4000'
+                  type: string
+                prev_page_url:
+                  description: URL previous page.
+                  example: http://localhost:8087/api/eventdb/v1/events_pref/?page=1
+                  type: string
+                to:
+                  description: Showed record to.
+                  example: '4000'
+                  type: string
+                total:
+                  description: Total records.
+                  example: '50'
+                  type: string
+              type: object
+            - properties:
+                data:
+                  items:
+                    allOf:
+                    - properties:
+                        fk_events_group:
+                          default: 0
+                          description: Link event group | bigint(20)
+                          format: int64
+                          type: integer
+                        id:
+                          description: Unique incremental id | bigint(20)
+                          example: 14932631
+                          format: int64
+                          type: integer
+                        id_locator:
+                          default: 0
+                          description: Event id created by locator | bigint(20)
+                          example: 182491
+                          format: int64
+                          type: integer
+                        inserted:
+                          default: CURRENT_TIMESTAMP
+                          description: Insert time | timestamp
+                          example: '2017-04-18 15:04:42'
+                          type: string
+                        modified:
+                          default: CURRENT_TIMESTAMP
+                          description: Last Review | timestamp
+                          example: '2017-04-18 15:04:42'
+                          type: string
+                        type_event:
+                          description: Name | varchar(255)
+                          example: earthquake
+                          type: string
+                      type: object
+                    - properties:
+                        hypocenter:
+                          properties:
+                            depth:
+                              description: Depth in Km | double
+                              example: 0.02
+                              format: double
+                              type: number
+                            id:
+                              description: Unique incremental id | bigint(20)
+                              example: 14932631
+                              format: int64
+                              type: integer
+                            inserted:
+                              default: CURRENT_TIMESTAMP
+                              description: Insert time | timestamp
+                              example: '2017-04-18 15:04:42'
+                              type: string
+                            lat:
+                              $ref: https://teamdigitale.github.io/openapi/master/definitions.yaml#/schemas/Latitude
+                            lon:
+                              $ref: https://teamdigitale.github.io/openapi/master/definitions.yaml#/schemas/Longitude
+                            modified:
+                              default: CURRENT_TIMESTAMP
+                              description: Last Review | timestamp
+                              example: '2017-04-18 15:04:42'
+                              type: string
+                            ot:
+                              description: Origin time | datetime(3)
+                              example: '2016-06-22 16:52:06.260'
+                              type: string
+                            provenance:
+                              properties:
+                                description:
+                                  default: null
+                                  description: Additional information | char(255)
+                                  example: Auto added
+                                  type: string
+                                hostname:
+                                  default: null
+                                  description: Hostname | char(255)
+                                  example: hew10.ingv.it
+                                  type: string
+                                instance:
+                                  default: null
+                                  description: Istance name. i.e. hew1_mole, endeavour_mole
+                                    | char(255)
+                                  example: hew1_mole
+                                  type: string
+                                name:
+                                  default: INGV
+                                  description: Name of Provenance. i.e. INGV, ETH,
+                                    USGS | char(255)
+                                  example: INGV
+                                  type: string
+                                softwarename:
+                                  description: Software name. i.e. SisPick, eqassemble,
+                                    hypoinverse | char(255)
+                                  example: software
+                                  type: string
+                                username:
+                                  default: null
+                                  description: User name | char(255)
+                                  example: ew
+                                  type: string
+                              type: object
+                            quality:
+                              description: Quality of the localization | char(2)
+                              example: AB
+                              type: string
+                            region:
+                              description: Event location remark region | varchar(255)
+                              example: Norcia
+                              type: string
+                          type: object
+                      type: object
+                    - properties:
+                        magnitude:
+                          properties:
+                            id:
+                              description: Unique incremental id | bigint(20)
+                              example: 14932631
+                              format: int64
+                              type: integer
+                            mag_quality:
+                              description: INGV quality code of the magnitude (computed
+                                by ew2moledb) | char(2)
+                              example: BB
+                              type: string
+                            provenance:
+                              properties:
+                                description:
+                                  default: null
+                                  description: Additional information | char(255)
+                                  example: Auto added
+                                  type: string
+                                hostname:
+                                  default: null
+                                  description: Hostname | char(255)
+                                  example: hew10.ingv.it
+                                  type: string
+                                instance:
+                                  default: null
+                                  description: Istance name. i.e. hew1_mole, endeavour_mole
+                                    | char(255)
+                                  example: hew1_mole
+                                  type: string
+                                name:
+                                  default: INGV
+                                  description: Name of Provenance. i.e. INGV, ETH,
+                                    USGS | char(255)
+                                  example: INGV
+                                  type: string
+                                softwarename:
+                                  description: Software name. i.e. SisPick, eqassemble,
+                                    hypoinverse | char(255)
+                                  example: software
+                                  type: string
+                                username:
+                                  default: null
+                                  description: User name | char(255)
+                                  example: ew
+                                  type: string
+                              type: object
+                            quality:
+                              description: quality | double
+                              format: double
+                              type: number
+                            type:
+                              default: null
+                              description: Type of the magnitude | varchar(50)
+                              example: ML-VAX
+                              type: string
+                            value:
+                              description: Magnitudo value | double
+                              example: 3.01
+                              format: double
+                              type: number
+                          type: object
+                      type: object
+                    - properties:
+                        provenance:
+                          properties:
+                            description:
+                              default: null
+                              description: Additional information | char(255)
+                              example: Auto added
+                              type: string
+                            hostname:
+                              default: null
+                              description: Hostname | char(255)
+                              example: hew10.ingv.it
+                              type: string
+                            instance:
+                              default: null
+                              description: Istance name. i.e. hew1_mole, endeavour_mole
+                                | char(255)
+                              example: hew1_mole
+                              type: string
+                            name:
+                              default: INGV
+                              description: Name of Provenance. i.e. INGV, ETH, USGS
+                                | char(255)
+                              example: INGV
+                              type: string
+                            softwarename:
+                              description: Software name. i.e. SisPick, eqassemble,
+                                hypoinverse | char(255)
+                              example: software
+                              type: string
+                            username:
+                              default: null
+                              description: User name | char(255)
+                              example: ew
+                              type: string
+                          type: object
+                      type: object
+                  type: array
+              type: object
+      description: Operation successful
     204NoContent:
       description: Request was properly formatted and submitted but no data matches
         the selection
@@ -686,6 +1205,11 @@ components:
       type: string
     longitude:
       $ref: '#/components/schemas/Longitude'
+    magnitude:
+      description: Magnitude | double
+      example: 3.2
+      format: double
+      type: number
     magnitudeSchema:
       allOf:
       - $ref: '#/components/schemas/magnitude__base'
@@ -751,9 +1275,7 @@ components:
             phases:
               $ref: '#/components/schemas/magnitude__phases'
             qAuthor:
-              description: qAuthor description
-              example: 014101073:028130073
-              type: string
+              $ref: '#/components/schemas/qAuthor'
             qddsVersion:
               description: qddsVersion description
               example: 0
@@ -844,7 +1366,7 @@ components:
       type: string
     pick__arrival_time:
       description: arrival time | datetime(3)
-      example: '2017-04-12 08:46:30.9300'
+      example: '2017-04-12 08:46:30.930'
       type: string
     pick__firstmotion:
       description: Up or down | char(1)
@@ -901,7 +1423,6 @@ components:
               - 109
               - 101
               - 122
-              items: null
               type: array
             pickId:
               $ref: '#/components/schemas/event__id_locator'
@@ -913,6 +1434,10 @@ components:
               $ref: '#/components/schemas/pick__arrival_time'
           required:
           - pickId
+    qAuthor:
+      description: qAuthor description
+      example: 014101073:028130073
+      type: string
     quake2kSchema:
       allOf:
       - $ref: '#/components/schemas/quake2k__base'
@@ -992,11 +1517,132 @@ components:
       description: Channel station code | varchar(5)
       example: ACER
       type: string
+    strongmotion__pga:
+      description: 'REQUIRED: peak ground acceleration (cm/s/s) | double'
+      example: 0.000162
+      format: double
+      type: number
+    strongmotion__pgd:
+      description: 'REQUIRED: peak ground displacement (cm) | double'
+      example: 2.5e-05
+      format: double
+      type: number
+    strongmotion__pgv:
+      description: 'REQUIRED: peak ground velocity (cm/s) | double'
+      example: 3.4e-05
+      format: double
+      type: number
+    strongmotion__t_dt:
+      default: '1970-01-01 00:00:00.000'
+      description: 'time: trigger reported by SM box - datetime part | datetime(6)'
+      example: '2017-04-12 08:46:56.190'
+      type: string
+    strongmotion__tpga_dt:
+      description: 'OPTIONAL: time of pga - datetime part | datetime(3)'
+      example: '2017-04-12 08:47:06.990'
+      type: string
+    strongmotion__tpgd_dt:
+      description: 'OPTIONAL: time of pgd - datetime part | datetime(3)'
+      example: '2017-04-12 08:46:59.989'
+      type: string
+    strongmotion__tpgv_dt:
+      description: 'OPTIONAL: time of pgv - datetime part | datetime(3)'
+      example: '2017-04-12 08:46:56.190'
+      type: string
+    strongmotion_alt__altcode:
+      description: code specifying the source of the alternate time field | int(11)
+      example: 0
+      type: number
+    strongmotion_alt__t_alt_dt:
+      description: 'alternate time: trigger reported by SM box - time with microseconds
+        | datetime(3)'
+      example: '1970-01-01 00:00:00.000'
+      type: string
+    strongmotioniiSchema:
+      allOf:
+      - $ref: '#/components/schemas/strongmotionii__base'
+      - properties:
+          ewLogo:
+            properties:
+              hostname:
+                $ref: '#/components/schemas/ewLogo__hostname'
+              installation:
+                $ref: '#/components/schemas/ewLogo__installation'
+              instance:
+                $ref: '#/components/schemas/ewLogo__instance'
+              module:
+                description: Module description | ???
+                example: MOD_GMEW
+                type: string
+              type:
+                description: Type description | ???
+                example: TYPE_STRONGMOTIONII
+                type: string
+              user:
+                $ref: '#/components/schemas/ewLogo__user'
+            required:
+            - type
+            - module
+            - installation
+            - instance
+        type: object
+    strongmotionii__base:
+      properties:
+        ewMessage:
+          properties:
+            RSA:
+              items:
+                properties:
+                  period:
+                    description: Period
+                    example: 0.3
+                    type: number
+                  value:
+                    description: RSA(response spectrum accel) value for period
+                    example: 0.000724
+                    type: number
+              type: array
+            alternateCode:
+              $ref: '#/components/schemas/strongmotion_alt__altcode'
+            alternateTime:
+              $ref: '#/components/schemas/strongmotion_alt__t_alt_dt'
+            component:
+              $ref: '#/components/schemas/cha'
+            location:
+              $ref: '#/components/schemas/loc'
+            network:
+              $ref: '#/components/schemas/net'
+            pga:
+              $ref: '#/components/schemas/strongmotion__pga'
+            pgaTime:
+              $ref: '#/components/schemas/strongmotion__tpga_dt'
+            pgd:
+              $ref: '#/components/schemas/strongmotion__pgd'
+            pgdTime:
+              $ref: '#/components/schemas/strongmotion__tpgd_dt'
+            pgv:
+              $ref: '#/components/schemas/strongmotion__pgv'
+            pgvTime:
+              $ref: '#/components/schemas/strongmotion__tpgv_dt'
+            qAuthor:
+              $ref: '#/components/schemas/qAuthor'
+            quakeId:
+              $ref: '#/components/schemas/event__id_locator'
+            station:
+              $ref: '#/components/schemas/sta'
+            time:
+              $ref: '#/components/schemas/strongmotion__t_dt'
+            version:
+              $ref: '#/components/schemas/type_hypocenter__name'
+          required:
+          - quakeId
+          - version
     type_hypocenter__name:
       description: Localization name (es:01,XX,WW,..) | varchar(255)
       example: ew prelim
       type: string
     type_magnitude__name:
+      default: null
       description: Type of the magnitude | varchar(50)
       example: ML-VAX
       type: string
