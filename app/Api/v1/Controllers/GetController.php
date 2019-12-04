@@ -42,6 +42,7 @@ class GetController extends DanteBaseController
             'orderby', 
             'page'
         ]);
+        \Log::debug(' getting only params: ',$input_parameters);
 
         /* Validator */
         $validator_default_check    = config('dante.validator_default_check');
@@ -111,7 +112,8 @@ class GetController extends DanteBaseController
             'page',
 			'event_group_id'
         ]);
-        
+        \Log::debug(' getting only params: ',$input_parameters);
+
         /* Validator */
         $validator_default_check    = config('dante.validator_default_check');
         $validator_default_message  = config('dante.validator_default_messages');
@@ -192,6 +194,7 @@ class GetController extends DanteBaseController
 			'originid',
 			'eventid'
         ]);
+        \Log::debug(' getting only params: ',$input_parameters);
         
         /* Validator */
         $validator_default_check    = config('dante.validator_default_check');
