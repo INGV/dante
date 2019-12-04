@@ -28,7 +28,7 @@ info:
   x-summary: Web Service to receive location from Earthworm or JSON standard
 servers:
 - description: Production
-  url: https://webservices.ingv.it/api/v1/hyp2000
+  url: https://localhost:8087/api
 paths:
   /eventdb/ew/v1/hyp2000arc/:
     post:
@@ -261,7 +261,7 @@ components:
       format: integer
       in: query
       name: event_group_id
-      required: false,
+      required: false
       type: integer
     lat:
       description: Specify the central latitude point for a radial search (in WGS84).
