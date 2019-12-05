@@ -4,7 +4,7 @@
 
 [![License](https://img.shields.io/github/license/INGV/dante.svg)](https://github.com/INGV/dante/blob/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/INGV/dante.svg)](https://github.com/INGV/dante/issues)
-[![Join the #dante channel](https://img.shields.io/badge/Slack%20channel-%23general-blue.svg)](https://ingv-institute.slack.com/messages/CRAE2JFS8)
+[![Join the #dante channel](https://img.shields.io/badge/Slack%20channel-%23dante-blue.svg)](https://ingv-institute.slack.com/messages/CRAE2JFS8)
 [![Get invited](https://slack.developers.italia.it/badge.svg)](https://ingv-institute.slack.com/)
 
 # dante
