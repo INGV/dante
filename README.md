@@ -11,7 +11,7 @@
 # dante
 
 ```
-$ git clone https://gitlab.rm.ingv.it/caravel/dante6beta dante
+$ git clone https://github.com/INGV/dante dante
 $ cd dante
 ```
 
@@ -83,5 +83,6 @@ Please, feel free to contribute.
 
 ## Author
 (c) 2019 Valentino Lauciani valentino.lauciani[at]ingv.it \
+(c) 2019 Matteo Quintiliani matteo.quintiliani[at]ingv.it \
 
 Istituto Nazionale di Geofisica e Vulcanologia, Italia
