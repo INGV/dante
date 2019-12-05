@@ -221,7 +221,7 @@ services:
 
 ### Docker-in-Docker ################################################
     docker-in-docker:
-      image: docker:dind
+      image: docker:19.03-dind
       #hostname: docker-in-docker
       environment:
         DOCKER_TLS_SAN: DNS:docker-in-docker
