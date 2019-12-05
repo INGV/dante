@@ -266,7 +266,6 @@ class DanteBaseModel extends Model
             try {
                 \Log::debug('    Sending request url: '.$requestUrl);
                 $res = $client->request('GET', $requestUrl);    
-                $res = null;
                 \Log::debug('    Done');
                 if (isset($res)) {
                     if ($res->getStatusCode() == 200) {
