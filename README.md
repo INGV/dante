@@ -67,6 +67,9 @@ $ cd ..
 When all containers are started, connect to: 
 - http://<your_host>:<your_port>/
 
+default is:
+- http://localhost:8087
+
 If all works, you should see a web page with OpenAPI3 specification to interact with WS.
 
 ## Test
