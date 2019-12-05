@@ -160,7 +160,7 @@ paths:
       - $ref: '#/components/parameters/endtime__REQUIRED'
       responses:
         '200':
-          $ref: '#/components/responses/200Event'
+          $ref: '#/components/responses/200EventVale'
         '404':
           $ref: '#/components/responses/404NotFound'
         '429':
@@ -278,11 +278,12 @@ components:
         type: string
     fk_events_group:
       description: Select events with same event_group_id.
-      format: integer
       in: query
       name: event_group_id
       required: false
-      type: integer
+      schema:
+        format: integer
+        type: integer
     lat:
       description: Specify the central latitude point for a radial search (in WGS84).
       in: query
@@ -423,58 +424,12 @@ components:
         format: date-time
         type: string
   responses:
-    200Event:
-      allOf:
-      - properties:
-          fk_events_group:
-            default: 0
-            description: Link event group | bigint(20)
-            format: int64
-            type: integer
-          fk_pref_hyp:
-            default: null
-            description: 'Link: preferred hypocenter. It can be NULL. | bigint(20)'
-            format: int64
-            type: integer
-          fk_pref_mag:
-            default: null
-            description: 'Link: preferred magnitude. It can be NULL. | bigint(20)'
-            format: int64
-            type: integer
-          fk_provenance:
-            description: 'Link: provenance | bigint(20)'
-            example: 13
-            format: int64
-            type: integer
-          fk_type_event:
-            default: 1
-            description: ' | bigint(20)'
-            example: 697
-            format: int64
-            type: integer
-          id_locator:
-            default: 0
-            description: Event id created by locator | bigint(20)
-            example: 182491
-            format: int64
-            type: integer
-          type_group:
-            default: 0
-            description: Group type. Used by clustering algorithm | tinyint(4)
-            format: int64
-            type: integer
-        required:
-        - id_locator
-        - fk_type_event
-        - fk_provenance
-        type: object
-      - properties:
-          id:
-            description: Unique incremental id | bigint(20)
-            example: 14932631
-            format: int64
-            type: integer
-        tpye: object
+    200EventVale:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/insertEventPost'
+      description: test
     200EventsAndEventsPref:
       content:
         application/json:
@@ -903,10 +858,51 @@ components:
       example: 694
       format: double
       type: number
+    eventBase:
+      properties:
+        fk_events_group:
+          $ref: '#/components/schemas/event__fk_events_group'
+        fk_pref_hyp:
+          $ref: '#/components/schemas/event__fk_pref_hyp'
+        fk_pref_mag:
+          $ref: '#/components/schemas/event__fk_pref_mag'
+        fk_provenance:
+          $ref: '#/components/schemas/fk_provenance'
+        fk_type_event:
+          $ref: '#/components/schemas/fk_type_event'
+        id_locator:
+          $ref: '#/components/schemas/event__id_locator'
+        type_group:
+          $ref: '#/components/schemas/event__type_group'
+      required:
+      - id_locator
+      - fk_type_event
+      - fk_provenance
+      type: object
+    event__fk_events_group:
+      default: 0
+      description: Link event group | bigint(20)
+      format: int64
+      type: integer
+    event__fk_pref_hyp:
+      default: null
+      description: 'Link: preferred hypocenter. It can be NULL. | bigint(20)'
+      format: int64
+      type: integer
+    event__fk_pref_mag:
+      default: null
+      description: 'Link: preferred magnitude. It can be NULL. | bigint(20)'
+      format: int64
+      type: integer
     event__id_locator:
       default: 0
       description: Event id created by locator | bigint(20)
       example: 182491
+      format: int64
+      type: integer
+    event__type_group:
+      default: 0
+      description: Group type. Used by clustering algorithm | tinyint(4)
       format: int64
       type: integer
     ewLogo__hostname:
@@ -925,6 +921,17 @@ components:
       description: User | ???
       example: ew
       type: string
+    fk_provenance:
+      description: 'Link: provenance | bigint(20)'
+      example: 13
+      format: int64
+      type: integer
+    fk_type_event:
+      default: 1
+      description: ' | bigint(20)'
+      example: 697
+      format: int64
+      type: integer
     hyp2000arcSchema:
       allOf:
       - $ref: '#/components/schemas/hyp2000arc__base'
@@ -1208,6 +1215,12 @@ components:
       description: Azimutal gap | double
       format: double
       type: number
+    hypocenter__confidence_lev:
+      default: 68.3
+      description: confidence level | double
+      example: 68.3
+      format: double
+      type: number
     hypocenter__e0:
       description: largest principal error | double
       format: double
@@ -1236,12 +1249,55 @@ components:
       description: smallest principal error | double
       format: double
       type: number
+    hypocenter__e2_az:
+      description: azimuth of smallest principal error | double
+      format: double
+      type: integer
+    hypocenter__e2_dip:
+      description: dip of smallest principal error | double
+      format: double
+      type: integer
+    hypocenter__err_depth:
+      description: Depth error | double
+      format: double
+      type: number
     hypocenter__err_h:
       description: Depth error | double
       format: double
       type: number
+    hypocenter__err_lat:
+      description: Latitude error | double
+      format: double
+      type: number
+    hypocenter__err_lon:
+      description: Longitude error | double
+      format: double
+      type: number
+    hypocenter__err_ot:
+      description: Origin time error | double
+      format: double
+      type: number
     hypocenter__err_z:
       description: Depth error | double
+      format: double
+      type: number
+    hypocenter__fix_depth:
+      default: 0
+      description: 1 if depth is fixed | tinyint(1)
+      example: 0
+      type: boolean
+    hypocenter__is_centroid:
+      default: 0
+      description: 1 if it is a centroid | tinyint(4)
+      example: 0
+      format: int64
+      type: integer
+    hypocenter__max_distance:
+      description: Distance from the furthest station | double
+      format: double
+      type: number
+    hypocenter__min_distance:
+      description: Distance from the closest station | double
       format: double
       type: number
     hypocenter__nph:
@@ -1264,16 +1320,339 @@ components:
       description: Origin time | datetime(3)
       example: '2016-06-22 16:52:06.260'
       type: string
+    hypocenter__quality:
+      description: Quality of the localization | char(2)
+      example: AB
+      type: string
     hypocenter__rms:
       description: Root mean square | double
       format: double
       type: number
+    hypocenter__sec_azim_gap:
+      description: Secondary Azimutal gap | double
+      format: double
+      type: number
+    hypocenter__w_rms:
+      description: Root mean square Weighted | double
+      format: double
+      type: number
+    hypocenter_region_name__region:
+      description: Event location remark region | varchar(255)
+      example: Norcia
+      type: string
+    id:
+      description: Unique incremental id | bigint(20)
+      example: 14932631
+      format: int64
+      type: integer
+    insertAmplitudeBase:
+      items:
+        properties:
+          amp1:
+            $ref: '#/components/schemas/amplitude__amp1'
+          amp2:
+            $ref: '#/components/schemas/amplitude__amp2'
+          azimut:
+            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__azimut'
+          ep_distance:
+            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__ep_distance'
+          err_mag:
+            $ref: '#/components/schemas/st_amp_mag-st_dur_mag__err_mag'
+          hyp_distance:
+            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__hyp_distance'
+          is_used:
+            $ref: '#/components/schemas/st_amp_mag-st_dur_mag__polarity_is_used'
+          mag:
+            $ref: '#/components/schemas/st_amp_mag__mag'
+          mag_correction:
+            $ref: '#/components/schemas/st_amp_mag__mag_correction'
+          period1:
+            $ref: '#/components/schemas/amplitude__period1'
+          period2:
+            $ref: '#/components/schemas/amplitude__period2'
+          provenance_description:
+            $ref: '#/components/schemas/provenance__description'
+          provenance_hostname:
+            $ref: '#/components/schemas/provenance__hostname'
+          provenance_instance:
+            $ref: '#/components/schemas/provenance__instance'
+          provenance_name:
+            $ref: '#/components/schemas/provenance__name'
+          provenance_softwarename:
+            $ref: '#/components/schemas/provenance__softwarename'
+          provenance_username:
+            $ref: '#/components/schemas/provenance__username'
+          scnl_cha:
+            $ref: '#/components/schemas/scnl__cha'
+          scnl_loc:
+            $ref: '#/components/schemas/scnl__loc'
+          scnl_net:
+            $ref: '#/components/schemas/scnl__net'
+          scnl_sta:
+            $ref: '#/components/schemas/scnl__sta'
+          time1:
+            $ref: '#/components/schemas/amplitude__time1'
+          time2:
+            $ref: '#/components/schemas/amplitude__time2'
+          type_amplitude:
+            $ref: '#/components/schemas/type_amplitude__type'
+          type_magnitude:
+            $ref: '#/components/schemas/type_magnitude__name'
+        required:
+        - amp1
+        - amp2
+      type: array
+    insertEventBase:
+      properties:
+        event:
+          properties:
+            hypocenters:
+              $ref: '#/components/schemas/insertHypocenterBase'
+            id_locator:
+              $ref: '#/components/schemas/event__id_locator'
+            provenance_description:
+              $ref: '#/components/schemas/provenance__description'
+            provenance_hostname:
+              $ref: '#/components/schemas/provenance__hostname'
+            provenance_instance:
+              $ref: '#/components/schemas/provenance__instance'
+            provenance_name:
+              $ref: '#/components/schemas/provenance__name'
+            provenance_softwarename:
+              $ref: '#/components/schemas/provenance__softwarename'
+            provenance_username:
+              $ref: '#/components/schemas/provenance__username'
+            type_event:
+              $ref: '#/components/schemas/event__type_group'
+          required:
+          - id_locator
+          - fk_type_event
+          - fk_provenance
+      type: object
+    insertEventPost:
+      properties:
+        data:
+          $ref: '#/components/schemas/insertEventBase'
+      type: object
+    insertHypocenterBase:
+      items:
+        properties:
+          azim_gap:
+            $ref: '#/components/schemas/hypocenter__azim_gap'
+          confidence_lev:
+            $ref: '#/components/schemas/hypocenter__confidence_lev'
+          depth:
+            $ref: '#/components/schemas/depth'
+          e0:
+            $ref: '#/components/schemas/hypocenter__e0'
+          e0_az:
+            $ref: '#/components/schemas/hypocenter__e0_az'
+          e0_dip:
+            $ref: '#/components/schemas/hypocenter__e0_dip'
+          e1:
+            $ref: '#/components/schemas/hypocenter__e1'
+          e1_az:
+            $ref: '#/components/schemas/hypocenter__e1_az'
+          e1_dip:
+            $ref: '#/components/schemas/hypocenter__e1_dip'
+          e2:
+            $ref: '#/components/schemas/hypocenter__e2'
+          e2_az:
+            $ref: '#/components/schemas/hypocenter__e2_az'
+          e2_dip:
+            $ref: '#/components/schemas/hypocenter__e2_dip'
+          err_depth:
+            $ref: '#/components/schemas/hypocenter__err_depth'
+          err_h:
+            $ref: '#/components/schemas/hypocenter__err_h'
+          err_lat:
+            $ref: '#/components/schemas/hypocenter__err_lat'
+          err_lon:
+            $ref: '#/components/schemas/hypocenter__err_lon'
+          err_ot:
+            $ref: '#/components/schemas/hypocenter__err_ot'
+          err_z:
+            $ref: '#/components/schemas/hypocenter__err_z'
+          fix_depth:
+            $ref: '#/components/schemas/hypocenter__fix_depth'
+          is_centroid:
+            $ref: '#/components/schemas/hypocenter__is_centroid'
+          lat:
+            $ref: '#/components/schemas/latitude'
+          loc_program:
+            $ref: '#/components/schemas/loc_program__name'
+          lon:
+            $ref: '#/components/schemas/longitude'
+          magnitudes:
+            $ref: '#/components/schemas/insertMagnitudeBase'
+          max_distance:
+            $ref: '#/components/schemas/hypocenter__max_distance'
+          min_distance:
+            $ref: '#/components/schemas/hypocenter__min_distance'
+          model:
+            $ref: '#/components/schemas/model__name'
+          nph:
+            $ref: '#/components/schemas/hypocenter__nph'
+          nph_fm:
+            $ref: '#/components/schemas/hypocenter__nph_fm'
+          nph_s:
+            $ref: '#/components/schemas/hypocenter__nph_s'
+          nph_tot:
+            $ref: '#/components/schemas/hypocenter__nph_tot'
+          ot:
+            $ref: '#/components/schemas/hypocenter__ot'
+          phases:
+            $ref: '#/components/schemas/insertPhaseBase'
+          provenance_description:
+            $ref: '#/components/schemas/provenance__description'
+          provenance_hostname:
+            $ref: '#/components/schemas/provenance__hostname'
+          provenance_instance:
+            $ref: '#/components/schemas/provenance__instance'
+          provenance_name:
+            $ref: '#/components/schemas/provenance__name'
+          provenance_softwarename:
+            $ref: '#/components/schemas/provenance__softwarename'
+          provenance_username:
+            $ref: '#/components/schemas/provenance__username'
+          quality:
+            $ref: '#/components/schemas/hypocenter__quality'
+          region:
+            $ref: '#/components/schemas/hypocenter_region_name__region'
+          rms:
+            $ref: '#/components/schemas/hypocenter__rms'
+          sec_azim_gap:
+            $ref: '#/components/schemas/hypocenter__sec_azim_gap'
+          type_hypocenter:
+            $ref: '#/components/schemas/id'
+          w_rms:
+            $ref: '#/components/schemas/hypocenter__w_rms'
+        required:
+        - ot
+        - lat
+        - lon
+        - depth
+      type: array
+    insertMagnitudeBase:
+      items:
+        properties:
+          amplitudes:
+            $ref: '#/components/schemas/insertAmplitudeBase'
+          azimut:
+            $ref: '#/components/schemas/magnitude__azimut'
+          err:
+            $ref: '#/components/schemas/magnitude__err'
+          mag:
+            $ref: '#/components/schemas/magnitude__mag'
+          mag_quality:
+            $ref: '#/components/schemas/magnitude__mag_quality'
+          min_dist:
+            $ref: '#/components/schemas/magnitude__min_dist'
+          ncha:
+            $ref: '#/components/schemas/magnitude__ncha'
+          nsta:
+            $ref: '#/components/schemas/magnitude__nsta'
+          nsta_used:
+            $ref: '#/components/schemas/magnitude__nsta_used'
+          provenance_description:
+            $ref: '#/components/schemas/provenance__description'
+          provenance_hostname:
+            $ref: '#/components/schemas/provenance__hostname'
+          provenance_instance:
+            $ref: '#/components/schemas/provenance__instance'
+          provenance_name:
+            $ref: '#/components/schemas/provenance__name'
+          provenance_softwarename:
+            $ref: '#/components/schemas/provenance__softwarename'
+          provenance_username:
+            $ref: '#/components/schemas/provenance__username'
+          quality:
+            $ref: '#/components/schemas/magnitude__quality'
+          type_magnitude:
+            $ref: '#/components/schemas/type_magnitude__name'
+        required:
+        - type_magnitude
+        - provenance_name
+        - provenance_softwarename
+      type: array
+    insertPhaseBase:
+      items:
+        properties:
+          arr_time_is_used:
+            $ref: '#/components/schemas/phase__arr_time_is_used'
+          arrival_time:
+            $ref: '#/components/schemas/pick__arrival_time'
+          azimut:
+            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__azimut'
+          emersio:
+            $ref: '#/components/schemas/pick__emersio'
+          ep_distance:
+            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__ep_distance'
+          err_arrival_time:
+            $ref: '#/components/schemas/pick__err_arrival_time'
+          firstmotion:
+            $ref: '#/components/schemas/pick__firstmotion'
+          hyp_distance:
+            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__hyp_distance'
+          isc_code:
+            $ref: '#/components/schemas/type_magnitude__name'
+          pamp:
+            $ref: '#/components/schemas/pick__pamp'
+          polarity_is_used:
+            $ref: '#/components/schemas/phase__polarity_is_used'
+          provenance_description:
+            $ref: '#/components/schemas/provenance__description'
+          provenance_hostname:
+            $ref: '#/components/schemas/provenance__hostname'
+          provenance_instance:
+            $ref: '#/components/schemas/provenance__instance'
+          provenance_name:
+            $ref: '#/components/schemas/provenance__name'
+          provenance_softwarename:
+            $ref: '#/components/schemas/provenance__softwarename'
+          provenance_username:
+            $ref: '#/components/schemas/provenance__username'
+          residual:
+            $ref: '#/components/schemas/phase__residual'
+          scnl_cha:
+            $ref: '#/components/schemas/scnl__cha'
+          scnl_loc:
+            $ref: '#/components/schemas/scnl__loc'
+          scnl_net:
+            $ref: '#/components/schemas/scnl__net'
+          scnl_sta:
+            $ref: '#/components/schemas/scnl__sta'
+          std_error:
+            $ref: '#/components/schemas/phase__std_error'
+          take_off:
+            $ref: '#/components/schemas/phase__take_off'
+          teo_travel_time:
+            $ref: '#/components/schemas/phase__teo_travel_time'
+          weight_phase_a_priori:
+            $ref: '#/components/schemas/phase__weight_in'
+          weight_phase_localization:
+            $ref: '#/components/schemas/phase__weight_out'
+          weight_picker:
+            $ref: '#/components/schemas/pick__weight'
+        required:
+        - isc_code
+        - arrival_time
+        - provenance_name
+        - provenance_softwarename
+        - scnl_net
+        - scnl_sta
+        - scnl_cha
+      type: array
     latitude:
       $ref: '#/components/schemas/Latitude'
     loc:
       default: --
       description: Channel location | char(2)
       example: '00'
+      type: string
+    loc_program__name:
+      description: Name of the localization program | char(255)
+      example: IPO-EW__tdmt_invc.c
       type: string
     longitude:
       $ref: '#/components/schemas/Longitude'
@@ -1389,6 +1768,10 @@ components:
       description: Number of the stations on magnitudo calculation | int(11)
       format: int64
       type: integer
+    magnitude__nsta_used:
+      description: Number of the stations used on magnitudo calculation | int(11)
+      format: int64
+      type: integer
     magnitude__phases:
       items:
         properties:
@@ -1432,18 +1815,83 @@ components:
       description: quality | double
       format: double
       type: number
+    model__name:
+      description: Name of the model | varchar(20)
+      example: prem
+      type: string
     net:
       description: Channel net code | char(2)
       example: IV
       type: string
+    phase-st_amp_mag-st_dur_mag__azimut:
+      description: Station hypocenter azimut | double
+      example: 161
+      format: double
+      type: number
+    phase-st_amp_mag-st_dur_mag__ep_distance:
+      description: Distance from epicenter of the station | double
+      example: 694
+      format: double
+      type: number
+    phase-st_amp_mag-st_dur_mag__hyp_distance:
+      description: Distance from hypocenter of the station | double
+      format: double
+      type: number
+    phase__arr_time_is_used:
+      description: 1 if it is used for hypocenter calculation | tinyint(4)
+      format: int64
+      type: integer
+    phase__polarity_is_used:
+      description: 1 if it is used for polarity calculation | tinyint(4)
+      format: int64
+      type: integer
+    phase__residual:
+      description: Residual | double
+      example: 6.19
+      format: double
+      type: number
+    phase__std_error:
+      description: Error evaluation | int(11)
+      format: int64
+      type: integer
+    phase__take_off:
+      description: Take off angle | double
+      example: 94
+      format: double
+      type: number
+    phase__teo_travel_time:
+      description: Teoretical travel time | datetime(6)
+      example: '2017-04-12 08:47:10'
+      type: string
+    phase__weight_in:
+      description: A priori weight | bigint(20)
+      example: 4
+      type: integer
+    phase__weight_out:
+      description: Localization weight | double
+      example: 0.88
+      type: integer
     pick__arrival_time:
       description: arrival time | datetime(3)
       example: '2017-04-12 08:46:30.930'
       type: string
+    pick__emersio:
+      description: Impulsive or emersio, pamp description | char(1)
+      example: null
+      type: string
+    pick__err_arrival_time:
+      description: Error arrival time | double
+      format: double
+      type: number
     pick__firstmotion:
       description: Up or down | char(1)
       example: D
       type: string
+    pick__pamp:
+      description: peak P-wave half amplitude | double
+      example: 283
+      format: double
+      type: number
     pick__weight:
       description: Picking weight of the phase | int(11)
       example: 2
@@ -1506,6 +1954,50 @@ components:
               $ref: '#/components/schemas/pick__arrival_time'
           required:
           - pickId
+    provenanceBase:
+      properties:
+        provenance_description:
+          $ref: '#/components/schemas/provenance__description'
+        provenance_hostname:
+          $ref: '#/components/schemas/provenance__hostname'
+        provenance_instance:
+          $ref: '#/components/schemas/provenance__instance'
+        provenance_name:
+          $ref: '#/components/schemas/provenance__name'
+        provenance_softwarename:
+          $ref: '#/components/schemas/provenance__softwarename'
+        provenance_username:
+          $ref: '#/components/schemas/provenance__username'
+      type: object
+    provenance__description:
+      default: null
+      description: Additional information | char(255)
+      example: Auto added
+      type: string
+    provenance__hostname:
+      default: null
+      description: Hostname | char(255)
+      example: hew10.ingv.it
+      type: string
+    provenance__instance:
+      default: null
+      description: Istance name. i.e. hew1_mole, endeavour_mole | char(255)
+      example: hew1_mole
+      type: string
+    provenance__name:
+      default: INGV
+      description: Name of Provenance. i.e. INGV, ETH, USGS | char(255)
+      example: INGV
+      type: string
+    provenance__softwarename:
+      description: Software name. i.e. SisPick, eqassemble, hypoinverse | char(255)
+      example: software
+      type: string
+    provenance__username:
+      default: null
+      description: User name | char(255)
+      example: ew
+      type: string
     qAuthor:
       description: qAuthor description
       example: 014101073:028130073
@@ -1575,6 +2067,31 @@ components:
           - latitude
           - longitude
           - depth
+    scnl__cha:
+      description: Channel code | char(3)
+      example: HHZ
+      type: string
+    scnl__loc:
+      default: --
+      description: Channel location | char(2)
+      example: '00'
+      type: string
+    scnl__net:
+      description: Channel net code | char(2)
+      example: IV
+      type: string
+    scnl__sta:
+      description: Channel station code | varchar(5)
+      example: ACER
+      type: string
+    st_amp_mag-st_dur_mag__err_mag:
+      description: magnitude error | double
+      format: double
+      type: number
+    st_amp_mag-st_dur_mag__polarity_is_used:
+      description: 1 if used | tinyint(4)
+      format: int64
+      type: integer
     st_amp_mag__mag:
       description: Amplitude magnitude value | double
       example: 3.04
@@ -1709,6 +2226,10 @@ components:
           required:
           - quakeId
           - version
+    type_amplitude__type:
+      description: Type of the amplitude | varchar(50)
+      example: Acceleration
+      type: string
     type_hypocenter__name:
       description: Localization name (es:01,XX,WW,..) | varchar(255)
       example: ew prelim
