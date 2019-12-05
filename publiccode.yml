@@ -4,8 +4,8 @@
 
 publiccodeYmlVersion: '0.2'
 name: 'INGV - DANTE' 
-releaseDate: '2019-11-07'
-url: 'https://gitlab.rm.ingv.it/caravel/dante6beta'
+releaseDate: '2019-12-05'
+url: 'https://github.com/INGV/dante'
 logo: public/images/ingv_logo_text_two_lines.png 
 landingURL: 'https://gitlab.rm.ingv.it/caravel/dante6beta'
 softwareVersion: 1.0.0-dev
