@@ -4,12 +4,20 @@ info:
     email: valentino.lauciani@ingv.it
     name: INGV
     url: http://terremoti.ingv.it/webservices_and_software
-  description: "  \n\n  # Introduction\n  Dante is an API Web Service developed to\
-    \ insert a layer between applications and **eventdb** DataBase. \n  \n\n  Dante\
+  description: "  \n\n  # Introduction\n  Dante is an API Web Service used for iteract\
+    \ with earthquake data stored in database (**eventdb**); the **eventdb** database\
+    \ schema is used at INGV.\n  Use other schema would require cration of specific\
+    \ `Model` and `Controller` but this is the potential of web services.  \n\n  Dante\
     \ provides a set of routes to store message **event**, **hypocenter**, **magnitude**,\
     \ **phase**, **...**.  \n\n  # Input\n  As input, Dante acept:\n  - A `json` message\
-    \ (view spec below) \n  - An Eartworm `json` message built from **ew2openapi**\
-    \ module  \n\n  "
+    \ (view '**store api**' spec below) \n  - An Eartworm `json` message (view '**earthworm\
+    \ api**' spec below) produced by **ew2openapi** module  \n\n  # Output\n  As output,\
+    \ Dante has a RESTful api foreach database table and implement three specific\
+    \ routes: \n  - `events_pref`: returns the preferred hypocenter and the preferred\
+    \ magnitude from all clusterd events. \n  - `events`: returns the preferred hypocenter\
+    \ and the preferred magnitude from the same instance. \n  - `event`: returns the\
+    \ full event (event, hypocenters, magnitudes, phases, amplitude, etc...) from\
+    \ an **eventid** or **originid**/**hypocenterid**. \n  \n\n  "
   license:
     name: Creative Commons Attribution 4.0 International
     url: http://creativecommons.org/licenses/by/4.0/
@@ -20,9 +28,9 @@ info:
   x-summary: Web Service to receive location from Earthworm or JSON standard
 servers:
 - description: Production
-  url: http://localhost:8087/api
+  url: http://localhost:8087/api/eventdb/
 paths:
-  /eventdb/ew/v1/hyp2000arc/:
+  /ew/v1/hyp2000arc/:
     post:
       requestBody:
         content:
@@ -45,7 +53,7 @@ paths:
       summary: Insert a new hyp2000arc message to the DB using ew2openapi module
       tags:
       - earthwmorm api
-  /eventdb/ew/v1/magnitude/:
+  /ew/v1/magnitude/:
     post:
       requestBody:
         content:
@@ -68,7 +76,7 @@ paths:
       summary: Insert a new magnitude message to the DB using ew2openapi module
       tags:
       - earthwmorm api
-  /eventdb/ew/v1/pick_scnl/:
+  /ew/v1/pick_scnl/:
     post:
       requestBody:
         content:
@@ -91,7 +99,7 @@ paths:
       summary: Insert a new pick_scnl message to the DB using ew2openapi module
       tags:
       - earthwmorm api
-  /eventdb/ew/v1/quake2k/:
+  /ew/v1/quake2k/:
     post:
       requestBody:
         content:
@@ -114,7 +122,7 @@ paths:
       summary: Insert a new quake2k message to the DB using ew2openapi module
       tags:
       - earthwmorm api
-  /eventdb/ew/v1/strongmotionii/:
+  /ew/v1/strongmotionii/:
     post:
       requestBody:
         content:
@@ -137,7 +145,7 @@ paths:
       summary: Insert a new strongmotionii message to the DB using ew2openapi module
       tags:
       - earthwmorm api
-  /eventdb/v1/event/:
+  /v1/event/:
     get:
       description: This API returns the preferred hypocenter and the preferred magnitude
         from all clusterd events.
@@ -174,10 +182,10 @@ paths:
           $ref: '#/components/responses/429TooManyRequests'
         '500':
           $ref: '#/components/responses/500InternalServerError'
-      summary: Event object that needs to be added to the DB using ew2openapi module
+      summary: Add a new event to the DB
       tags:
       - store api
-  /eventdb/v1/events/:
+  /v1/events/:
     get:
       description: This API returns the preferred hypocenter and the preferred magnitude
         from the same instance
@@ -213,7 +221,7 @@ paths:
         from the same instance.
       tags:
       - get
-  /eventdb/v1/events_pref/:
+  /v1/events_pref/:
     get:
       description: This API returns the preferred hypocenter and the preferred magnitude
         from all clusterd events.
@@ -248,6 +256,48 @@ paths:
         from all clusterd events.
       tags:
       - get
+  /v1/hypocenter/:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/insertHypocenterPost'
+        description: JSON to store
+        required: true
+      responses:
+        '201':
+          description: record inserted
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+      summary: Add a new hypocenter(s) to the DB
+      tags:
+      - store api
+  /v1/magnitude/:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/insertMagnitudePost'
+        description: JSON to store
+        required: true
+      responses:
+        '201':
+          description: record inserted
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+      summary: Add a new magnitude(s) to the DB
+      tags:
+      - store api
 components:
   headers:
     Retry-After:
@@ -1100,6 +1150,32 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/objectEventBase'
+      type: object
+    insertHypocenterPost:
+      properties:
+        data:
+          allOf:
+          - properties:
+              eventid:
+                $ref: '#/components/schemas/id'
+            type: object
+          - properties:
+              hypocenter:
+                $ref: '#/components/schemas/objectHypocenterBase'
+            type: object
+      type: object
+    insertMagnitudePost:
+      properties:
+        data:
+          allOf:
+          - properties:
+              hypocenter_id:
+                $ref: '#/components/schemas/id'
+            type: object
+          - properties:
+              magnitudes:
+                $ref: '#/components/schemas/objectMagnitudeBase'
+            type: object
       type: object
     inserted:
       default: CURRENT_TIMESTAMP
