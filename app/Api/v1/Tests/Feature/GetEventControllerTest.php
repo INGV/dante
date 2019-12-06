@@ -8,134 +8,162 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 use App\Api\v1\Tests\DanteBaseTest;
-use App\Api\v1\Tests\Feature\InsertEwQuake2kControllerTest;
 
-class InsertEwStrongmotioniiControllerTest extends TestCase
+class GetEventControllerTest extends TestCase
 {
-    /* 
-     * Do not insert all fields that are auto generated; for example:
-     *  - 'id' (that is autoincremente) 
-     *  - 'inserted' (that is auto-generated)
-     *  - 'modified' (that is auto-generated) 
-     */
-    protected $input_strongmotionii_json = '{
-        "data": {
-            "ewLogo": {
-                "type": "TYPE_STRONGMOTIONII",
-                "module": "MOD_GMEW",
-                "installation": "INST_INGV",
-                "instance": "hew10_mole_phpunit",
-                "user": "ew",
-                "hostname": "hew10_phpunit"
-            },
-            "ewMessage": {
-                "quakeId": 205341,
-                "station": "SLCN",
-                "component": "HHZ",
-                "network": "IV",
-                "location": "--",
-                "qAuthor": "014101073:029111073",
-                "time": "2019-11-27 00:08:09.727000",
-                "alternateTime": "1970-01-01 00:00:00.000000",
-                "alternateCode": 0,
-                "pga": 0.028422,
-                "pgaTime": "2019-11-27 00:08:18.907000",
-                "pgv": 0.00022,
-                "pgvTime": "2019-11-27 00:08:18.897000",
-                "pgd": 0.000028,
-                "pgdTime": "2019-11-27 00:08:09.727000",
-                "RSA": [
-                    {
-                        "period": 0.3,
-                        "value": 0.001781
-                    },
-                    {
-                        "period": 1,
-                        "value": 0.000204
-                    },
-                    {
-                        "period": 3,
-                        "value": 0.000252
-                    }
-                ]
-            }
-        }
-    }';
-
     /* Output structure expected */
     protected $output_json = '{
-        "strongmotions": [
-            {
-                "id": 1456214244,
-                "t_dt": "2019-11-27 00:08:09.727",
-                "pga": 0.028422,
-                "tpga_dt": "2019-11-27 00:08:18.907",
-                "pgv": 0.00022,
-                "tpgv_dt": "2019-11-27 00:08:18.897",
-                "pgd": 2.8e-5,
-                "tpgd_dt": "2019-11-27 00:08:09.727",
-                "rsa_030": 0.001781,
-                "rsa_100": 0.000204,
-                "rsa_300": 0.000252,
-                "fk_event": 21968866,
-                "fk_scnl": 755,
-                "fk_provenance": 1788,
-                "modified": "2019-11-27 00:10:09",
-                "inserted": "2019-11-27 00:10:09",
-                "strongmotion_rsas": [
-                    "period": null
-                    "value": null
+        "data": {
+          "event": {
+            "provenance_description": "Auto added",
+            "provenance_hostname": "hew10.ingv.it",
+            "provenance_instance": "hew1_mole",
+            "provenance_name": "INGV",
+            "provenance_softwarename": "software",
+            "provenance_username": "ew",
+            "hypocenters": [
+              {
+                "provenance_description": "Auto added",
+                "provenance_hostname": "hew10.ingv.it",
+                "provenance_instance": "hew1_mole",
+                "provenance_name": "INGV",
+                "provenance_softwarename": "software",
+                "provenance_username": "ew",
+                "azim_gap": 0,
+                "confidence_lev": 68.3,
+                "depth": 0.02,
+                "e0": 0,
+                "e0_az": 0,
+                "e0_dip": 0,
+                "e1": 0,
+                "e1_az": 0,
+                "e1_dip": 0,
+                "e2": 0,
+                "e2_az": 0,
+                "e2_dip": 0,
+                "err_depth": 0,
+                "err_h": 0,
+                "err_lat": 0,
+                "err_lon": 0,
+                "err_ot": 0,
+                "err_z": 0,
+                "fix_depth": 0,
+                "is_centroid": 0,
+                "lat": 45.492599,
+                "loc_program": "IPO-EW__tdmt_invc.c",
+                "lon": 9.19289,
+                "magnitudes": [
+                  {
+                    "provenance_description": "Auto added",
+                    "provenance_hostname": "hew10.ingv.it",
+                    "provenance_instance": "hew1_mole",
+                    "provenance_name": "INGV",
+                    "provenance_softwarename": "software",
+                    "provenance_username": "ew",
+                    "amplitudes": [
+                      {
+                        "provenance_description": "Auto added",
+                        "provenance_hostname": "hew10.ingv.it",
+                        "provenance_instance": "hew1_mole",
+                        "provenance_name": "INGV",
+                        "provenance_softwarename": "software",
+                        "provenance_username": "ew",
+                        "amp1": -0.358,
+                        "amp2": 0.292,
+                        "azimut": 161,
+                        "ep_distance": 694,
+                        "err_mag": 0,
+                        "hyp_distance": 0,
+                        "is_used": 0,
+                        "mag": 3.04,
+                        "mag_correction": 0,
+                        "period1": -1,
+                        "period2": -1,
+                        "scnl_cha": "HHZ",
+                        "scnl_loc": "00",
+                        "scnl_net": "IV",
+                        "scnl_sta": "ACER",
+                        "time1": "2017-04-28 06:34:15.350",
+                        "time2": "2017-04-28 06:34:15.850",
+                        "type_amplitude": "Acceleration",
+                        "type_magnitude": "ML-VAX"
+                      }
+                    ],
+                    "azimut": 0,
+                    "err": 2.01,
+                    "mag": 3.01,
+                    "mag_quality": "BB",
+                    "min_dist": 0,
+                    "ncha": 0,
+                    "nsta": 0,
+                    "nsta_used": 0,
+                    "quality": 0,
+                    "type_magnitude": "ML-VAX"
+                  }
                 ],
-                "strongmotion_alts": [
-                    "t_alt_dt": null
-                    "altcode": null
-                ]
-            }
-        ]
-    }';
+                "max_distance": 0,
+                "min_distance": 0,
+                "model": "prem",
+                "nph": 0,
+                "nph_fm": 0,
+                "nph_s": 0,
+                "nph_tot": 0,
+                "ot": "2016-06-22 16:52:06.260",
+                "phases": [
+                  {
+                    "provenance_description": "Auto added",
+                    "provenance_hostname": "hew10.ingv.it",
+                    "provenance_instance": "hew1_mole",
+                    "provenance_name": "INGV",
+                    "provenance_softwarename": "software",
+                    "provenance_username": "ew",
+                    "arr_time_is_used": 0,
+                    "arrival_time": "2017-04-12 08:46:30.930",
+                    "azimut": 161,
+                    "emersio": null,
+                    "ep_distance": 694,
+                    "err_arrival_time": 0,
+                    "firstmotion": "D",
+                    "hyp_distance": 0,
+                    "isc_code": "S",
+                    "pamp": 283,
+                    "polarity_is_used": 0,
+                    "residual": 6.19,
+                    "scnl_cha": "HHZ",
+                    "scnl_loc": "00",
+                    "scnl_net": "IV",
+                    "scnl_sta": "ACER",
+                    "std_error": 0,
+                    "take_off": 94,
+                    "teo_travel_time": "2017-04-12 08:47:10",
+                    "weight_phase_a_priori": 4,
+                    "weight_phase_localization": 0.88,
+                    "weight_picker": 2
+                  }
+                ],
+                "quality": "AB",
+                "region": "Norcia",
+                "rms": 0,
+                "sec_azim_gap": 0,
+                "type_hypocenter": 14932631,
+                "w_rms": 0
+              }
+            ],
+            "id_locator": 182491,
+            "type_event": 0
+          }
+        }
+      }';
     
-    public function setUp(): void 
+    public function test_get_event() 
     {
-        parent::setUp();
-        
-        /* Insert a 'quke2k' (event) to attach the strongmotionii */
-        $input_quake2k                      = (new InsertEwQuake2kControllerTest)->setInputParameters();
-        $response                           = $this->post(route('insert_ew_quake2k.store', $input_quake2k));
-        $this->output_quake2k_decoded       = json_decode($response->getContent(), true);
-        $quake2k_ewLogo_instance            = $input_quake2k['data']['ewLogo']['instance'];
-        $quake2k_ewMessage_quakeId          = $input_quake2k['data']['ewMessage']['quakeId'];
-
-        /* Set '$input_strongmotionii' using '$input_strongmotionii_json' */
-        $input_strongmotionii_json__decoded = json_decode($this->input_strongmotionii_json, true);
-        $input_strongmotionii_json__decoded['data']['ewLogo']['instance']   = $quake2k_ewLogo_instance;
-        $input_strongmotionii_json__decoded['data']['ewMessage']['quakeId'] = $quake2k_ewMessage_quakeId;
-        $this->input_strongmotionii = $input_strongmotionii_json__decoded;
-    }
-    
-    public function test_store_strongmotionii() 
-    {
-        $response = $this->post(route('insert_ew_strongmotionii.store', $this->input_strongmotionii));
-        $response->assertStatus(201);
-        
-        /* Get output data */
-        $this->output_strongmotionii_decoded = json_decode($response->getContent(), true);
+        // Get output request to get single record
+        $response = $this->get(route('get_event.index', ['eventid' => 21320301]));
+        $response->assertStatus(200);
         
         /* Check JSON structure */
-        $output_json__decoded   = json_decode($this->output_json, true);
-        $output_json__structure = (new DanteBaseTest)->getArrayStructure($output_json__decoded);
-        print_r($output_json__structure);
-        $response->assertJsonStructure($output_json__structure);
-    }
-    
-    public function tearDown(): void 
-    {
-        /* Remove magnitude */
-        foreach ($this->output_strongmotionii_decoded['strongmotions'] as $strongmotion) {
-            $this->delete(route('strongmotion.destroy', $strongmotion['id']))->assertStatus(204);
-        }
-        /* Remove 'event' */
-        $this->delete(route('event.destroy', $this->output_quake2k_decoded['event']['id']))->assertStatus(204);
-        
-        parent::tearDown();
+        $output_json__decoded = json_decode($this->output_json, true);    
+        $output_json__structure = (new DanteBaseTest)->getArrayStructure($output_json__decoded); 
+        $response->assertJsonStructure($output_json__structure);        
     }
 }
