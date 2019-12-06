@@ -478,6 +478,7 @@ class GetModel extends Model
             $arrayToReturnNew['event']['hypocenters'][$hypocenter_count]['model']							= $hypocenter['model']['name'];
             $arrayToReturnNew['event']['hypocenters'][$hypocenter_count]['loc_program']						= $hypocenter['loc_program']['name'];
             $arrayToReturnNew['event']['hypocenters'][$hypocenter_count]['provenance_instance']				= $hypocenter['provenance']['instance'];
+            $arrayToReturnNew['event']['hypocenters'][$hypocenter_count]['provenance_name']                 = $hypocenter['provenance']['name'];
             $arrayToReturnNew['event']['hypocenters'][$hypocenter_count]['provenance_softwarename']			= $hypocenter['provenance']['softwarename'];
             $arrayToReturnNew['event']['hypocenters'][$hypocenter_count]['provenance_username']				= $hypocenter['provenance']['username'];
             $arrayToReturnNew['event']['hypocenters'][$hypocenter_count]['provenance_hostname']				= $hypocenter['provenance']['hostname'];
