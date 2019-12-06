@@ -4,20 +4,12 @@ info:
     email: valentino.lauciani@ingv.it
     name: INGV
     url: http://terremoti.ingv.it/webservices_and_software
-  description: "\n# Introduction\nHypoinverse is software used to Locate earthquakes\
-    \ and determine magnitudes in a local or regional seismic network.\n\nMore info,\
-    \ here: [https://www.usgs.gov/software/hypoinverse-earthquake-location](https://www.usgs.gov/software/hypoinverse-earthquake-location)\n\
-    \nAt INGV we build stand-alone Docker to deploy \"hyp2000\" ([https://github.com/ingv/hyp2000](https://github.com/ingv/hyp2000))\
-    \ and on top of this docker was build a Web Service.\n\n# Input\nThe input file\
-    \ is a JSON with four sections: \n  - **HYP2000_CONF**: HYPOINVERS configuration\
-    \ file (refer to manual for more details)\n  - **MODEL**: Crustal velocity model\n\
-    \  - **OUTPUT**: It could be `json`, `prt`, `arc`, `sum`\n  - **TYPE_HYP2000ARC**:\
-    \ An array of phases in **ew2openapi** format.\n\n# Output\nThe output could be\
-    \ `json`, `prt`, `arc` or `sum`:\n  - `prt`: print format\n  - `arc`: archive\
-    \ format\n  - `sum`: summary format\n  - `json`: NON STANDARD json format developed\
-    \ in **ew2openapi**\n\n# Rate limit:\n  The **Rate Limit** and **Rate Reset**\
-    \ are specified in the HTTP-header with `X-RateLimit-Limit` and `X-RateLimit-Reset`;\
-    \ the rate limit is *per* `IP`."
+  description: "  \n\n  # Introduction\n  Dante is an API Web Service developed to\
+    \ insert a layer between applications and **eventdb** DataBase. \n  \n\n  Dante\
+    \ provides a set of routes to store message **event**, **hypocenter**, **magnitude**,\
+    \ **phase**, **...**.  \n\n  # Input\n  As input, Dante acept:\n  - A `json` message\
+    \ (view spec below) \n  - An Eartworm `json` message built from **ew2openapi**\
+    \ module  \n\n  "
   license:
     name: Creative Commons Attribution 4.0 International
     url: http://creativecommons.org/licenses/by/4.0/
@@ -28,11 +20,10 @@ info:
   x-summary: Web Service to receive location from Earthworm or JSON standard
 servers:
 - description: Production
-  url: https://localhost:8087/api
+  url: http://localhost:8087/api
 paths:
   /eventdb/ew/v1/hyp2000arc/:
     post:
-      description: Insert a new hyp2000arc message to the DB using ew2openapi module
       requestBody:
         content:
           application/json:
@@ -40,7 +31,7 @@ paths:
               properties:
                 data:
                   $ref: '#/components/schemas/hyp2000arcSchema'
-        description: JSON to send
+        description: JSON to store
         required: true
       responses:
         '201':
@@ -51,12 +42,11 @@ paths:
           $ref: '#/components/responses/429TooManyRequests'
         '500':
           $ref: '#/components/responses/500InternalServerError'
-      summary: Insert a new hyp2000arc message to the DB
+      summary: Insert a new hyp2000arc message to the DB using ew2openapi module
       tags:
-      - earthworm_api
+      - earthwmorm api
   /eventdb/ew/v1/magnitude/:
     post:
-      description: Insert a new magnitude message to the DB using ew2openapi module
       requestBody:
         content:
           application/json:
@@ -64,7 +54,7 @@ paths:
               properties:
                 data:
                   $ref: '#/components/schemas/magnitudeSchema'
-        description: JSON to send
+        description: JSON to store
         required: true
       responses:
         '201':
@@ -75,12 +65,11 @@ paths:
           $ref: '#/components/responses/429TooManyRequests'
         '500':
           $ref: '#/components/responses/500InternalServerError'
-      summary: Insert a new magnitude message to the DB
+      summary: Insert a new magnitude message to the DB using ew2openapi module
       tags:
-      - earthworm_api
+      - earthwmorm api
   /eventdb/ew/v1/pick_scnl/:
     post:
-      description: Insert a new pick_scnl message to the DB using ew2openapi module
       requestBody:
         content:
           application/json:
@@ -99,12 +88,11 @@ paths:
           $ref: '#/components/responses/429TooManyRequests'
         '500':
           $ref: '#/components/responses/500InternalServerError'
-      summary: Insert a new pick_scnl message to the DB
+      summary: Insert a new pick_scnl message to the DB using ew2openapi module
       tags:
-      - earthworm_api
+      - earthwmorm api
   /eventdb/ew/v1/quake2k/:
     post:
-      description: Insert a new quake2k message to the DB using ew2openapi module
       requestBody:
         content:
           application/json:
@@ -112,7 +100,7 @@ paths:
               properties:
                 data:
                   $ref: '#/components/schemas/quake2kSchema'
-        description: JSON to send
+        description: JSON to store
         required: true
       responses:
         '201':
@@ -123,13 +111,11 @@ paths:
           $ref: '#/components/responses/429TooManyRequests'
         '500':
           $ref: '#/components/responses/500InternalServerError'
-      summary: Insert a new quake2k message to the DB
+      summary: Insert a new quake2k message to the DB using ew2openapi module
       tags:
-      - earthworm_api
+      - earthwmorm api
   /eventdb/ew/v1/strongmotionii/:
     post:
-      description: Insert a new strongmotionii message to the DB using ew2openapi
-        module
       requestBody:
         content:
           application/json:
@@ -148,19 +134,19 @@ paths:
           $ref: '#/components/responses/429TooManyRequests'
         '500':
           $ref: '#/components/responses/500InternalServerError'
-      summary: Insert a new strongmotionii message to the DB
+      summary: Insert a new strongmotionii message to the DB using ew2openapi module
       tags:
-      - earthworm_api
+      - earthwmorm api
   /eventdb/v1/event/:
     get:
       description: This API returns the preferred hypocenter and the preferred magnitude
         from all clusterd events.
       parameters:
-      - $ref: '#/components/parameters/starttime__REQUIRED'
-      - $ref: '#/components/parameters/endtime__REQUIRED'
+      - $ref: '#/components/parameters/originid'
+      - $ref: '#/components/parameters/eventid'
       responses:
         '200':
-          $ref: '#/components/responses/200EventVale'
+          $ref: '#/components/responses/200Event'
         '404':
           $ref: '#/components/responses/404NotFound'
         '429':
@@ -170,7 +156,27 @@ paths:
       summary: This API returns the preferred hypocenter and the preferred magnitude
         from all clusterd events.
       tags:
-      - get_data
+      - get
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/insertEventPost'
+        description: JSON to store
+        required: true
+      responses:
+        '201':
+          description: record inserted
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+      summary: Event object that needs to be added to the DB using ew2openapi module
+      tags:
+      - store api
   /eventdb/v1/events/:
     get:
       description: This API returns the preferred hypocenter and the preferred magnitude
@@ -206,7 +212,7 @@ paths:
       summary: This API returns the preferred hypocenter and the preferred magnitude
         from the same instance.
       tags:
-      - get_data
+      - get
   /eventdb/v1/events_pref/:
     get:
       description: This API returns the preferred hypocenter and the preferred magnitude
@@ -241,7 +247,7 @@ paths:
       summary: This API returns the preferred hypocenter and the preferred magnitude
         from all clusterd events.
       tags:
-      - get_data
+      - get
 components:
   headers:
     Retry-After:
@@ -270,12 +276,21 @@ components:
     endtime__REQUIRED:
       description: Select date end. - [ **YYYY-MM-DDThh:mm:ss** | **YYYY-MM-DD** ]
         (ex. 2013-02-19T17:06:38)
+      example: '2019-01-31T23:59:59'
       in: query
       name: endtime
       required: true
       schema:
         format: date-time
         type: string
+    eventid:
+      description: Retrieve an event based on the unique INGV event id.
+      in: query
+      name: eventid
+      required: false
+      schema:
+        format: int64
+        type: integer
     fk_events_group:
       description: Select events with same event_group_id.
       in: query
@@ -286,6 +301,7 @@ components:
         type: integer
     lat:
       description: Specify the central latitude point for a radial search (in WGS84).
+      example: 42
       in: query
       name: lat
       required: false
@@ -293,6 +309,7 @@ components:
         $ref: '#/components/schemas/latitude'
     lon:
       description: Specify the central longitude point for a radial search (in WGS84).
+      example: 12
       in: query
       name: lon
       required: false
@@ -301,6 +318,7 @@ components:
     maxdepth:
       description: Specify maximum depth (kilometers), values increase positively
         with depth.
+      example: 50
       in: query
       name: maxdepth
       required: false
@@ -309,6 +327,7 @@ components:
         type: number
     maxlat:
       description: Specify northern boundary for search (in WGS84).
+      example: 46.52
       in: query
       name: maxlat
       required: false
@@ -316,6 +335,7 @@ components:
         $ref: '#/components/schemas/latitude'
     maxlon:
       description: Specify eastern boundary for search (in WGS84).
+      example: 15.12
       in: query
       name: maxlon
       required: false
@@ -324,6 +344,7 @@ components:
     maxmag:
       description: Limit to events with a magnitude smaller than or equal to the specified
         maximum.
+      example: 7.3
       in: query
       name: maxmag
       required: false
@@ -332,6 +353,7 @@ components:
     maxradius:
       description: Specify maximum distance from the geographic point defined by latitude
         and longitude (in Degrees).
+      example: 5
       in: query
       name: maxradius
       required: false
@@ -350,6 +372,7 @@ components:
     mindepth:
       description: Specify minimum depth (kilometers), values increase positively
         with depth.
+      example: 0
       in: query
       name: mindepth
       required: false
@@ -358,6 +381,7 @@ components:
         type: number
     minlat:
       description: Specify southern boundary for search (in WGS84).
+      example: 39.12
       in: query
       name: minlat
       required: false
@@ -365,6 +389,7 @@ components:
         $ref: '#/components/schemas/latitude'
     minlon:
       description: Specify western boundary for search (in WGS84).
+      example: 10.12
       in: query
       name: minlon
       required: false
@@ -373,6 +398,7 @@ components:
     minmag:
       description: Limit to events with a magnitude larger than or equal to the specified
         minimum.
+      example: 1.1
       in: query
       name: minmag
       required: false
@@ -381,6 +407,7 @@ components:
     minradius:
       description: Specify minimum distance from the geographic point defined by latitude
         and longitude (in Degrees).
+      example: '0'
       in: query
       name: minradius
       required: false
@@ -414,9 +441,18 @@ components:
         - mag_mag-asc
         - mag_mag-desc
         type: string
+    originid:
+      description: Select by origin/hypocenter id.
+      in: query
+      name: originid
+      required: false
+      schema:
+        format: integer
+        type: integer
     starttime__REQUIRED:
       description: Select date start. - [ **YYYY-MM-DDThh:mm:ss** | **YYYY-MM-DD**
         ] (ex. 2013-02-18T15:06:38)
+      example: '2019-01-01T00:00:00'
       in: query
       name: starttime
       required: true
@@ -424,275 +460,37 @@ components:
         format: date-time
         type: string
   responses:
-    200EventVale:
+    200Event:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/insertEventPost'
-      description: test
+            properties:
+              data:
+                $ref: '#/components/schemas/objectEventBase'
+            type: object
+      description: Operation successful
     200EventsAndEventsPref:
       content:
         application/json:
           schema:
             allOf:
-            - properties:
-                current_page:
-                  description: Current page.
-                  example: '1'
-                  type: string
-                first_page_url:
-                  description: URL first page.
-                  example: http://localhost:8087/api/eventdb/v1/events_pref/?page=2
-                  type: string
-                from:
-                  description: Showed record from.
-                  example: '1'
-                  type: string
-                last_page:
-                  description: Last page.
-                  example: '967'
-                  type: string
-                last_page_url:
-                  description: URL last page.
-                  example: http://localhost:8087/api/eventdb/v1/events_pref/?page=4
-                  type: string
-                next_page_url:
-                  description: URL next page.
-                  example: http://localhost:8087/api/eventdb/v1/events_pref/?page=3
-                  type: string
-                path:
-                  description: URL base path.
-                  example: http://localhost:8087
-                  type: string
-                per_page:
-                  description: Record per page.
-                  example: '4000'
-                  type: string
-                prev_page_url:
-                  description: URL previous page.
-                  example: http://localhost:8087/api/eventdb/v1/events_pref/?page=1
-                  type: string
-                to:
-                  description: Showed record to.
-                  example: '4000'
-                  type: string
-                total:
-                  description: Total records.
-                  example: '50'
-                  type: string
-              type: object
+            - $ref: '#/components/schemas/metaDefinition'
             - properties:
                 data:
                   items:
                     allOf:
-                    - properties:
-                        fk_events_group:
-                          default: 0
-                          description: Link event group | bigint(20)
-                          format: int64
-                          type: integer
-                        id:
-                          description: Unique incremental id | bigint(20)
-                          example: 14932631
-                          format: int64
-                          type: integer
-                        id_locator:
-                          default: 0
-                          description: Event id created by locator | bigint(20)
-                          example: 182491
-                          format: int64
-                          type: integer
-                        inserted:
-                          default: CURRENT_TIMESTAMP
-                          description: Insert time | timestamp
-                          example: '2017-04-18 15:04:42'
-                          type: string
-                        modified:
-                          default: CURRENT_TIMESTAMP
-                          description: Last Review | timestamp
-                          example: '2017-04-18 15:04:42'
-                          type: string
-                        type_event:
-                          description: Name | varchar(255)
-                          example: earthquake
-                          type: string
-                      type: object
+                    - $ref: '#/components/schemas/objectEventForEventsAndEventsPref'
                     - properties:
                         hypocenter:
-                          properties:
-                            depth:
-                              description: Depth in Km | double
-                              example: 0.02
-                              format: double
-                              type: number
-                            id:
-                              description: Unique incremental id | bigint(20)
-                              example: 14932631
-                              format: int64
-                              type: integer
-                            inserted:
-                              default: CURRENT_TIMESTAMP
-                              description: Insert time | timestamp
-                              example: '2017-04-18 15:04:42'
-                              type: string
-                            lat:
-                              $ref: https://teamdigitale.github.io/openapi/master/definitions.yaml#/schemas/Latitude
-                            lon:
-                              $ref: https://teamdigitale.github.io/openapi/master/definitions.yaml#/schemas/Longitude
-                            modified:
-                              default: CURRENT_TIMESTAMP
-                              description: Last Review | timestamp
-                              example: '2017-04-18 15:04:42'
-                              type: string
-                            ot:
-                              description: Origin time | datetime(3)
-                              example: '2016-06-22 16:52:06.260'
-                              type: string
-                            provenance:
-                              properties:
-                                description:
-                                  default: null
-                                  description: Additional information | char(255)
-                                  example: Auto added
-                                  type: string
-                                hostname:
-                                  default: null
-                                  description: Hostname | char(255)
-                                  example: hew10.ingv.it
-                                  type: string
-                                instance:
-                                  default: null
-                                  description: Istance name. i.e. hew1_mole, endeavour_mole
-                                    | char(255)
-                                  example: hew1_mole
-                                  type: string
-                                name:
-                                  default: INGV
-                                  description: Name of Provenance. i.e. INGV, ETH,
-                                    USGS | char(255)
-                                  example: INGV
-                                  type: string
-                                softwarename:
-                                  description: Software name. i.e. SisPick, eqassemble,
-                                    hypoinverse | char(255)
-                                  example: software
-                                  type: string
-                                username:
-                                  default: null
-                                  description: User name | char(255)
-                                  example: ew
-                                  type: string
-                              type: object
-                            quality:
-                              description: Quality of the localization | char(2)
-                              example: AB
-                              type: string
-                            region:
-                              description: Event location remark region | varchar(255)
-                              example: Norcia
-                              type: string
-                          type: object
+                          $ref: '#/components/schemas/objectHypocenterForEventsAndEventsPref'
                       type: object
                     - properties:
                         magnitude:
-                          properties:
-                            id:
-                              description: Unique incremental id | bigint(20)
-                              example: 14932631
-                              format: int64
-                              type: integer
-                            mag_quality:
-                              description: INGV quality code of the magnitude (computed
-                                by ew2moledb) | char(2)
-                              example: BB
-                              type: string
-                            provenance:
-                              properties:
-                                description:
-                                  default: null
-                                  description: Additional information | char(255)
-                                  example: Auto added
-                                  type: string
-                                hostname:
-                                  default: null
-                                  description: Hostname | char(255)
-                                  example: hew10.ingv.it
-                                  type: string
-                                instance:
-                                  default: null
-                                  description: Istance name. i.e. hew1_mole, endeavour_mole
-                                    | char(255)
-                                  example: hew1_mole
-                                  type: string
-                                name:
-                                  default: INGV
-                                  description: Name of Provenance. i.e. INGV, ETH,
-                                    USGS | char(255)
-                                  example: INGV
-                                  type: string
-                                softwarename:
-                                  description: Software name. i.e. SisPick, eqassemble,
-                                    hypoinverse | char(255)
-                                  example: software
-                                  type: string
-                                username:
-                                  default: null
-                                  description: User name | char(255)
-                                  example: ew
-                                  type: string
-                              type: object
-                            quality:
-                              description: quality | double
-                              format: double
-                              type: number
-                            type:
-                              default: null
-                              description: Type of the magnitude | varchar(50)
-                              example: ML-VAX
-                              type: string
-                            value:
-                              description: Magnitudo value | double
-                              example: 3.01
-                              format: double
-                              type: number
-                          type: object
+                          $ref: '#/components/schemas/objectMagnitudeForEventsAndEventsPref'
                       type: object
                     - properties:
                         provenance:
-                          properties:
-                            description:
-                              default: null
-                              description: Additional information | char(255)
-                              example: Auto added
-                              type: string
-                            hostname:
-                              default: null
-                              description: Hostname | char(255)
-                              example: hew10.ingv.it
-                              type: string
-                            instance:
-                              default: null
-                              description: Istance name. i.e. hew1_mole, endeavour_mole
-                                | char(255)
-                              example: hew1_mole
-                              type: string
-                            name:
-                              default: INGV
-                              description: Name of Provenance. i.e. INGV, ETH, USGS
-                                | char(255)
-                              example: INGV
-                              type: string
-                            softwarename:
-                              description: Software name. i.e. SisPick, eqassemble,
-                                hypoinverse | char(255)
-                              example: software
-                              type: string
-                            username:
-                              default: null
-                              description: User name | char(255)
-                              example: ew
-                              type: string
-                          type: object
+                          $ref: '#/components/schemas/objectProvenaceForEventsAndEventsPref'
                       type: object
                   type: array
               type: object
@@ -858,51 +656,15 @@ components:
       example: 694
       format: double
       type: number
-    eventBase:
-      properties:
-        fk_events_group:
-          $ref: '#/components/schemas/event__fk_events_group'
-        fk_pref_hyp:
-          $ref: '#/components/schemas/event__fk_pref_hyp'
-        fk_pref_mag:
-          $ref: '#/components/schemas/event__fk_pref_mag'
-        fk_provenance:
-          $ref: '#/components/schemas/fk_provenance'
-        fk_type_event:
-          $ref: '#/components/schemas/fk_type_event'
-        id_locator:
-          $ref: '#/components/schemas/event__id_locator'
-        type_group:
-          $ref: '#/components/schemas/event__type_group'
-      required:
-      - id_locator
-      - fk_type_event
-      - fk_provenance
-      type: object
     event__fk_events_group:
       default: 0
       description: Link event group | bigint(20)
-      format: int64
-      type: integer
-    event__fk_pref_hyp:
-      default: null
-      description: 'Link: preferred hypocenter. It can be NULL. | bigint(20)'
-      format: int64
-      type: integer
-    event__fk_pref_mag:
-      default: null
-      description: 'Link: preferred magnitude. It can be NULL. | bigint(20)'
       format: int64
       type: integer
     event__id_locator:
       default: 0
       description: Event id created by locator | bigint(20)
       example: 182491
-      format: int64
-      type: integer
-    event__type_group:
-      default: 0
-      description: Group type. Used by clustering algorithm | tinyint(4)
       format: int64
       type: integer
     ewLogo__hostname:
@@ -921,17 +683,6 @@ components:
       description: User | ???
       example: ew
       type: string
-    fk_provenance:
-      description: 'Link: provenance | bigint(20)'
-      example: 13
-      format: int64
-      type: integer
-    fk_type_event:
-      default: 1
-      description: ' | bigint(20)'
-      example: 697
-      format: int64
-      type: integer
     hyp2000arcSchema:
       allOf:
       - $ref: '#/components/schemas/hyp2000arc__base'
@@ -1345,304 +1096,16 @@ components:
       example: 14932631
       format: int64
       type: integer
-    insertAmplitudeBase:
-      items:
-        properties:
-          amp1:
-            $ref: '#/components/schemas/amplitude__amp1'
-          amp2:
-            $ref: '#/components/schemas/amplitude__amp2'
-          azimut:
-            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__azimut'
-          ep_distance:
-            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__ep_distance'
-          err_mag:
-            $ref: '#/components/schemas/st_amp_mag-st_dur_mag__err_mag'
-          hyp_distance:
-            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__hyp_distance'
-          is_used:
-            $ref: '#/components/schemas/st_amp_mag-st_dur_mag__polarity_is_used'
-          mag:
-            $ref: '#/components/schemas/st_amp_mag__mag'
-          mag_correction:
-            $ref: '#/components/schemas/st_amp_mag__mag_correction'
-          period1:
-            $ref: '#/components/schemas/amplitude__period1'
-          period2:
-            $ref: '#/components/schemas/amplitude__period2'
-          provenance_description:
-            $ref: '#/components/schemas/provenance__description'
-          provenance_hostname:
-            $ref: '#/components/schemas/provenance__hostname'
-          provenance_instance:
-            $ref: '#/components/schemas/provenance__instance'
-          provenance_name:
-            $ref: '#/components/schemas/provenance__name'
-          provenance_softwarename:
-            $ref: '#/components/schemas/provenance__softwarename'
-          provenance_username:
-            $ref: '#/components/schemas/provenance__username'
-          scnl_cha:
-            $ref: '#/components/schemas/scnl__cha'
-          scnl_loc:
-            $ref: '#/components/schemas/scnl__loc'
-          scnl_net:
-            $ref: '#/components/schemas/scnl__net'
-          scnl_sta:
-            $ref: '#/components/schemas/scnl__sta'
-          time1:
-            $ref: '#/components/schemas/amplitude__time1'
-          time2:
-            $ref: '#/components/schemas/amplitude__time2'
-          type_amplitude:
-            $ref: '#/components/schemas/type_amplitude__type'
-          type_magnitude:
-            $ref: '#/components/schemas/type_magnitude__name'
-        required:
-        - amp1
-        - amp2
-      type: array
-    insertEventBase:
-      properties:
-        event:
-          properties:
-            hypocenters:
-              $ref: '#/components/schemas/insertHypocenterBase'
-            id_locator:
-              $ref: '#/components/schemas/event__id_locator'
-            provenance_description:
-              $ref: '#/components/schemas/provenance__description'
-            provenance_hostname:
-              $ref: '#/components/schemas/provenance__hostname'
-            provenance_instance:
-              $ref: '#/components/schemas/provenance__instance'
-            provenance_name:
-              $ref: '#/components/schemas/provenance__name'
-            provenance_softwarename:
-              $ref: '#/components/schemas/provenance__softwarename'
-            provenance_username:
-              $ref: '#/components/schemas/provenance__username'
-            type_event:
-              $ref: '#/components/schemas/event__type_group'
-          required:
-          - id_locator
-          - fk_type_event
-          - fk_provenance
-      type: object
     insertEventPost:
       properties:
         data:
-          $ref: '#/components/schemas/insertEventBase'
+          $ref: '#/components/schemas/objectEventBase'
       type: object
-    insertHypocenterBase:
-      items:
-        properties:
-          azim_gap:
-            $ref: '#/components/schemas/hypocenter__azim_gap'
-          confidence_lev:
-            $ref: '#/components/schemas/hypocenter__confidence_lev'
-          depth:
-            $ref: '#/components/schemas/depth'
-          e0:
-            $ref: '#/components/schemas/hypocenter__e0'
-          e0_az:
-            $ref: '#/components/schemas/hypocenter__e0_az'
-          e0_dip:
-            $ref: '#/components/schemas/hypocenter__e0_dip'
-          e1:
-            $ref: '#/components/schemas/hypocenter__e1'
-          e1_az:
-            $ref: '#/components/schemas/hypocenter__e1_az'
-          e1_dip:
-            $ref: '#/components/schemas/hypocenter__e1_dip'
-          e2:
-            $ref: '#/components/schemas/hypocenter__e2'
-          e2_az:
-            $ref: '#/components/schemas/hypocenter__e2_az'
-          e2_dip:
-            $ref: '#/components/schemas/hypocenter__e2_dip'
-          err_depth:
-            $ref: '#/components/schemas/hypocenter__err_depth'
-          err_h:
-            $ref: '#/components/schemas/hypocenter__err_h'
-          err_lat:
-            $ref: '#/components/schemas/hypocenter__err_lat'
-          err_lon:
-            $ref: '#/components/schemas/hypocenter__err_lon'
-          err_ot:
-            $ref: '#/components/schemas/hypocenter__err_ot'
-          err_z:
-            $ref: '#/components/schemas/hypocenter__err_z'
-          fix_depth:
-            $ref: '#/components/schemas/hypocenter__fix_depth'
-          is_centroid:
-            $ref: '#/components/schemas/hypocenter__is_centroid'
-          lat:
-            $ref: '#/components/schemas/latitude'
-          loc_program:
-            $ref: '#/components/schemas/loc_program__name'
-          lon:
-            $ref: '#/components/schemas/longitude'
-          magnitudes:
-            $ref: '#/components/schemas/insertMagnitudeBase'
-          max_distance:
-            $ref: '#/components/schemas/hypocenter__max_distance'
-          min_distance:
-            $ref: '#/components/schemas/hypocenter__min_distance'
-          model:
-            $ref: '#/components/schemas/model__name'
-          nph:
-            $ref: '#/components/schemas/hypocenter__nph'
-          nph_fm:
-            $ref: '#/components/schemas/hypocenter__nph_fm'
-          nph_s:
-            $ref: '#/components/schemas/hypocenter__nph_s'
-          nph_tot:
-            $ref: '#/components/schemas/hypocenter__nph_tot'
-          ot:
-            $ref: '#/components/schemas/hypocenter__ot'
-          phases:
-            $ref: '#/components/schemas/insertPhaseBase'
-          provenance_description:
-            $ref: '#/components/schemas/provenance__description'
-          provenance_hostname:
-            $ref: '#/components/schemas/provenance__hostname'
-          provenance_instance:
-            $ref: '#/components/schemas/provenance__instance'
-          provenance_name:
-            $ref: '#/components/schemas/provenance__name'
-          provenance_softwarename:
-            $ref: '#/components/schemas/provenance__softwarename'
-          provenance_username:
-            $ref: '#/components/schemas/provenance__username'
-          quality:
-            $ref: '#/components/schemas/hypocenter__quality'
-          region:
-            $ref: '#/components/schemas/hypocenter_region_name__region'
-          rms:
-            $ref: '#/components/schemas/hypocenter__rms'
-          sec_azim_gap:
-            $ref: '#/components/schemas/hypocenter__sec_azim_gap'
-          type_hypocenter:
-            $ref: '#/components/schemas/id'
-          w_rms:
-            $ref: '#/components/schemas/hypocenter__w_rms'
-        required:
-        - ot
-        - lat
-        - lon
-        - depth
-      type: array
-    insertMagnitudeBase:
-      items:
-        properties:
-          amplitudes:
-            $ref: '#/components/schemas/insertAmplitudeBase'
-          azimut:
-            $ref: '#/components/schemas/magnitude__azimut'
-          err:
-            $ref: '#/components/schemas/magnitude__err'
-          mag:
-            $ref: '#/components/schemas/magnitude__mag'
-          mag_quality:
-            $ref: '#/components/schemas/magnitude__mag_quality'
-          min_dist:
-            $ref: '#/components/schemas/magnitude__min_dist'
-          ncha:
-            $ref: '#/components/schemas/magnitude__ncha'
-          nsta:
-            $ref: '#/components/schemas/magnitude__nsta'
-          nsta_used:
-            $ref: '#/components/schemas/magnitude__nsta_used'
-          provenance_description:
-            $ref: '#/components/schemas/provenance__description'
-          provenance_hostname:
-            $ref: '#/components/schemas/provenance__hostname'
-          provenance_instance:
-            $ref: '#/components/schemas/provenance__instance'
-          provenance_name:
-            $ref: '#/components/schemas/provenance__name'
-          provenance_softwarename:
-            $ref: '#/components/schemas/provenance__softwarename'
-          provenance_username:
-            $ref: '#/components/schemas/provenance__username'
-          quality:
-            $ref: '#/components/schemas/magnitude__quality'
-          type_magnitude:
-            $ref: '#/components/schemas/type_magnitude__name'
-        required:
-        - type_magnitude
-        - provenance_name
-        - provenance_softwarename
-      type: array
-    insertPhaseBase:
-      items:
-        properties:
-          arr_time_is_used:
-            $ref: '#/components/schemas/phase__arr_time_is_used'
-          arrival_time:
-            $ref: '#/components/schemas/pick__arrival_time'
-          azimut:
-            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__azimut'
-          emersio:
-            $ref: '#/components/schemas/pick__emersio'
-          ep_distance:
-            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__ep_distance'
-          err_arrival_time:
-            $ref: '#/components/schemas/pick__err_arrival_time'
-          firstmotion:
-            $ref: '#/components/schemas/pick__firstmotion'
-          hyp_distance:
-            $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__hyp_distance'
-          isc_code:
-            $ref: '#/components/schemas/type_magnitude__name'
-          pamp:
-            $ref: '#/components/schemas/pick__pamp'
-          polarity_is_used:
-            $ref: '#/components/schemas/phase__polarity_is_used'
-          provenance_description:
-            $ref: '#/components/schemas/provenance__description'
-          provenance_hostname:
-            $ref: '#/components/schemas/provenance__hostname'
-          provenance_instance:
-            $ref: '#/components/schemas/provenance__instance'
-          provenance_name:
-            $ref: '#/components/schemas/provenance__name'
-          provenance_softwarename:
-            $ref: '#/components/schemas/provenance__softwarename'
-          provenance_username:
-            $ref: '#/components/schemas/provenance__username'
-          residual:
-            $ref: '#/components/schemas/phase__residual'
-          scnl_cha:
-            $ref: '#/components/schemas/scnl__cha'
-          scnl_loc:
-            $ref: '#/components/schemas/scnl__loc'
-          scnl_net:
-            $ref: '#/components/schemas/scnl__net'
-          scnl_sta:
-            $ref: '#/components/schemas/scnl__sta'
-          std_error:
-            $ref: '#/components/schemas/phase__std_error'
-          take_off:
-            $ref: '#/components/schemas/phase__take_off'
-          teo_travel_time:
-            $ref: '#/components/schemas/phase__teo_travel_time'
-          weight_phase_a_priori:
-            $ref: '#/components/schemas/phase__weight_in'
-          weight_phase_localization:
-            $ref: '#/components/schemas/phase__weight_out'
-          weight_picker:
-            $ref: '#/components/schemas/pick__weight'
-        required:
-        - isc_code
-        - arrival_time
-        - provenance_name
-        - provenance_softwarename
-        - scnl_net
-        - scnl_sta
-        - scnl_cha
-      type: array
+    inserted:
+      default: CURRENT_TIMESTAMP
+      description: Insert time | timestamp
+      example: '2017-04-18 15:04:42'
+      type: string
     latitude:
       $ref: '#/components/schemas/Latitude'
     loc:
@@ -1815,14 +1278,453 @@ components:
       description: quality | double
       format: double
       type: number
+    metaDefinition:
+      properties:
+        current_page:
+          description: Current page.
+          example: '1'
+          type: string
+        first_page_url:
+          description: URL first page.
+          example: http://localhost:8087/api/eventdb/v1/events_pref/?page=2
+          type: string
+        from:
+          description: Showed record from.
+          example: '1'
+          type: string
+        last_page:
+          description: Last page.
+          example: '967'
+          type: string
+        last_page_url:
+          description: URL last page.
+          example: http://localhost:8087/api/eventdb/v1/events_pref/?page=4
+          type: string
+        next_page_url:
+          description: URL next page.
+          example: http://localhost:8087/api/eventdb/v1/events_pref/?page=3
+          type: string
+        path:
+          description: URL base path.
+          example: http://localhost:8087
+          type: string
+        per_page:
+          description: Record per page.
+          example: '4000'
+          type: string
+        prev_page_url:
+          description: URL previous page.
+          example: http://localhost:8087/api/eventdb/v1/events_pref/?page=1
+          type: string
+        to:
+          description: Showed record to.
+          example: '4000'
+          type: string
+        total:
+          description: Total records.
+          example: '50'
+          type: string
+      type: object
     model__name:
       description: Name of the model | varchar(20)
       example: prem
+      type: string
+    modified:
+      default: CURRENT_TIMESTAMP
+      description: Last Review | timestamp
+      example: '2017-04-18 15:04:42'
       type: string
     net:
       description: Channel net code | char(2)
       example: IV
       type: string
+    objectAmplitudeBase:
+      items:
+        allOf:
+        - $ref: '#/components/schemas/objectProvenance'
+        - properties:
+            amp1:
+              $ref: '#/components/schemas/amplitude__amp1'
+            amp2:
+              $ref: '#/components/schemas/amplitude__amp2'
+            azimut:
+              $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__azimut'
+            ep_distance:
+              $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__ep_distance'
+            err_mag:
+              $ref: '#/components/schemas/st_amp_mag-st_dur_mag__err_mag'
+            hyp_distance:
+              $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__hyp_distance'
+            is_used:
+              $ref: '#/components/schemas/st_amp_mag-st_dur_mag__polarity_is_used'
+            mag:
+              $ref: '#/components/schemas/st_amp_mag__mag'
+            mag_correction:
+              $ref: '#/components/schemas/st_amp_mag__mag_correction'
+            period1:
+              $ref: '#/components/schemas/amplitude__period1'
+            period2:
+              $ref: '#/components/schemas/amplitude__period2'
+            provenance_description:
+              $ref: '#/components/schemas/provenance__description'
+            provenance_hostname:
+              $ref: '#/components/schemas/provenance__hostname'
+            provenance_instance:
+              $ref: '#/components/schemas/provenance__instance'
+            provenance_name:
+              $ref: '#/components/schemas/provenance__name'
+            provenance_softwarename:
+              $ref: '#/components/schemas/provenance__softwarename'
+            provenance_username:
+              $ref: '#/components/schemas/provenance__username'
+            scnl_cha:
+              $ref: '#/components/schemas/scnl__cha'
+            scnl_loc:
+              $ref: '#/components/schemas/scnl__loc'
+            scnl_net:
+              $ref: '#/components/schemas/scnl__net'
+            scnl_sta:
+              $ref: '#/components/schemas/scnl__sta'
+            time1:
+              $ref: '#/components/schemas/amplitude__time1'
+            time2:
+              $ref: '#/components/schemas/amplitude__time2'
+            type_amplitude:
+              $ref: '#/components/schemas/type_amplitude__type'
+            type_magnitude:
+              $ref: '#/components/schemas/type_magnitude__name'
+          type: object
+        required:
+        - amp1
+        - amp2
+      type: array
+    objectEventBase:
+      properties:
+        event:
+          allOf:
+          - $ref: '#/components/schemas/objectProvenance'
+          - properties:
+              hypocenters:
+                $ref: '#/components/schemas/objectHypocenterBase'
+              id_locator:
+                $ref: '#/components/schemas/event__id_locator'
+              type_event:
+                $ref: '#/components/schemas/type_event__name'
+            type: object
+          required:
+          - id_locator
+          - type_event
+          - provenance_instance
+      type: object
+    objectEventForEventsAndEventsPref:
+      properties:
+        fk_events_group:
+          $ref: '#/components/schemas/event__fk_events_group'
+        id:
+          $ref: '#/components/schemas/id'
+        id_locator:
+          $ref: '#/components/schemas/event__id_locator'
+        inserted:
+          $ref: '#/components/schemas/inserted'
+        modified:
+          $ref: '#/components/schemas/modified'
+        type_event:
+          $ref: '#/components/schemas/type_event__name'
+      type: object
+    objectHypocenterBase:
+      items:
+        allOf:
+        - $ref: '#/components/schemas/objectProvenance'
+        - properties:
+            azim_gap:
+              $ref: '#/components/schemas/hypocenter__azim_gap'
+            confidence_lev:
+              $ref: '#/components/schemas/hypocenter__confidence_lev'
+            depth:
+              $ref: '#/components/schemas/depth'
+            e0:
+              $ref: '#/components/schemas/hypocenter__e0'
+            e0_az:
+              $ref: '#/components/schemas/hypocenter__e0_az'
+            e0_dip:
+              $ref: '#/components/schemas/hypocenter__e0_dip'
+            e1:
+              $ref: '#/components/schemas/hypocenter__e1'
+            e1_az:
+              $ref: '#/components/schemas/hypocenter__e1_az'
+            e1_dip:
+              $ref: '#/components/schemas/hypocenter__e1_dip'
+            e2:
+              $ref: '#/components/schemas/hypocenter__e2'
+            e2_az:
+              $ref: '#/components/schemas/hypocenter__e2_az'
+            e2_dip:
+              $ref: '#/components/schemas/hypocenter__e2_dip'
+            err_depth:
+              $ref: '#/components/schemas/hypocenter__err_depth'
+            err_h:
+              $ref: '#/components/schemas/hypocenter__err_h'
+            err_lat:
+              $ref: '#/components/schemas/hypocenter__err_lat'
+            err_lon:
+              $ref: '#/components/schemas/hypocenter__err_lon'
+            err_ot:
+              $ref: '#/components/schemas/hypocenter__err_ot'
+            err_z:
+              $ref: '#/components/schemas/hypocenter__err_z'
+            fix_depth:
+              $ref: '#/components/schemas/hypocenter__fix_depth'
+            is_centroid:
+              $ref: '#/components/schemas/hypocenter__is_centroid'
+            lat:
+              $ref: '#/components/schemas/latitude'
+            loc_program:
+              $ref: '#/components/schemas/loc_program__name'
+            lon:
+              $ref: '#/components/schemas/longitude'
+            magnitudes:
+              $ref: '#/components/schemas/objectMagnitudeBase'
+            max_distance:
+              $ref: '#/components/schemas/hypocenter__max_distance'
+            min_distance:
+              $ref: '#/components/schemas/hypocenter__min_distance'
+            model:
+              $ref: '#/components/schemas/model__name'
+            nph:
+              $ref: '#/components/schemas/hypocenter__nph'
+            nph_fm:
+              $ref: '#/components/schemas/hypocenter__nph_fm'
+            nph_s:
+              $ref: '#/components/schemas/hypocenter__nph_s'
+            nph_tot:
+              $ref: '#/components/schemas/hypocenter__nph_tot'
+            ot:
+              $ref: '#/components/schemas/hypocenter__ot'
+            phases:
+              $ref: '#/components/schemas/objectPhaseBase'
+            provenance_description:
+              $ref: '#/components/schemas/provenance__description'
+            provenance_hostname:
+              $ref: '#/components/schemas/provenance__hostname'
+            provenance_instance:
+              $ref: '#/components/schemas/provenance__instance'
+            provenance_name:
+              $ref: '#/components/schemas/provenance__name'
+            provenance_softwarename:
+              $ref: '#/components/schemas/provenance__softwarename'
+            provenance_username:
+              $ref: '#/components/schemas/provenance__username'
+            quality:
+              $ref: '#/components/schemas/hypocenter__quality'
+            region:
+              $ref: '#/components/schemas/hypocenter_region_name__region'
+            rms:
+              $ref: '#/components/schemas/hypocenter__rms'
+            sec_azim_gap:
+              $ref: '#/components/schemas/hypocenter__sec_azim_gap'
+            type_hypocenter:
+              $ref: '#/components/schemas/type_hypocenter__name'
+            w_rms:
+              $ref: '#/components/schemas/hypocenter__w_rms'
+          type: object
+        required:
+        - ot
+        - lat
+        - lon
+        - depth
+      type: array
+    objectHypocenterForEventsAndEventsPref:
+      properties:
+        depth:
+          $ref: '#/components/schemas/depth'
+        err_h:
+          $ref: '#/components/schemas/hypocenter__err_h'
+        err_lat:
+          $ref: '#/components/schemas/hypocenter__err_lat'
+        err_lon:
+          $ref: '#/components/schemas/hypocenter__err_lon'
+        err_ot:
+          $ref: '#/components/schemas/hypocenter__err_ot'
+        err_z:
+          $ref: '#/components/schemas/hypocenter__err_z'
+        id:
+          $ref: '#/components/schemas/id'
+        inserted:
+          $ref: '#/components/schemas/inserted'
+        lat:
+          $ref: '#/components/schemas/latitude'
+        lon:
+          $ref: '#/components/schemas/longitude'
+        modified:
+          $ref: '#/components/schemas/modified'
+        ot:
+          $ref: '#/components/schemas/hypocenter__ot'
+        provenance:
+          $ref: '#/components/schemas/objectProvenaceForEventsAndEventsPref'
+        quality:
+          $ref: '#/components/schemas/hypocenter__quality'
+        region:
+          $ref: '#/components/schemas/hypocenter_region_name__region'
+        type:
+          $ref: '#/components/schemas/type_hypocenter__name'
+        value:
+          $ref: '#/components/schemas/type_hypocenter__value'
+      type: object
+    objectMagnitudeBase:
+      items:
+        allOf:
+        - $ref: '#/components/schemas/objectProvenance'
+        - properties:
+            amplitudes:
+              $ref: '#/components/schemas/objectAmplitudeBase'
+            azimut:
+              $ref: '#/components/schemas/magnitude__azimut'
+            err:
+              $ref: '#/components/schemas/magnitude__err'
+            mag:
+              $ref: '#/components/schemas/magnitude__mag'
+            mag_quality:
+              $ref: '#/components/schemas/magnitude__mag_quality'
+            min_dist:
+              $ref: '#/components/schemas/magnitude__min_dist'
+            ncha:
+              $ref: '#/components/schemas/magnitude__ncha'
+            nsta:
+              $ref: '#/components/schemas/magnitude__nsta'
+            nsta_used:
+              $ref: '#/components/schemas/magnitude__nsta_used'
+            provenance_description:
+              $ref: '#/components/schemas/provenance__description'
+            provenance_hostname:
+              $ref: '#/components/schemas/provenance__hostname'
+            provenance_instance:
+              $ref: '#/components/schemas/provenance__instance'
+            provenance_name:
+              $ref: '#/components/schemas/provenance__name'
+            provenance_softwarename:
+              $ref: '#/components/schemas/provenance__softwarename'
+            provenance_username:
+              $ref: '#/components/schemas/provenance__username'
+            quality:
+              $ref: '#/components/schemas/magnitude__quality'
+            type_magnitude:
+              $ref: '#/components/schemas/type_magnitude__name'
+          type: object
+        required:
+        - type_magnitude
+        - provenance_name
+        - provenance_softwarename
+      type: array
+    objectMagnitudeForEventsAndEventsPref:
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+        mag_quality:
+          $ref: '#/components/schemas/magnitude__mag_quality'
+        name:
+          $ref: '#/components/schemas/type_magnitude__name'
+        provenance:
+          $ref: '#/components/schemas/objectProvenaceForEventsAndEventsPref'
+        quality:
+          $ref: '#/components/schemas/magnitude__quality'
+        value:
+          $ref: '#/components/schemas/magnitude__mag'
+      type: object
+    objectPhaseBase:
+      items:
+        allOf:
+        - $ref: '#/components/schemas/objectProvenance'
+        - properties:
+            arr_time_is_used:
+              $ref: '#/components/schemas/phase__arr_time_is_used'
+            arrival_time:
+              $ref: '#/components/schemas/pick__arrival_time'
+            azimut:
+              $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__azimut'
+            emersio:
+              $ref: '#/components/schemas/pick__emersio'
+            ep_distance:
+              $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__ep_distance'
+            err_arrival_time:
+              $ref: '#/components/schemas/pick__err_arrival_time'
+            firstmotion:
+              $ref: '#/components/schemas/pick__firstmotion'
+            hyp_distance:
+              $ref: '#/components/schemas/phase-st_amp_mag-st_dur_mag__hyp_distance'
+            isc_code:
+              $ref: '#/components/schemas/phase__isc_code'
+            pamp:
+              $ref: '#/components/schemas/pick__pamp'
+            polarity_is_used:
+              $ref: '#/components/schemas/phase__polarity_is_used'
+            provenance_description:
+              $ref: '#/components/schemas/provenance__description'
+            provenance_hostname:
+              $ref: '#/components/schemas/provenance__hostname'
+            provenance_instance:
+              $ref: '#/components/schemas/provenance__instance'
+            provenance_name:
+              $ref: '#/components/schemas/provenance__name'
+            provenance_softwarename:
+              $ref: '#/components/schemas/provenance__softwarename'
+            provenance_username:
+              $ref: '#/components/schemas/provenance__username'
+            residual:
+              $ref: '#/components/schemas/phase__residual'
+            scnl_cha:
+              $ref: '#/components/schemas/scnl__cha'
+            scnl_loc:
+              $ref: '#/components/schemas/scnl__loc'
+            scnl_net:
+              $ref: '#/components/schemas/scnl__net'
+            scnl_sta:
+              $ref: '#/components/schemas/scnl__sta'
+            std_error:
+              $ref: '#/components/schemas/phase__std_error'
+            take_off:
+              $ref: '#/components/schemas/phase__take_off'
+            teo_travel_time:
+              $ref: '#/components/schemas/phase__teo_travel_time'
+            weight_phase_a_priori:
+              $ref: '#/components/schemas/phase__weight_in'
+            weight_phase_localization:
+              $ref: '#/components/schemas/phase__weight_out'
+            weight_picker:
+              $ref: '#/components/schemas/pick__weight'
+          type: object
+        required:
+        - isc_code
+        - arrival_time
+        - provenance_name
+        - provenance_softwarename
+        - scnl_net
+        - scnl_sta
+        - scnl_cha
+      type: array
+    objectProvenaceForEventsAndEventsPref:
+      properties:
+        instance:
+          $ref: '#/components/schemas/provenance__instance'
+        name:
+          $ref: '#/components/schemas/provenance__name'
+        softwarename:
+          $ref: '#/components/schemas/provenance__softwarename'
+      type: object
+    objectProvenance:
+      properties:
+        provenance_description:
+          $ref: '#/components/schemas/provenance__description'
+        provenance_hostname:
+          $ref: '#/components/schemas/provenance__hostname'
+        provenance_instance:
+          $ref: '#/components/schemas/provenance__instance'
+        provenance_name:
+          $ref: '#/components/schemas/provenance__name'
+        provenance_softwarename:
+          $ref: '#/components/schemas/provenance__softwarename'
+        provenance_username:
+          $ref: '#/components/schemas/provenance__username'
+      type: object
     phase-st_amp_mag-st_dur_mag__azimut:
       description: Station hypocenter azimut | double
       example: 161
@@ -1841,6 +1743,10 @@ components:
       description: 1 if it is used for hypocenter calculation | tinyint(4)
       format: int64
       type: integer
+    phase__isc_code:
+      description: ISC phase code | varchar(8)
+      example: S
+      type: string
     phase__polarity_is_used:
       description: 1 if it is used for polarity calculation | tinyint(4)
       format: int64
@@ -1954,21 +1860,6 @@ components:
               $ref: '#/components/schemas/pick__arrival_time'
           required:
           - pickId
-    provenanceBase:
-      properties:
-        provenance_description:
-          $ref: '#/components/schemas/provenance__description'
-        provenance_hostname:
-          $ref: '#/components/schemas/provenance__hostname'
-        provenance_instance:
-          $ref: '#/components/schemas/provenance__instance'
-        provenance_name:
-          $ref: '#/components/schemas/provenance__name'
-        provenance_softwarename:
-          $ref: '#/components/schemas/provenance__softwarename'
-        provenance_username:
-          $ref: '#/components/schemas/provenance__username'
-      type: object
     provenance__description:
       default: null
       description: Additional information | char(255)
@@ -2230,9 +2121,18 @@ components:
       description: Type of the amplitude | varchar(50)
       example: Acceleration
       type: string
+    type_event__name:
+      description: Name | varchar(255)
+      example: earthquake
+      type: string
     type_hypocenter__name:
       description: Localization name (es:01,XX,WW,..) | varchar(255)
       example: ew prelim
+      type: string
+    type_hypocenter__value:
+      description: Define a numeric value for type hypocenter. < 100 is automatic
+        location | bigint(20)
+      example: '10'
       type: string
     type_magnitude__name:
       default: null
