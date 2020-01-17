@@ -1084,7 +1084,8 @@ USER root
 ARG INSTALL_YAML=false
 
 RUN if [ ${INSTALL_YAML} = true ]; then \
-    apt-get install libyaml-dev -y ; \
+    apt-get update -yqq && \
+    apt-get install -y php${LARADOCK_PHP_VERSION}-dev libyaml-dev ; \
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
         pecl install -a yaml-1.3.2; \
     else \
@@ -1128,7 +1129,7 @@ RUN set -xe; php -v | head -n 1 | grep -q "PHP ${LARADOCK_PHP_VERSION}."
 ###########################################################################
 # Install docker client:
 ###########################################################################
-RUN curl -sS https://download.docker.com/linux/static/stable/x86_64/docker-19.03.2.tgz -o /tmp/docker.tar.gz && tar -xzf /tmp/docker.tar.gz -C /tmp/ && cp /tmp/docker/docker* /usr/local/bin && chmod +x /usr/local/bin/docker*
+RUN curl -sS https://download.docker.com/linux/static/stable/x86_64/docker-19.03.5.tgz -o /tmp/docker.tar.gz && tar -xzf /tmp/docker.tar.gz -C /tmp/ && cp /tmp/docker/docker* /usr/local/bin && chmod +x /usr/local/bin/docker*
 
 
 #
