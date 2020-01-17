@@ -1084,7 +1084,8 @@ USER root
 ARG INSTALL_YAML=false
 
 RUN if [ ${INSTALL_YAML} = true ]; then \
-    apt-get install libyaml-dev -y ; \
+    apt-get update -yqq && \
+    apt-get install -y php${LARADOCK_PHP_VERSION}-dev libyaml-dev ; \
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
         pecl install -a yaml-1.3.2; \
     else \
