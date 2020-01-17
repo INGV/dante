@@ -1,11 +1,10 @@
 |**Service**|**Master**|**Develop**|
 |---|---|---|
-|CircleCI|[![CircleCI](https://circleci.com/gh/INGV/dante/tree/master.svg?style=svg)](https://circleci.com/gh/INGV/dante/tree/master)|[![CircleCI](https://circleci.com/gh/INGV/dante/tree/develop.svg?style=svg)](https://circleci.com/gh/INGV/dante/tree/develop)|
 |Version|[![Version](https://img.shields.io/badge/dynamic/yaml?label=ver&query=softwareVersion&url=https://raw.githubusercontent.com/INGV/dante/master/publiccode.yml)](https://github.com/INGV/dante/blob/master/HISTORY)|[![Version](https://img.shields.io/badge/dynamic/yaml?label=ver&query=softwareVersion&url=https://raw.githubusercontent.com/INGV/dante/develop/publiccode.yml)](https://github.com/INGV/dante/blob/develop/HISTORY)|
 
 [![License](https://img.shields.io/github/license/INGV/dante.svg)](https://github.com/INGV/dante/blob/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/INGV/dante.svg)](https://github.com/INGV/dante/issues)
-[![Join the #general channel](https://img.shields.io/badge/Slack%20channel-%23general-blue.svg)](https://ingv-institute.slack.com/messages/CKS902Y5B)
+[![Join the #dante channel](https://img.shields.io/badge/Slack%20channel-%23dante-blue.svg)](https://ingv-institute.slack.com/messages/CRAE2JFS8)
 [![Get invited](https://slack.developers.italia.it/badge.svg)](https://ingv-institute.slack.com/)
 
 # dante
@@ -66,6 +65,9 @@ $ cd ..
 ## How to use it
 When all containers are started, connect to: 
 - http://<your_host>:<your_port>/
+
+default is:
+- http://localhost:8087
 
 If all works, you should see a web page with OpenAPI3 specification to interact with WS.
 

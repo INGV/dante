@@ -265,12 +265,17 @@ class DanteBaseModel extends Model
 			
             try {
                 \Log::debug('    Sending request url: '.$requestUrl);
-                $res = $client->request('GET', $requestUrl);
+                $res = $client->request('GET', $requestUrl);    
                 \Log::debug('    Done');
-                if ($res->getStatusCode() == 200) {
-                    $ret = json_decode($res->getBody(), true);
+                if (isset($res)) {
+                    if ($res->getStatusCode() == 200) {
+                        $ret = json_decode($res->getBody(), true);
+                    } else {
+                        \Log::debug("     getStatusCode=".$res->getStatusCode());
+                        $ret = null;
+                    }
                 } else {
-                    \Log::debug("     getStatusCode=".$res->getStatusCode());
+                    \Log::debug('     return value is: null');
                     $ret = null;
                 }
             } catch (\GuzzleHttp\Exception\RequestException $e) {

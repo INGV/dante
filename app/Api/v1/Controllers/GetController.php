@@ -50,7 +50,7 @@ class GetController extends DanteBaseController
         $validator = Validator::make($input_parameters, [
             'starttime'			=> [new StartOrEndDateRule],
             'endtime'			=> [new StartOrEndDateRule],
-			'lat'				=> ['bail','numeric','min:-90','max:90', function($attribute, $value, $fail) {
+			'lat'				=> ['bail','numeric','min:-90','max:90', function($attribute, $value, $fail) use ($input_parameters) {
 									if (
 											(!isset($input_parameters['minradius']) || !isset($input_parameters['maxradius']))
 											&&
@@ -59,7 +59,7 @@ class GetController extends DanteBaseController
 											return $fail('"'.$attribute.'" require "minradius" and "maxradius" or "minradiuskm" and "maxradiuskm".');
 										}
 								}],
-			'lon'				=> ['bail','numeric','min:-180','max:180', function($attribute, $value, $fail) {
+			'lon'				=> ['bail','numeric','min:-180','max:180', function($attribute, $value, $fail) use ($input_parameters) {
 									if (
 											(!isset($input_parameters['minradius']) || !isset($input_parameters['maxradius']))
 											&&
@@ -120,7 +120,7 @@ class GetController extends DanteBaseController
         $validator = Validator::make($input_parameters, [
             'starttime'				=> [new StartOrEndDateRule],
             'endtime'				=> [new StartOrEndDateRule],
-			'lat'					=> ['bail','numeric','min:-90','max:90', function($attribute, $value, $fail) {
+			'lat'					=> ['bail','numeric','min:-90','max:90', function($attribute, $value, $fail) use ($input_parameters) {
 										if (
 												(!isset($input_parameters['minradius']) || !isset($input_parameters['maxradius']))
 												&&
@@ -129,7 +129,7 @@ class GetController extends DanteBaseController
 												return $fail('"'.$attribute.'" require "minradius" and "maxradius" or "minradiuskm" and "maxradiuskm".');
 											}
 									}],
-			'lon'					=> ['bail','numeric','min:-180','max:180', function($attribute, $value, $fail) {
+			'lon'					=> ['bail','numeric','min:-180','max:180', function($attribute, $value, $fail) use ($input_parameters) {
 										if (
 												(!isset($input_parameters['minradius']) || !isset($input_parameters['maxradius']))
 												&&
