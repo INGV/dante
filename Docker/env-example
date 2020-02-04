@@ -204,6 +204,13 @@ NGINX_PHP_UPSTREAM_CONTAINER=php-fpm
 NGINX_PHP_UPSTREAM_PORT=9000
 NGINX_SSL_PATH=./nginx/ssl/
 
+### LARAVEL_HORIZON ################################################
+
+LARAVEL_HORIZON_INSTALL_SOCKETS=true
+LARAVEL_HORIZON_INSTALL_PHPREDIS=true
+LARAVEL_HORIZON_INSTALL_MONGO=false
+LARAVEL_HORIZON_INSTALL_FFMPEG=false
+
 ### REDIS #################################################
 
 REDIS_PORT=6387
