@@ -8,7 +8,7 @@ releaseDate: '2019-12-19'
 url: 'https://github.com/INGV/dante'
 logo: public/images/ingv_logo_text_two_lines.png 
 landingURL: 'https://gitlab.rm.ingv.it/caravel/dante6beta'
-softwareVersion: 1.0.0
+softwareVersion: 1.1.0-dev
 developmentStatus: stable
 softwareType: standalone/other
 platforms:
