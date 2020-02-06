@@ -2,7 +2,7 @@
 
 namespace App\Dante\Listeners;
 
-use App\Dante\Events\DanteExceptionWasThrownEvent;
+use App\Dante\Events\ExceptionWasThrownEvent;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
