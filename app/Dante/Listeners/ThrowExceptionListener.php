@@ -29,6 +29,7 @@ class ThrowExceptionListener
      */
     public function handle(ExceptionWasThrownEvent $event)
     {
+        \Log::debug("START - ".__CLASS__.' -> '.__FUNCTION__);
         $data = [
 			'url'				=> $event->url,
             'message'			=> $event->message,
@@ -40,5 +41,6 @@ class ThrowExceptionListener
         ];
 
         Mail::to(config('dante.emailRecipients'))->send(new ThrowExceptionMail($data));
+        \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
     }
 }
