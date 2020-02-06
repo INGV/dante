@@ -55,7 +55,6 @@ return [
     | Email recipients
     |--------------------------------------------------------------------------
     */
-    //'emailRecipients'               => array_map('trim', explode(',', env('MAIL_RECIPIENTS'))), 'valentino.lauciani@ingv.it',
     'emailRecipients'               => (trim(env("MAIL_RECIPIENTS", "")) == "") ? 'valentino.lauciani@ingv.it' : array_map('trim', explode(',', env('MAIL_RECIPIENTS'))),
     
     /*
