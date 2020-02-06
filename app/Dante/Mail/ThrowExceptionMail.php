@@ -31,6 +31,6 @@ class ThrowExceptionMail extends Mailable
     public function build()
     {
         return $this->markdown('emails.throw_exception')
-                ->subject('WS '.config('app.name').' v.'. config('ingv.version'));
+                ->subject('WS '.config('app.name').' v.'. config('dante.version'));
     }
 }
