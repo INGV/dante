@@ -110,7 +110,7 @@ class Handler extends ExceptionHandler
         \Log::debug(" exception:", $rcf7807Output);
 
         /* Trigger the event */
-        //Event::fire(new DanteExceptionWasThrownEvent($eventArray));
+        event(new DanteExceptionWasThrownEvent($eventArray));
 
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $prepareOutput;

@@ -117,7 +117,7 @@ class SetRegionJob implements ShouldQueue
         $eventArray['random_string']    = config('dante.random_string');
         $eventArray['log_file']         = config('dante.log_file');
         \Log::debug(" eventArray:", $eventArray);
-        Event::fire(new DanteExceptionWasThrownEvent($eventArray));
+        event(new DanteExceptionWasThrownEvent($eventArray));
     */
         \Log::info("END - ".__CLASS__.' -> '.__FUNCTION__);
     }

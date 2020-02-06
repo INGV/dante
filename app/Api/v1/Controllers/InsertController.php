@@ -761,7 +761,7 @@ class InsertController extends DanteBaseController
 					$eventArray['status']           = 404;
 					$eventArray['random_string']    = config('dante.random_string');
 					$eventArray['log_file']         = config('dante.log_file');
-					Event::fire(new DanteExceptionWasThrownEvent($eventArray));
+					event(new DanteExceptionWasThrownEvent($eventArray));
         */
 				}
 				\Log::info(" END - Call \"SetRegionJob\" Job on hypocenter=".$hypocenter_id);
