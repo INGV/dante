@@ -7,7 +7,7 @@ name: 'INGV - DANTE'
 releaseDate: '2019-12-19'
 url: 'https://github.com/INGV/dante'
 logo: public/images/ingv_logo_text_two_lines.png 
-landingURL: 'https://gitlab.rm.ingv.it/caravel/dante6beta'
+landingURL: 'https://github.com/INGV/dante'
 softwareVersion: 1.1.0-dev
 developmentStatus: stable
 softwareType: standalone/other
@@ -45,7 +45,7 @@ description:
     genericName: dante
     shortDescription: >-
       Web Service built to interact with 'eventdb' DataBase.
-    documentation: 'https://gitlab.rm.ingv.it/caravel/dante6beta/blob/master/README.md'
+    documentation: 'https://github.com/INGV/dante/blob/master/README.md'
     longDescription: >
       Web Service built to interact with 'eventdb' DataBase.
       
