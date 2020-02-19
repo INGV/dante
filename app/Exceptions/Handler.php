@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 use Symfony\Component\HttpFoundation\Response;
+use App\Dante\Events\ExceptionWasThrownEvent;
 
 class Handler extends ExceptionHandler
 {
@@ -110,7 +111,7 @@ class Handler extends ExceptionHandler
         \Log::debug(" exception:", $rcf7807Output);
 
         /* Trigger the event */
-        event(new DanteExceptionWasThrownEvent($eventArray));
+        event(new ExceptionWasThrownEvent($eventArray));
 
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $prepareOutput;
