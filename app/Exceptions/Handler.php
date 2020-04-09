@@ -111,7 +111,12 @@ class Handler extends ExceptionHandler
         \Log::debug(" exception:", $rcf7807Output);
 
         /* Trigger the event */
-        event(new ExceptionWasThrownEvent($eventArray));
+        try {
+            event(new ExceptionWasThrownEvent($eventArray));
+        }
+        catch (\Swift_TransportException $e) {
+            \Log::error(" Error sending email: ".$e->getMessage());
+        }
 
         \Log::debug("END - ".__CLASS__.' -> '.__FUNCTION__);
         return $prepareOutput;
