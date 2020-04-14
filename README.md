@@ -16,7 +16,7 @@ $ git submodule update --init --recursive
 ```
 
 ## Configure Laradock
-Set `LARADOCK_HTTP_PORT` (default `8087`) in `./laradock-dante/.env` and run:
+Set `LARADOCK_HTTP_PORT` (default `8087`) in `./dante/configure_laradock.sh` and run:
 ```
 $ ./dante/configure_laradock.sh
 ```
