@@ -12,31 +12,26 @@
 ```
 $ git clone https://github.com/INGV/dante dante
 $ cd dante
+$ git submodule update --init --recursive
 ```
 
-## Configure
-Copy docker environment file:
+## Configure Laradock
+Set `LARADOCK_HTTP_PORT` (default `8087`) in `./laradock-dante/.env` and run:
 ```
-$ cp ./Docker/env-example ./Docker/.env
+$ ./dante/configure_laradock.sh
 ```
 
+## Configure Laravel
 Copy laravel environment file:
 ```
 $ cp ./.env.example ./.env
 ```
 
-Set `NGINX_HOST_HTTP_PORT` in `./Docker/.env` file.
-
-### !!! On Linux machine and no 'root' user !!!
-To run container as *linux-user* (intead of `root`), set `WORKSPACE_PUID` and `WORKSPACE_PGID` in `./Docker/.env` file with:
-- `WORKSPACE_PUID` should be equal to the output of `id -u` command
-- `WORKSPACE_PGID` should be equal to the output of `id -g` command
-
 ## Start dante
 First, build docker images:
 
 ```
-$ cd Docker
+$ cd laradock-dante
 $ COMPOSE_HTTP_TIMEOUT=200 docker-compose up -d nginx redis workspace
 $ cd ..
 ```
@@ -44,7 +39,7 @@ $ cd ..
 ## Configure Laravel
 ### !!! On Linux machine and no 'root' user !!!
 ```
-$ cd Docker
+$ cd laradock-dante
 $ docker-compose exec -T --user=laradock workspace composer install
 $ docker-compose exec -T --user=laradock workspace php artisan key:generate
 $ docker-compose exec -T --user=laradock workspace chown -R $(id -u):$(id -g) ./storage
@@ -54,7 +49,7 @@ $ cd ..
 
 ### !!! Others !!!
 ```
-$ cd Docker
+$ cd laradock-dante
 $ docker-compose exec -T workspace composer install
 $ docker-compose exec -T workspace php artisan key:generate
 $ docker-compose exec -T workspace chown -R 1000:1000 ./storage
@@ -73,7 +68,7 @@ If all works, you should see a web page with OpenAPI3 specification to interact 
 
 ## Test
 ```
-$ cd Docker
+$ cd laradock-dante
 $ docker-compose exec -T --user=laradock workspace bash -c "vendor/bin/phpunit -v"
 ```
 
