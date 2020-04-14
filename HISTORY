@@ -2,7 +2,8 @@
 Dante Release History
 #########################
 
-* Release 1.1.0-dev (2020/02/04)
+* Release 1.1.0-dev (2020/04/14)
+    - Add Laradock
     - Add 'laravel-horizon' Docker container to manage 'supervisor'
 
 * Release 1.0.0 (2020/01/18)
