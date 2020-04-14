@@ -77,9 +77,6 @@ $ cd Docker
 $ docker-compose exec -T --user=laradock workspace bash -c "vendor/bin/phpunit -v"
 ```
 
-## Thanks to
-This project uses the [Laradock](https://github.com/laradock/laradock) idea to start docker containers
-
 ## Contribute
 Please, feel free to contribute.
 
